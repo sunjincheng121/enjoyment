@@ -3,7 +3,7 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Pretty cool enjoyment 
+title: Pretty Cool Enjoyment 
 subtitle: 
 description: Apache Flink
 keywords: Apache Flink
@@ -73,7 +73,7 @@ pagination_dir: page
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: Chic 
+theme: next 
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
@@ -81,3 +81,4 @@ deploy:
   type: git
   repo: git@github.com:sunjincheng121/enjoyment.git
   branch: gh-pages 
+
