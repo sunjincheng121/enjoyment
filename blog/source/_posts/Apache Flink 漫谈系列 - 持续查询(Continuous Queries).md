@@ -1,11 +1,14 @@
 ---
 title: Apache Flink 漫谈系列 - 持续查询(Continuous Queries)
 date: 2019-01-01 18:18:18
+updated: 2019-01-01 18:18:18
 categories: Apache Flink 漫谈
 tags: Flink
 ---
 # 实际问题
 我们知道在流计算场景中，数据是源源不断的流入的，数据流永远不会结束，那么计算就永远不会结束，如果计算永远不会结束的话，那么计算结果何时输出呢？本篇将介绍Apache Flink利用持续查询来对流计算结果进行持续输出的实现原理。
+
+<!-- more --> 
 
 # 数据管理
 在介绍持续查询之前，我们先看看Apache Flink对数据的管理和传统数据库对数据管理的区别，以MySQL为例，如下图：

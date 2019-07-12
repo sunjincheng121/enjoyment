@@ -158,6 +158,7 @@ baidu_push: false
 # External url should start with http:// or https://
 menu:
   home: / || home
+  Catalog: /catalog/ || calendar
   about: /about/ || user
   tags: /tags/ || tags
   categories: /categories/ || th
@@ -604,7 +605,7 @@ disqus:
   enable: true
   shortname: http-enjoyment-cool
   count: true
-  lazyload: false
+  lazyload: true
 
 # DisqusJS
 # Alternative Disqus - Render comment component using Disqus API
@@ -785,7 +786,7 @@ rating:
 # Show number of visitors to each article.
 # You can visit https://leancloud.cn to get AppID and AppKey.
 leancloud_visitors:
-  enable: false
+  enable: true
   app_id: #<app_id>
   app_key: #<app_key>
   # Dependencies: https://github.com/theme-next/hexo-leancloud-counter-security

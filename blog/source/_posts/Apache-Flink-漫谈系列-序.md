@@ -1,12 +1,14 @@
 ---
 title: Apache Flink 漫谈系列 - 序
 date: 2019-01-01 18:18:18
+updated: 2019-01-01 18:18:18
 categories: Apache Flink 漫谈
 tags: Flink
 ---
 
 # Who
 本人 孙金城，淘宝花名"金竹"，阿里巴巴高级技术专家，Apache Flink PMC。目前就职于阿里巴巴计算平台事业部，自2015年以来一直投入于基于Apache Flink的新一代大数据计算平台Blink的设计研发工作。
+<!-- more --> 
 
 # What
 Apache Flink 漫谈系列会分享什么呢？本系列分享的核心内容会围绕 Apache Flink的核心特征以及阿里巴巴对Apache Flink功能的丰富和性能、架构的优化进行深入剖析，从系统架构到具体每个算子的语义都会向读者进行细致分享，并且以图文和具体示例的方式讲解具体算子的实现原理。

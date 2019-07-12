@@ -1,11 +1,14 @@
 ---
 title: Apache Flink 漫谈系列 - Fault Tolerance
 date: 2019-01-01 18:18:18
+updated: 2019-01-01 18:18:18
 categories: Apache Flink 漫谈
 tags: Flink
 ---
 # 实际问题
-在流计算场景中，数据会源源不断的流入Apache Flink系统，每条数据进入Apache Flink系统都会触发计算。那么在计算过程中如果网络、机器等原因导致Task运行失败了，Apache Flink会如何处理呢？在 《Apache Flink 漫谈系列 - State》一篇中我们介绍了 Apache Flink 会利用State记录计算的状态，在Failover时候Task会根据State进行恢复。但State的内容是如何记录的？Apache Flink 是如何保证 Exactly-Once 语义的呢？这就涉及到了Apache Flink的 容错(Fault Tolerance) 机制，本篇将会为大家进行相关内容的介绍。
+在流计算场景中，数据会源源不断的流入Apache Flink系统，每条数据进入Apache Flink系统都会触发计算。那么在计算过程中如果网络、机器等原因导致Task运行失败了，Apache Flink会如何处理呢？
+<!-- more --> 
+在 《Apache Flink 漫谈系列 - State》一篇中我们介绍了 Apache Flink 会利用State记录计算的状态，在Failover时候Task会根据State进行恢复。但State的内容是如何记录的？Apache Flink 是如何保证 Exactly-Once 语义的呢？这就涉及到了Apache Flink的 容错(Fault Tolerance) 机制，本篇将会为大家进行相关内容的介绍。
 
 # 什么是Fault Tolerance
 容错(Fault Tolerance) 是指容忍故障，在故障发生时能够自动检测出来，并使系统能够自动恢复正常运行。当出现某些指定的网络故障、硬件故障、软件错误时，系统仍能执行规定的一组程序，或者说程序不会因系统中的故障而中止，并且执行结果也不包含系统故障所引起的差错。
