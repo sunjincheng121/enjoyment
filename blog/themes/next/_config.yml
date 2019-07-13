@@ -605,7 +605,7 @@ disqus:
   enable: true
   shortname: http-enjoyment-cool
   count: true
-  lazyload: true
+  lazyload: false
 
 # DisqusJS
 # Alternative Disqus - Render comment component using Disqus API
@@ -786,7 +786,7 @@ rating:
 # Show number of visitors to each article.
 # You can visit https://leancloud.cn to get AppID and AppKey.
 leancloud_visitors:
-  enable: true
+  enable: false
   app_id: #<app_id>
   app_key: #<app_key>
   # Dependencies: https://github.com/theme-next/hexo-leancloud-counter-security
@@ -808,7 +808,7 @@ firestore:
 # Show Views / Visitors of the website / page with busuanzi.
 # Get more information on http://ibruce.info/2015/04/04/busuanzi
 busuanzi_count:
-  enable: false
+  enable: true
   total_visitors: true
   total_visitors_icon: user
   total_views: true

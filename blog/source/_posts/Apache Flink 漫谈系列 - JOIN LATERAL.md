@@ -1,12 +1,12 @@
 ---
 title: Apache Flink 漫谈系列 - JOIN LATERAL
-date: 2019-01-01 18:18:18
-updated: 2019-01-01 18:18:18
+date: 2019-03-11 18:18:18
 categories: Apache Flink 漫谈
 tags: Flink
 ---
 # 聊什么
 上一篇《Apache Flink 漫谈系列 - JOIN算子》我们对最常见的JOIN做了详尽的分析，本篇介绍一个特殊的JOIN，那就是JOIN LATERAL。JOIN LATERAL为什么特殊呢，直观说因为JOIN的右边不是一个实际的物理表，而是一个VIEW或者Table-valued Funciton。
+
 <!-- more --> 
 
 如下图所示：

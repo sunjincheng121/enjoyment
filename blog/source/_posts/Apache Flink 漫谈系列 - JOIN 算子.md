@@ -1,12 +1,12 @@
 ---
 title: Apache Flink 漫谈系列 - JOIN 算子
-date: 2019-01-01 18:18:18
-updated: 2019-01-01 18:18:18
+date: 2019-03-06 18:18:18
 categories: Apache Flink 漫谈
 tags: Flink
 ---
 # 聊什么
 在《Apache Flink 漫谈系列 - SQL概览》中我们介绍了JOIN算子的语义和基本的使用方式，介绍过程中大家发现Apache Flink在语法语义上是遵循ANSI-SQL标准的，那么再深思一下传统数据库为啥需要有JOIN算子呢？在实现原理上面Apache Flink内部实现和传统数据库有什么区别呢？本篇将详尽的为大家介绍传统数据库为什么需要JOIN算子，以及JOIN算子在Apache Flink中的底层实现原理和在实际使用中的优化！
+
 <!-- more --> 
 
 # 什么是JOIN

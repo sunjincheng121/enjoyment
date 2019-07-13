@@ -1,7 +1,6 @@
 ---
 title: Apache Flink 漫谈系列 - 概述
-date: 2019-01-01 18:18:18
-updated: 2019-01-01 18:18:18
+date: 2019-01-05 18:18:18
 categories: Apache Flink 漫谈
 tags: Flink
 ---

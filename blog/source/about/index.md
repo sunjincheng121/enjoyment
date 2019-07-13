@@ -1,8 +1,10 @@
 ---
-title: More about this blog ->
+title: 我的5W...
 date: 2019-07-12 19:19:19
 updated: 2019-07-12 19:19:19
 ---
+
+<img src="avatar.gif" width = "100" height = "100" div align=center />
 
 # Who
 本人 孙金城，淘宝花名"金竹"，阿里巴巴高级技术专家，Apache Flink PMC。自2015年以来一直专注于大数据计算领域，并持续贡献于Apache Flink 社区。 
@@ -16,6 +18,12 @@ updated: 2019-07-12 19:19:19
 # When
  From now on ...
 
-# Family
+# Whole
+ 我有一个简单，平凡 永远拥有 晴天 的小家:)
+
+ - 我 -> 昵称 “平凡”， 乐享 平凡 生活；
+ - 她 -> 昵称 “简单”， 追求 简单 思维；
+ - 他 -> 昵称。“晴天☀️”， 阳光☀️男孩，爱画画也爱跆拳道；
+
 ![](family.jpg)
 

@@ -1,13 +1,13 @@
 ---
-title: Apache Flink SQL 概览
-date: 2019-01-01 18:18:18
-updated: 2019-01-01 18:18:18
+title: Apache Flink 漫谈系列 - SQL 概览
+date: 2019-04-01 18:18:18
 categories: Apache Flink 漫谈
 tags: Flink
 ---
 # Apache Flink SQL 概览
 
 本篇核心目标是让大家概要了解一个完整的Apache Flink SQL Job的组成部分，以及Apache Flink SQL所提供的核心算子的语义，最后会应用Tumble Window编写一个End-to-End的页面访问的统计示例。
+
 <!-- more --> 
 
 # Apache Flink SQL Job的组成
@@ -351,6 +351,7 @@ BeiJing,2017-11-11 02:10:00.0,2017-11-11 02:12:00.0,2
 ShangHai,2017-11-11 04:10:00.0,2017-11-11 04:12:00.0,1
 ```
 表格化如上结果：
+
 | region |winStart  | winEnd | pv|
 | --- | --- | --- | --- |
 | BeiJing |2017-11-11 02:00:00.0|2017-11-11 02:02:00.0|1
