@@ -8,7 +8,6 @@ tags: Flink
 # 实际问题
 很多大数据计算产品，都对用户提供了SQL API，比如Hive, Spark, Flink等，那么SQL作为传统关系数据库的查询语言，是应用在批查询场景的。Hive和Spark本质上都是Batch的计算模式(在《Apache Flink 漫谈系列 - 概述》我们介绍过Spark是Micro Batching模式)，提供SQL API很容易被人理解，但是Flink是纯流（Native Streaming）的计算模式, 流与批在数据集和计算过程上有很大的区别.
 
-<!-- more --> 
 
 如图所示：
 

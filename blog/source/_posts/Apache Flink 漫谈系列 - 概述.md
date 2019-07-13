@@ -7,7 +7,6 @@ tags: Flink
 # Apache Flink 的命脉
 "**命脉**" 即生命与血脉，常喻极为重要的事物。系列的首篇，首篇的首段不聊Apache Flink的历史，不聊Apache Flink的架构，不聊Apache Flink的功能特性，我们用一句话聊聊什么是 Apache Flink 的命脉？我的答案是：Apache Flink 是以"**批是流的特例**"的认知进行系统设计的。
 
-<!-- more --> 
 
 # 唯快不破
 我们经常听说 "天下武功，唯快不破"，大概意思是说 "任何一种武功的招数都是有拆招的，唯有速度快，快到对手根本来不及反应，你就将对手KO了，对手没有机会拆招，所以唯快不破"。 那么这与Apache Flink有什么关系呢？Apache Flink是Native Streaming(纯流式)计算引擎，在实时计算场景最关心的就是"**快**",也就是 "**低延时**"。

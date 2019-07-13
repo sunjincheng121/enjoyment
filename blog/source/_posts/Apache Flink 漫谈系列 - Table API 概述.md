@@ -7,8 +7,6 @@ tags: Flink
 # 什么是Table API
 在《Apache Flink 漫谈系列(08) - SQL概览》中我们概要的向大家介绍了什么是好SQL，SQL和Table API是Apache Flink中的同一层次的API抽象.
 
-<!-- more --> 
-
 如下图所示：
 
 ![](6C38519A-6AE6-43B9-81E3-F9F61C3061C6.png)

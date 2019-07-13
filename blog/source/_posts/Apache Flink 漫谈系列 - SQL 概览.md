@@ -8,8 +8,6 @@ tags: Flink
 
 本篇核心目标是让大家概要了解一个完整的Apache Flink SQL Job的组成部分，以及Apache Flink SQL所提供的核心算子的语义，最后会应用Tumble Window编写一个End-to-End的页面访问的统计示例。
 
-<!-- more --> 
-
 # Apache Flink SQL Job的组成
 我们做任何数据计算都离不开读取原始数据，计算逻辑和写入计算结果数据三部分，当然基于Apache Flink SQL编写的计算Job也离不开这个三部分，如下所所示：
 ![](E18BAB16-4094-48B3-92E5-D45EA18A62C1.png)

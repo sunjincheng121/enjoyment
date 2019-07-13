@@ -82,7 +82,7 @@
       applicationID: '',
       apiKey: '',
       indexName: '',
-      hits: {"per_page":10},
+      hits: {"per_page":5},
       labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
     }
   };
@@ -390,6 +390,192 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://enjoyment.cool/2019/07/13/Apache-Flink-说道系列-序/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jincheng Sun">
+      <meta itemprop="description" content="Apache Flink">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Pretty Cool Enjoyment">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2019/07/13/Apache-Flink-说道系列-序/" class="post-title-link" itemprop="url">Apache Flink 说道系列 - 序</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-07-13 21:25:14 / Modified: 21:57:17" itemprop="dateCreated datePublished" datetime="2019-07-13T21:25:14+08:00">2019-07-13</time>
+            </span>
+          
+
+          
+            
+
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/archives/Apache-Flink-说道/" itemprop="url" rel="index"><span itemprop="name">Apache Flink 说道</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+              
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">Comments: </span>
+                <a href="/2019/07/13/Apache-Flink-说道系列-序/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/07/13/Apache-Flink-说道系列-序/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          <br>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>
+              Who
+本人 孙金城，淘宝花名&quot;金竹&quot;，阿里巴巴高级技术专家，Apache Flink PMC。自2015年以来一直专注于大数据计算领域，并持续贡献于Apache Flink 社区。
+What
+Apache Flink 说&quot;道&quot;系列会分享什么呢？本系列分享的内容会围绕 Apache Flink 1.9 版本内容为核心，每篇博文以点滴知识点为主，以简短的篇幅向大家分享Apache Flink的核心技术。同时每篇文章
+              ...
+            </p>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/2019/07/13/Apache-Flink-说道系列-序/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://enjoyment.cool/2019/04/01/Apache Flink 漫谈系列 - SQL 概览/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -450,7 +636,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-07-13 08:37:37" itemprop="dateModified" datetime="2019-07-13T08:37:37+08:00">2019-07-13</time>
+                <time title="Modified: 2019-07-13 21:09:44" itemprop="dateModified" datetime="2019-07-13T21:09:44+08:00">2019-07-13</time>
               </span>
             
           
@@ -515,7 +701,14 @@
 
       
         
-          <h1 id="Apache-Flink-SQL-概览"><a href="#Apache-Flink-SQL-概览" class="headerlink" title="Apache Flink SQL 概览"></a>Apache Flink SQL 概览</h1><p>本篇核心目标是让大家概要了解一个完整的Apache Flink SQL Job的组成部分，以及Apache Flink SQL所提供的核心算子的语义，最后会应用Tumble Window编写一个End-to-End的页面访问的统计示例。</p>
+          
+            <p>
+              Apache Flink SQL 概览
+本篇核心目标是让大家概要了解一个完整的Apache Flink SQL Job的组成部分，以及Apache Flink SQL所提供的核心算子的语义，最后会应用Tumble Window编写一个End-to-End的页面访问的统计示例。
+Apache Flink SQL Job的组成
+我们做任何数据计算都离不开读取原始数据，计算逻辑和写入计算结果数据三部分，当然基于Apache Flink SQL编写的计算Job
+              ...
+            </p>
           <!--noindex-->
           
             <div class="post-button text-center">
@@ -639,7 +832,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-07-13 08:29:03" itemprop="dateModified" datetime="2019-07-13T08:29:03+08:00">2019-07-13</time>
+                <time title="Modified: 2019-07-13 21:20:57" itemprop="dateModified" datetime="2019-07-13T21:20:57+08:00">2019-07-13</time>
               </span>
             
           
@@ -704,7 +897,15 @@
 
       
         
-          <h1 id="什么是Table-API"><a href="#什么是Table-API" class="headerlink" title="什么是Table API"></a>什么是Table API</h1><p>在《Apache Flink 漫谈系列(08) - SQL概览》中我们概要的向大家介绍了什么是好SQL，SQL和Table API是Apache Flink中的同一层次的API抽象.</p>
+          
+            <p>
+              什么是Table API
+在《Apache Flink 漫谈系列(08) - SQL概览》中我们概要的向大家介绍了什么是好SQL，SQL和Table API是Apache Flink中的同一层次的API抽象.
+如下图所示：
+
+Apache Flink 针对不同的用户场景提供了三层用户API,最下层ProcessFunction API可以对State，Timer等复杂机制进行有效的控制，但用户使用的便捷性很弱，也就是说即使很简单统计逻辑，也要较多的代码
+              ...
+            </p>
           <!--noindex-->
           
             <div class="post-button text-center">
@@ -828,7 +1029,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-07-13 06:55:12" itemprop="dateModified" datetime="2019-07-13T06:55:12+08:00">2019-07-13</time>
+                <time title="Modified: 2019-07-13 21:10:05" itemprop="dateModified" datetime="2019-07-13T21:10:05+08:00">2019-07-13</time>
               </span>
             
           
@@ -893,7 +1094,12 @@
 
       
         
-          <h1 id="说什么"><a href="#说什么" class="headerlink" title="说什么"></a>说什么</h1><p>JOIN 算子是数据处理的核心算子，前面我们在《Apache Flink 漫谈系列 - JOIN 算子》介绍了UnBounded的双流JOIN，在《Apache Flink 漫谈系列 - JOIN LATERAL》介绍了单流与UDTF的JOIN操作，在《Apache Flink 漫谈系列 - Temporal Table JOIN》又介绍了单流与版本表的JOIN，本篇将介绍在UnBounded数据流上按时间维度进行数据划分进行JOIN操作 - Time Interval(Time-windowed)JOIN, 后面我们叫做Interval JOIN。</p>
+          
+            <p>
+              说什么
+JOIN 算子是数据处理的核心算子，前面我们在《Apache Flink 漫谈系列 - JOIN 算子》介绍了UnBounded的双流JOIN，在《Apache Flink 漫谈系列 - JOIN LATERAL》介绍了单流与UDTF的JOIN操作，在《Apache Flink 漫谈系列 - Temporal Table JOIN》又介绍了单流与版本表的JOIN，本篇将介绍在UnBounded数据流上按时间维度进行数据划分进行JOIN操作 - 
+              ...
+            </p>
           <!--noindex-->
           
             <div class="post-button text-center">
@@ -1017,7 +1223,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-07-13 08:28:59" itemprop="dateModified" datetime="2019-07-13T08:28:59+08:00">2019-07-13</time>
+                <time title="Modified: 2019-07-13 21:09:56" itemprop="dateModified" datetime="2019-07-13T21:09:56+08:00">2019-07-13</time>
               </span>
             
           
@@ -1082,7 +1288,13 @@
 
       
         
-          <h1 id="什么是Temporal-Table"><a href="#什么是Temporal-Table" class="headerlink" title="什么是Temporal Table"></a>什么是Temporal Table</h1><p>在《Apache Flink 漫谈系列 - JOIN LATERAL》中提到了Temporal Table JOIN，本篇就向大家详细介绍什么是Temporal Table JOIN。</p>
+          
+            <p>
+              什么是Temporal Table
+在《Apache Flink 漫谈系列 - JOIN LATERAL》中提到了Temporal Table JOIN，本篇就向大家详细介绍什么是Temporal Table JOIN。
+在ANSI-SQL 2011 中提出了Temporal 的概念，Oracle，SQLServer，DB2等大的数据库厂商也先后实现了这个标准。Temporal Table记录了历史上任何时间点所有的数据改动，Temporal Tabl
+              ...
+            </p>
           <!--noindex-->
           
             <div class="post-button text-center">
@@ -1131,1145 +1343,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://enjoyment.cool/2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jincheng Sun">
-      <meta itemprop="description" content="Apache Flink">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Pretty Cool Enjoyment">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/" class="post-title-link" itemprop="url">Apache Flink 漫谈系列 - JOIN LATERAL</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-
-          
-          
-          
-
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-
-              
-                
-              
-
-              <time title="Created: 2019-03-11 18:18:18" itemprop="dateCreated datePublished" datetime="2019-03-11T18:18:18+08:00">2019-03-11</time>
-            </span>
-          
-
-          
-            
-
-            
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Edited on</span>
-                
-                <time title="Modified: 2019-07-13 08:28:26" itemprop="dateModified" datetime="2019-07-13T08:28:26+08:00">2019-07-13</time>
-              </span>
-            
-          
-
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/archives/Apache-Flink-漫谈/" itemprop="url" rel="index"><span itemprop="name">Apache Flink 漫谈</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-              
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-            
-                <span class="post-meta-item-text">Comments: </span>
-                <a href="/2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          <br>
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="聊什么"><a href="#聊什么" class="headerlink" title="聊什么"></a>聊什么</h1><p>上一篇《Apache Flink 漫谈系列 - JOIN算子》我们对最常见的JOIN做了详尽的分析，本篇介绍一个特殊的JOIN，那就是JOIN LATERAL。JOIN LATERAL为什么特殊呢，直观说因为JOIN的右边不是一个实际的物理表，而是一个VIEW或者Table-valued Funciton。</p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://enjoyment.cool/2019/03/06/Apache Flink 漫谈系列 - JOIN 算子/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jincheng Sun">
-      <meta itemprop="description" content="Apache Flink">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Pretty Cool Enjoyment">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2019/03/06/Apache Flink 漫谈系列 - JOIN 算子/" class="post-title-link" itemprop="url">Apache Flink 漫谈系列 - JOIN 算子</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-
-          
-          
-          
-
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-
-              
-                
-              
-
-              <time title="Created: 2019-03-06 18:18:18" itemprop="dateCreated datePublished" datetime="2019-03-06T18:18:18+08:00">2019-03-06</time>
-            </span>
-          
-
-          
-            
-
-            
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Edited on</span>
-                
-                <time title="Modified: 2019-07-13 08:28:22" itemprop="dateModified" datetime="2019-07-13T08:28:22+08:00">2019-07-13</time>
-              </span>
-            
-          
-
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/archives/Apache-Flink-漫谈/" itemprop="url" rel="index"><span itemprop="name">Apache Flink 漫谈</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-              
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-            
-                <span class="post-meta-item-text">Comments: </span>
-                <a href="/2019/03/06/Apache Flink 漫谈系列 - JOIN 算子/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/03/06/Apache Flink 漫谈系列 - JOIN 算子/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          <br>
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="聊什么"><a href="#聊什么" class="headerlink" title="聊什么"></a>聊什么</h1><p>在《Apache Flink 漫谈系列 - SQL概览》中我们介绍了JOIN算子的语义和基本的使用方式，介绍过程中大家发现Apache Flink在语法语义上是遵循ANSI-SQL标准的，那么再深思一下传统数据库为啥需要有JOIN算子呢？在实现原理上面Apache Flink内部实现和传统数据库有什么区别呢？本篇将详尽的为大家介绍传统数据库为什么需要JOIN算子，以及JOIN算子在Apache Flink中的底层实现原理和在实际使用中的优化！</p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2019/03/06/Apache Flink 漫谈系列 - JOIN 算子/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://enjoyment.cool/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jincheng Sun">
-      <meta itemprop="description" content="Apache Flink">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Pretty Cool Enjoyment">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/" class="post-title-link" itemprop="url">Apache Flink 漫谈系列 - 持续查询(Continuous Queries)</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-
-          
-          
-          
-
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-
-              
-                
-              
-
-              <time title="Created: 2019-03-01 18:18:18" itemprop="dateCreated datePublished" datetime="2019-03-01T18:18:18+08:00">2019-03-01</time>
-            </span>
-          
-
-          
-            
-
-            
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Edited on</span>
-                
-                <time title="Modified: 2019-07-13 06:54:03" itemprop="dateModified" datetime="2019-07-13T06:54:03+08:00">2019-07-13</time>
-              </span>
-            
-          
-
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/archives/Apache-Flink-漫谈/" itemprop="url" rel="index"><span itemprop="name">Apache Flink 漫谈</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-              
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-            
-                <span class="post-meta-item-text">Comments: </span>
-                <a href="/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          <br>
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="实际问题"><a href="#实际问题" class="headerlink" title="实际问题"></a>实际问题</h1><p>我们知道在流计算场景中，数据是源源不断的流入的，数据流永远不会结束，那么计算就永远不会结束，如果计算永远不会结束的话，那么计算结果何时输出呢？本篇将介绍Apache Flink利用持续查询来对流计算结果进行持续输出的实现原理。</p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://enjoyment.cool/2019/01/05/Apache Flink 漫谈系列 - 概述/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jincheng Sun">
-      <meta itemprop="description" content="Apache Flink">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Pretty Cool Enjoyment">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2019/01/05/Apache Flink 漫谈系列 - 概述/" class="post-title-link" itemprop="url">Apache Flink 漫谈系列 - 概述</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-
-          
-          
-          
-
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-
-              
-                
-              
-
-              <time title="Created: 2019-01-05 18:18:18" itemprop="dateCreated datePublished" datetime="2019-01-05T18:18:18+08:00">2019-01-05</time>
-            </span>
-          
-
-          
-            
-
-            
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Edited on</span>
-                
-                <time title="Modified: 2019-07-13 06:50:50" itemprop="dateModified" datetime="2019-07-13T06:50:50+08:00">2019-07-13</time>
-              </span>
-            
-          
-
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/archives/Apache-Flink-漫谈/" itemprop="url" rel="index"><span itemprop="name">Apache Flink 漫谈</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-              
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-            
-                <span class="post-meta-item-text">Comments: </span>
-                <a href="/2019/01/05/Apache Flink 漫谈系列 - 概述/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/01/05/Apache Flink 漫谈系列 - 概述/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          <br>
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="Apache-Flink-的命脉"><a href="#Apache-Flink-的命脉" class="headerlink" title="Apache Flink 的命脉"></a>Apache Flink 的命脉</h1><p>“<strong>命脉</strong>“ 即生命与血脉，常喻极为重要的事物。系列的首篇，首篇的首段不聊Apache Flink的历史，不聊Apache Flink的架构，不聊Apache Flink的功能特性，我们用一句话聊聊什么是 Apache Flink 的命脉？我的答案是：Apache Flink 是以”<strong>批是流的特例</strong>“的认知进行系统设计的。</p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2019/01/05/Apache Flink 漫谈系列 - 概述/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://enjoyment.cool/2019/01/01/Apache Flink 漫谈系列 -  Watermark/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jincheng Sun">
-      <meta itemprop="description" content="Apache Flink">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Pretty Cool Enjoyment">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2019/01/01/Apache Flink 漫谈系列 -  Watermark/" class="post-title-link" itemprop="url">Apache Flink 漫谈系列 -  Watermark</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-
-          
-          
-          
-
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-
-              
-                
-              
-
-              <time title="Created: 2019-01-01 18:18:18" itemprop="dateCreated datePublished" datetime="2019-01-01T18:18:18+08:00">2019-01-01</time>
-            </span>
-          
-
-          
-            
-
-            
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Edited on</span>
-                
-                <time title="Modified: 2019-01-11 18:18:18" itemprop="dateModified" datetime="2019-01-11T18:18:18+08:00">2019-01-11</time>
-              </span>
-            
-          
-
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/archives/Apache-Flink-漫谈/" itemprop="url" rel="index"><span itemprop="name">Apache Flink 漫谈</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-              
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-            
-                <span class="post-meta-item-text">Comments: </span>
-                <a href="/2019/01/01/Apache Flink 漫谈系列 -  Watermark/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/01/01/Apache Flink 漫谈系列 -  Watermark/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          <br>
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="实际问题（乱序）"><a href="#实际问题（乱序）" class="headerlink" title="实际问题（乱序）"></a>实际问题（乱序）</h1><p>在介绍Watermark相关内容之前我们先抛出一个具体的问题，在实际的流式计算中数据到来的顺序对计算结果的正确性有至关重要的影响，比如：</p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2019/01/01/Apache Flink 漫谈系列 -  Watermark/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://enjoyment.cool/2019/01/01/Apache Flink 漫谈系列 - Fault Tolerance/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jincheng Sun">
-      <meta itemprop="description" content="Apache Flink">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Pretty Cool Enjoyment">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2019/01/01/Apache Flink 漫谈系列 - Fault Tolerance/" class="post-title-link" itemprop="url">Apache Flink 漫谈系列 - Fault Tolerance</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-
-          
-          
-          
-
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-
-              
-                
-              
-
-              <time title="Created: 2019-01-01 18:18:18" itemprop="dateCreated datePublished" datetime="2019-01-01T18:18:18+08:00">2019-01-01</time>
-            </span>
-          
-
-          
-            
-
-            
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Edited on</span>
-                
-                <time title="Modified: 2019-01-21 18:18:18" itemprop="dateModified" datetime="2019-01-21T18:18:18+08:00">2019-01-21</time>
-              </span>
-            
-          
-
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/archives/Apache-Flink-漫谈/" itemprop="url" rel="index"><span itemprop="name">Apache Flink 漫谈</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-              
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-            
-                <span class="post-meta-item-text">Comments: </span>
-                <a href="/2019/01/01/Apache Flink 漫谈系列 - Fault Tolerance/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/01/01/Apache Flink 漫谈系列 - Fault Tolerance/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          <br>
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="实际问题"><a href="#实际问题" class="headerlink" title="实际问题"></a>实际问题</h1><p>在流计算场景中，数据会源源不断的流入Apache Flink系统，每条数据进入Apache Flink系统都会触发计算。那么在计算过程中如果网络、机器等原因导致Task运行失败了，Apache Flink会如何处理呢？</p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2019/01/01/Apache Flink 漫谈系列 - Fault Tolerance/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
   </nav>
 
 
@@ -2313,7 +1391,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-count">14</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>
@@ -2332,7 +1410,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">1</span>
+                      
+                    
+                    <span class="site-state-item-count">2</span>
                     <span class="site-state-item-name">categories</span>
                   </a>
                 </div>
@@ -2351,7 +1431,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">1</span>
+                      
+                    
+                    <span class="site-state-item-count">2</span>
                     <span class="site-state-item-name">tags</span>
                   </a>
                 </div>

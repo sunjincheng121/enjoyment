@@ -8,8 +8,6 @@ tags: Flink
 # 说什么
 JOIN 算子是数据处理的核心算子，前面我们在《Apache Flink 漫谈系列 - JOIN 算子》介绍了UnBounded的双流JOIN，在《Apache Flink 漫谈系列 - JOIN LATERAL》介绍了单流与UDTF的JOIN操作，在《Apache Flink 漫谈系列 - Temporal Table JOIN》又介绍了单流与版本表的JOIN，本篇将介绍在UnBounded数据流上按时间维度进行数据划分进行JOIN操作 - Time Interval(Time-windowed)JOIN, 后面我们叫做Interval JOIN。
 
-<!-- more --> 
-
 # 实际问题
 前面章节我们介绍了Flink中对各种JOIN的支持，那么想想下面的查询需求之前介绍的JOIN能否满足？需求描述如下:
 

@@ -312,8 +312,8 @@ excerpt_description: true
 # Automatically Excerpt (Not recommend).
 # Use <!-- more --> in the post to control excerpt accurately.
 auto_excerpt:
-  enable: false
-  length: 150
+  enable: true
+  length: 228
 
 # Read more button
 # If true, the read more button would be displayed in excerpt section.
@@ -639,7 +639,7 @@ valine:
   placeholder: Just go go # comment box placeholder
   avatar: mm # gravatar style
   guest_info: nick,mail,link # custom comment header
-  pageSize: 10 # pagination size
+  pageSize: 5 # pagination size
   language: # language, available values: en, zh-cn
   visitor: false # leancloud-counter-security is not supported for now. When visitor is set to be true, appid and appkey are recommended to be the same as leancloud_visitors' for counter compatibility. Article reading statistic https://valine.js.org/visitor.html
   comment_count: true # if false, comment count will only be displayed in post page, not in home page
@@ -762,7 +762,7 @@ facebook_sdk:
 # If facebook_sdk.enable is false, Facebook comments plugin is unavailable.
 facebook_comments_plugin:
   enable:       false
-  num_of_posts: 10    # min posts num is 1
+  num_of_posts: 5    # min posts num is 1
   width:        100%  # default width is 550px
   scheme:       light # default scheme is light (light or dark)
 
@@ -773,7 +773,7 @@ vkontakte_api:
   app_id:       #<app_id>
   like:         true
   comments:     true
-  num_of_posts: 10
+  num_of_posts: 5
 
 # Star rating support to each article.
 # To get your ID visit https://widgetpack.com
@@ -834,7 +834,7 @@ busuanzi_count:
 algolia_search:
   enable: false
   hits:
-    per_page: 10
+    per_page: 5
   labels:
     input_placeholder: Search for Posts
     hits_empty: "We didn't find any results for the search: ${query}"

@@ -7,8 +7,6 @@ tags: Flink
 # 什么是Temporal Table
 在《Apache Flink 漫谈系列 - JOIN LATERAL》中提到了Temporal Table JOIN，本篇就向大家详细介绍什么是Temporal Table JOIN。
 
-<!-- more --> 
-
 在[ANSI-SQL 2011](https://sigmodrecord.org/publications/sigmodRecord/1209/pdfs/07.industry.kulkarni.pdf) 中提出了Temporal 的概念，Oracle，SQLServer，DB2等大的数据库厂商也先后实现了这个标准。Temporal Table记录了历史上任何时间点所有的数据改动，Temporal Table的工作流程如下：
 ![](D05B8A19-6D97-4809-8723-B4B95FE075A7.png)
 上图示意Temporal Table具有普通table的特性，有具体独特的DDL/DML/QUERY语法，时间是其核心属性。历史意味着时间，意味着快照Snapshot。
