@@ -22,16 +22,16 @@ tags: [Flink, 道德经,上善若水]
 我们看看行业分析公司[RedMonk](https://redmonk.com/sogrady/2019/07/18/language-rankings-6-19/)最新的最受欢迎的语言排名数据如下：
 ![](DF105B35-22A0-4981-AABB-3C03EDF4AFCA.png)
 上图从github和Stack Overflow两个维度进行分析的前十名如下：
-1 JavaScript
-2 Java
-3 Python
-4 PHP
-5 C++
-5 C#
-7 CSS
-8 Ruby
-9 C
-10 TypeScript
+* JavaScript
+* Java
+* Python
+* PHP
+* C++
+* C#
+* CSS
+* Ruby
+* C
+* TypeScript
 
 我们发现Pytnon排在了第3名，目前也非常流行的R和Go语言排在了15和16名。这个很客观的分享足以证明Python的受众是多么的庞大，任何项目对Python的支持就是在无形的扩大项目的受众用户！
 
@@ -102,4 +102,7 @@ Python 是一种面向对象的解释型程序语言，由荷兰人(Guido van Ro
 
 # 小结
 本篇重点描述了Apache Flink 为啥需要支持Python API。以实际数字说明目前我们处于一个大数据时代，数据的价值要依靠大数据分析，而由于数据的时效性的重要性而催生了著名的Apache Flink流式计算平台。目前在大数据计算时代，AI是赤手可热的发展方向，机器学习是AI的重要手段之一，而恰恰由于语言的特点和生态的优势，Python成为了机器学习最重要的语言，进而推出Apache Flink 着手发力 Flink API的动机！所谓时势造英雄，Apache Flink Python API是时代的产物，水其自然而得之的必然！最后再次强调本篇所提的 "上善如水"的为人之道值得我们以实际生活来慢慢体会！
+
+# 鼓励是动力&建议是马力
+本系列文章难免有很多缺陷和不足，真诚希望读者对有收获的篇章给予点赞鼓励，因为那是我持续更新的动力！对有不足的篇章给予反馈和建议，因为那是不断提高文章质量的马力！再次感谢大家对本篇文章的查阅！下篇见...
 
