@@ -33,7 +33,7 @@ tags: [Flink, 道德经, 曲则全]
 ## 源码构建发布包
 ### 下载flink源代码
 ```
-git clone git@github.com:apache/flink.git
+git clone https://github.com/apache/flink.git
 ```
 签出release-1.9分支(1.9版本是Apache Flink Python Table API的第一个版本）
 ```
@@ -235,7 +235,7 @@ enjoyment,Apache Flink,cool,Apache Flink
 为了方便大家快速体验本篇内容，可以下载本篇涉及到的python项目，git地址如下：[https://github.com/sunjincheng121/enjoyment.code](https://github.com/sunjincheng121/enjoyment.code)
 
 # 小结
-本篇是为后续Flink Python Table API 的算子介绍做铺垫，介绍如何搭建开发环境，所以欲善其事必先利其器，最后以一个最简单的，也是最经典的WordCount具体示例来验证开发开发环境。
+本篇是为后续Flink Python Table API 的算子介绍做铺垫，介绍如何搭建开发环境。最后以一个最简单，也是最经典的WordCount具体示例来验证开发环境。同时在开篇说道部分简单为大家分享了老子所宣扬的"曲则全"的人生智慧，希望大家在学习技术的同时也能学到为人的智慧！谢谢大家的对本篇博文的查阅！
 
 # 关于评论
 如果你没有看到下面的评论区域，请进行翻墙！
