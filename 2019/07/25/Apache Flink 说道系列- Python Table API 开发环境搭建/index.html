@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+<link rel="stylesheet" href="/css/main.css?v=7.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="mask-icon" href="/images/me.png?v=7.2.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.2.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":5},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="开篇说道 - 曲则全“曲则全，枉则直，洼则盈，敝则新，少则得，多则惑” 语出《道德经》第二十二章，整句充分反映了老子的辩证思想，老子用曲则全，枉则直，洼则盈，敝则新，少则得和多则惑来讲述了”道”顺其自然的理论。 所谓的顺其自然，有很多方面，比如前面一篇讲的”上善若水”，水自高而下的流淌也是顺其自然的体现，如果不顺其自然,而是阻止水的自上而下的流淌会发生什么？那就是 灾难，水灾。大家知道在 大禹治水">
+<meta name="keywords" content="Flink,道德经,曲则全">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Apache Flink 说道系列- Python Table API 开发环境搭建">
+<meta property="og:url" content="http://enjoyment.cool/2019/07/25/Apache Flink 说道系列- Python Table API 开发环境搭建/index.html">
+<meta property="og:site_name" content="Pretty Cool Enjoyment">
+<meta property="og:description" content="开篇说道 - 曲则全“曲则全，枉则直，洼则盈，敝则新，少则得，多则惑” 语出《道德经》第二十二章，整句充分反映了老子的辩证思想，老子用曲则全，枉则直，洼则盈，敝则新，少则得和多则惑来讲述了”道”顺其自然的理论。 所谓的顺其自然，有很多方面，比如前面一篇讲的”上善若水”，水自高而下的流淌也是顺其自然的体现，如果不顺其自然,而是阻止水的自上而下的流淌会发生什么？那就是 灾难，水灾。大家知道在 大禹治水">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://enjoyment.cool/2019/07/25/Apache%20Flink%20说道系列-%20Python%20Table%20API%20开发环境搭建/5A3AE975-B828-45D4-BD83-591A1F6A1EFF.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/07/25/Apache%20Flink%20说道系列-%20Python%20Table%20API%20开发环境搭建/4ED03355-1070-4A51-8FD1-DB049AB7FEFE.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/07/25/Apache%20Flink%20说道系列-%20Python%20Table%20API%20开发环境搭建/8308BB64-2AB2-480C-9B2E-4AADD515F183.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/07/25/Apache%20Flink%20说道系列-%20Python%20Table%20API%20开发环境搭建/77394C3C-D401-4DE6-A005-D4ADFFBFB892.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/07/25/Apache%20Flink%20说道系列-%20Python%20Table%20API%20开发环境搭建/6EB7A4C3-B19E-43E0-8E88-6CD2D95936AB.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/07/25/Apache%20Flink%20说道系列-%20Python%20Table%20API%20开发环境搭建/E371FA28-BAAE-448F-A930-E795CBF09B0E.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/07/25/Apache%20Flink%20说道系列-%20Python%20Table%20API%20开发环境搭建/270E89C8-DB14-4AD7-9EF7-EA5518FC394D.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/07/25/Apache%20Flink%20说道系列-%20Python%20Table%20API%20开发环境搭建/34546866-F865-4660-8177-A64C5A14C002.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/07/25/Apache%20Flink%20说道系列-%20Python%20Table%20API%20开发环境搭建/0B58FCBF-4D98-41F9-98A3-13B31F939916.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/07/25/Apache%20Flink%20说道系列-%20Python%20Table%20API%20开发环境搭建/comment.png">
+<meta property="og:updated_time" content="2019-07-25T14:36:30.629Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Apache Flink 说道系列- Python Table API 开发环境搭建">
+<meta name="twitter:description" content="开篇说道 - 曲则全“曲则全，枉则直，洼则盈，敝则新，少则得，多则惑” 语出《道德经》第二十二章，整句充分反映了老子的辩证思想，老子用曲则全，枉则直，洼则盈，敝则新，少则得和多则惑来讲述了”道”顺其自然的理论。 所谓的顺其自然，有很多方面，比如前面一篇讲的”上善若水”，水自高而下的流淌也是顺其自然的体现，如果不顺其自然,而是阻止水的自上而下的流淌会发生什么？那就是 灾难，水灾。大家知道在 大禹治水">
+<meta name="twitter:image" content="http://enjoyment.cool/2019/07/25/Apache%20Flink%20说道系列-%20Python%20Table%20API%20开发环境搭建/5A3AE975-B828-45D4-BD83-591A1F6A1EFF.png">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://enjoyment.cool/2019/07/25/Apache Flink 说道系列- Python Table API 开发环境搭建/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Apache Flink 说道系列- Python Table API 开发环境搭建 | Pretty Cool Enjoyment</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Pretty Cool Enjoyment</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">Apache Flink</h1>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-catalog">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/catalog/" rel="section"><i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Catalog</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+  
+  
+
+  
+
+  <a href="https://github.com/sunjincheng121" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://enjoyment.cool/2019/07/25/Apache Flink 说道系列- Python Table API 开发环境搭建/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jincheng Sun">
+      <meta itemprop="description" content="Apache Flink">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Pretty Cool Enjoyment">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">Apache Flink 说道系列- Python Table API 开发环境搭建
+
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+
+          
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-07-25 21:05:15 / Modified: 22:36:30" itemprop="dateCreated datePublished" datetime="2019-07-25T21:05:15+08:00">2019-07-25</time>
+            </span>
+          
+
+          
+            
+
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/archives/Apache-Flink-说道/" itemprop="url" rel="index"><span itemprop="name">Apache Flink 说道</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+              
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">Comments: </span>
+                <a href="/2019/07/25/Apache Flink 说道系列- Python Table API 开发环境搭建/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/07/25/Apache Flink 说道系列- Python Table API 开发环境搭建/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+                 Views:  
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          
+
+          <br>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="开篇说道-曲则全"><a href="#开篇说道-曲则全" class="headerlink" title="开篇说道 - 曲则全"></a>开篇说道 - 曲则全</h1><p>“曲则全，枉则直，洼则盈，敝则新，少则得，多则惑” 语出《道德经》第二十二章，整句充分反映了老子的辩证思想，老子用曲则全，枉则直，洼则盈，敝则新，少则得和多则惑来讲述了”道”顺其自然的理论。</p>
+<p>所谓的顺其自然，有很多方面，比如前面一篇讲的”上善若水”，水自高而下的流淌也是顺其自然的体现，如果不顺其自然,而是阻止水的自上而下的流淌会发生什么？那就是 灾难，水灾。大家知道在 大禹治水 之前人类是如何处理洪水的？”拦截” 无目的的随处拦截，不是拦截不好，而是只拦截不疏通就违背自然之道了。再想想大禹治水，则是在顺应自然的同时，在疏通水道的同时在恰当的地方进行拦截，使得在不违背水自上而下的自然本性的同时合理影响水流的方向，进而造福人类。</p>
+<p>那么本篇的”曲则全，枉则直，洼则盈，敝则新，少则得，多则惑”如何理解呢？直译一下就是：”弯曲才可保全，委屈才可伸展，低洼将可充满，敝旧将可更新，少取反而获得，多取反而迷惑”。其实不难理解，比如:”洼则盈”, “洼”也就是低洼，”盈”就是满，只有低洼的的地势才能赢得水流，也就是只有空的杯子才能装的进水。满的杯子很难再容下其他物品。其实老子无时无刻不在论证为人之道，谦卑将自己放空，才能容纳他人，聚贤聚德。下面我们再以一个简短的故事解释”曲则全”来结束本篇的论道：</p>
+<p>春秋时期，齐国君主齐景公非常喜欢捕鸟，当时有个名叫 烛雏 的大臣专门为其捕鸟。但有一次由于 烛雏 的疏忽将捕来的鸟弄飞了。这使得齐景公勃然大怒，要杀了 烛雏。当时 晏子 也附和齐景王对 烛雏 说：你有三大罪状：1. 你的疏忽把鸟放跑了，这是第一罪状，2. 因为鸟飞了使得大王要去杀人，使大王背上了喜欢杀人的坏名声，这是你第二大罪状，3. 这件事情传出去天下人会认为大王把鸟看的比人命还重要，破坏了大王的威望，这是你第三大罪状。所以，大王请将 烛雏 处死吧？可想而知 齐景王并没有完全失去理智，虽然 晏子 没有直接劝阻他不要杀死 烛雏，但他听出了 晏子 的用意，所以自然赦免了 烛雏。</p>
+<p>所以真正的智者会顺势而为，见机行事，无法直言的时候就要学会迂回，这也是对老子”曲则全”理论的典型运用！</p>
+<h1 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h1><p>欲善其事必利其器，要想利用Apache Flink Python Table API进行业务开发，首先要先搭建一个开发环境。本文将细致的叙述如何搭建开发环境，最后在编写一个简单的WordCount示例程序。</p>
+<h1 id="依赖环境"><a href="#依赖环境" class="headerlink" title="依赖环境"></a>依赖环境</h1><ul>
+<li>JDK 1.8+ (1.8.0_211)</li>
+<li>Maven 3.x (3.2.5)</li>
+<li>Scala 2.11+ (2.12.0)</li>
+<li>Python 2.7+ (2.7.16)</li>
+<li>Git 2.20+ (2.20.1)</li>
+</ul>
+<p>大家如上依赖配置如果有问题，可以在评论区留言。</p>
+<h1 id="安装PyFlink"><a href="#安装PyFlink" class="headerlink" title="安装PyFlink"></a>安装PyFlink</h1><p>我们要想利用Apache Flink Python API 进行业务开发，需要将PyFlink发布包进行安装。目前PyFlink并没有发布到Python仓库，比如著名的PyPI(正在社区讨论，<a href="http://apache-flink-mailing-list-archive.1008284.n3.nabble.com/DISCUSS-Publish-the-PyFlink-into-PyPI-td30095.html" target="_blank" rel="noopener">详见</a>)，所以我们需要从源码构建。</p>
+<h2 id="源码构建发布包"><a href="#源码构建发布包" class="headerlink" title="源码构建发布包"></a>源码构建发布包</h2><h3 id="下载flink源代码"><a href="#下载flink源代码" class="headerlink" title="下载flink源代码"></a>下载flink源代码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/apache/flink.git</span><br></pre></td></tr></table></figure>
+
+<p>签出release-1.9分支(1.9版本是Apache Flink Python Table API的第一个版本）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git fetch origin release-1.9</span><br><span class="line">git checkout -b release-1.9 origin/release-1.9</span><br></pre></td></tr></table></figure>
+
+<p>输出如下证明已经签出了release-1.9代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Branch &apos;release-1.9&apos; set up to track remote branch &apos;release-1.9&apos; from &apos;origin&apos;.</span><br><span class="line">Switched to a new branch &apos;release-1.9&apos;</span><br></pre></td></tr></table></figure>
+
+<h3 id="构建Java二进制包"><a href="#构建Java二进制包" class="headerlink" title="构建Java二进制包"></a>构建Java二进制包</h3><p>查看我们在relese-1.9分支并进行源码构建发布包（JAVA）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn clean install -DskipTests -Dfast</span><br></pre></td></tr></table></figure>
+
+<p>上面命令会执行一段时间(时间长短取决于你机器配置),最终输出如下信息，证明已经成功的完成发布包的构建：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">...</span><br><span class="line">[INFO] flink-ml-lib ....................................... SUCCESS [  0.190 s]</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">[INFO] BUILD SUCCESS</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">[INFO] Total time: 14:47 min</span><br><span class="line">[INFO] Finished at: 2019-07-25T17:38:06+08:00</span><br><span class="line">[INFO] Final Memory: 537M/2085M</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br></pre></td></tr></table></figure>
+
+<p>在flink-dist/target/下的lib目录和opt目录中flink-python<em>.jar 和 flink-table</em>.jar 都是PyFlink必须依赖的JARs, 在下面构建PyFlink包的时候，会将这些依赖JRAs也包含在里面。</p>
+<h3 id="构建PyFlink发布包"><a href="#构建PyFlink发布包" class="headerlink" title="构建PyFlink发布包"></a>构建PyFlink发布包</h3><p>一般情况我们期望以pip install的方式安装python的类库，我们要想安装PyFlink的类库，也需要构建可用于pip install的发布包。执行如下命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd flink-python; python setup.py sdist</span><br></pre></td></tr></table></figure>
+
+<p>最终输出如下信息，证明是成功的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">...</span><br><span class="line">copying pyflink/table/types.py -&gt; apache-flink-1.9.dev0/pyflink/table</span><br><span class="line">copying pyflink/table/window.py -&gt; apache-flink-1.9.dev0/pyflink/table</span><br><span class="line">copying pyflink/util/__init__.py -&gt; apache-flink-1.9.dev0/pyflink/util</span><br><span class="line">copying pyflink/util/exceptions.py -&gt; apache-flink-1.9.dev0/pyflink/util</span><br><span class="line">copying pyflink/util/utils.py -&gt; apache-flink-1.9.dev0/pyflink/util</span><br><span class="line">Writing apache-flink-1.9.dev0/setup.cfg</span><br><span class="line">creating dist</span><br><span class="line">Creating tar archive</span><br><span class="line">removing &apos;apache-flink-1.9.dev0&apos; (and everything under it)</span><br></pre></td></tr></table></figure>
+
+<p>在dist目录的apache-flink-1.9.dev0.tar.gz就是我们可以用于pip install的PyFlink包.</p>
+<h2 id="安装PyFlink-1"><a href="#安装PyFlink-1" class="headerlink" title="安装PyFlink"></a>安装PyFlink</h2><p>上面我们构建了PyFlink的发布包，接下来我们利用pip进行安装，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install dist/*.tar.gz</span><br></pre></td></tr></table></figure>
+
+<p>输出如下信息，证明已经安装成功：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Building wheels for collected packages: apache-flink</span><br><span class="line">  Building wheel for apache-flink (setup.py) ... done</span><br><span class="line">  Stored in directory: /Users/jincheng.sunjc/Library/Caches/pip/wheels/34/b1/23/fca6e31a6de419c9c9d75a6d11df197d538c2ef67e017d79ea</span><br><span class="line">Successfully built apache-flink</span><br><span class="line">Installing collected packages: apache-flink</span><br><span class="line">Successfully installed apache-flink-1.9.dev0</span><br></pre></td></tr></table></figure>
+
+<p>用pip命令检查是否安装成功：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">IT-C02YL16BJHD2:flink-python jincheng.sunjc$ pip list</span><br><span class="line">Package         Version    </span><br><span class="line">--------------- -----------</span><br><span class="line">apache-flink    1.9.dev0   </span><br><span class="line">configparser    3.7.4      </span><br><span class="line">entrypoints     0.3        </span><br><span class="line">enum34          1.1.6      </span><br><span class="line">flake8          3.7.8      </span><br><span class="line">functools32     3.2.3.post2</span><br><span class="line">kafka-python    1.4.6      </span><br><span class="line">mccabe          0.6.1      </span><br><span class="line">pip             19.1.1     </span><br><span class="line">py4j            0.10.8.1   </span><br><span class="line">pycodestyle     2.5.0      </span><br><span class="line">pyflakes        2.1.1      </span><br><span class="line">python-dateutil 2.8.0      </span><br><span class="line">setuptools      41.0.1     </span><br><span class="line">six             1.12.0     </span><br><span class="line">tld             0.9.3      </span><br><span class="line">typing          3.7.4      </span><br><span class="line">virtualenv      16.6.1     </span><br><span class="line">wheel           0.33.4</span><br></pre></td></tr></table></figure>
+
+<p>其中 <code>apache-flink    1.9.dev0</code>就是我们刚才安装的版本。  </p>
+<h1 id="配置IDE开发环境"><a href="#配置IDE开发环境" class="headerlink" title="配置IDE开发环境"></a>配置IDE开发环境</h1><p>开发Python最好用的集成开发环境应该是PyCharm了，我们接下来介绍如果配置PyCharm环境。</p>
+<h2 id="下载安装包"><a href="#下载安装包" class="headerlink" title="下载安装包"></a>下载安装包</h2><p>从 <a href="https://www.jetbrains.com/pycharm/" target="_blank" rel="noopener">https://www.jetbrains.com/pycharm/</a> 选择你需要的版本，如果你需要mac版本，直接打开如下链接下载：<br><a href="https://download.jetbrains.8686c.com/python/pycharm-community-2019.2.dmg" target="_blank" rel="noopener">https://download.jetbrains.8686c.com/python/pycharm-community-2019.2.dmg</a></p>
+<h2 id="安装配置并创建项目"><a href="#安装配置并创建项目" class="headerlink" title="安装配置并创建项目"></a>安装配置并创建项目</h2><p>上面下载的应该都是可以直接执行的，一路next之后，就可以对PyCharm进行配置了。我们在启动界面选择创建一个项目，如下：<br><img src="/2019/07/25/Apache Flink 说道系列- Python Table API 开发环境搭建/5A3AE975-B828-45D4-BD83-591A1F6A1EFF.png" alt><br>点击 “Create New Project”之后，出现如下界面：<br><img src="/2019/07/25/Apache Flink 说道系列- Python Table API 开发环境搭建/4ED03355-1070-4A51-8FD1-DB049AB7FEFE.png" alt></p>
+<ol>
+<li>我们要项目取一个名字，比如”myPyFlink”。</li>
+<li>选择”Existing interpreter”。</li>
+<li>配置”interpreter” <strong>非常重要</strong>,这个配置必须和你刚才安装PyFlink的时候(pip install)的python完全一致。</li>
+<li>如果没有你需要的python版本，可以点击 4 所示位置进行添加。</li>
+<li>如何知道你pip install对应的python，请使用5所示的命令”which is python”进行查看。</li>
+</ol>
+<p>如果需要进行4所需要的操作，点击之后界面如下：<br><img src="/2019/07/25/Apache Flink 说道系列- Python Table API 开发环境搭建/8308BB64-2AB2-480C-9B2E-4AADD515F183.png" alt><br>选择配置”System Interpreter”,并配置”which is python”说输出的路径。<br>点击 “OK”。<br>在顺利完成上面配置之后，我们点击 “Create”，完成项目的创建，如下图：<br><img src="/2019/07/25/Apache Flink 说道系列- Python Table API 开发环境搭建/77394C3C-D401-4DE6-A005-D4ADFFBFB892.png" alt><br>我们可以核实一下，我们依赖的External Libraries是<br>“which is python”说输出的Python。</p>
+<h1 id="开发WordCount"><a href="#开发WordCount" class="headerlink" title="开发WordCount"></a>开发WordCount</h1><p>如果上面的过程一切顺利，那么我们的器已经很锋利了，开始善其事了，新建一个package,名为enjoyment,然后新建一个word_count.py。如下：<br><img src="/2019/07/25/Apache Flink 说道系列- Python Table API 开发环境搭建/6EB7A4C3-B19E-43E0-8E88-6CD2D95936AB.png" alt><br>然后，在弹出的界面写入word_count之后，点击 “OK”。<br><img src="/2019/07/25/Apache Flink 说道系列- Python Table API 开发环境搭建/E371FA28-BAAE-448F-A930-E795CBF09B0E.png" alt></p>
+<h2 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"># -*- coding: utf-8 -*-</span><br><span class="line"></span><br><span class="line">from pyflink.dataset import ExecutionEnvironment</span><br><span class="line">from pyflink.table import TableConfig, DataTypes, BatchTableEnvironment</span><br><span class="line">from pyflink.table.descriptors import Schema, OldCsv, FileSystem</span><br><span class="line"></span><br><span class="line">import os</span><br><span class="line"></span><br><span class="line"># 数据源文件</span><br><span class="line">source_file = &apos;source.csv&apos;</span><br><span class="line">#计算结果文件</span><br><span class="line">sink_file = &apos;sink.csv&apos;</span><br><span class="line"></span><br><span class="line"># 创建执行环境</span><br><span class="line">exec_env = ExecutionEnvironment.get_execution_environment()</span><br><span class="line"># 设置并发为1 方便调试</span><br><span class="line">exec_env.set_parallelism(1)</span><br><span class="line">t_config = TableConfig()</span><br><span class="line">t_env = BatchTableEnvironment.create(exec_env, t_config)</span><br><span class="line"></span><br><span class="line"># 如果结果文件已经存在,就先删除</span><br><span class="line">if os.path.exists(sink_file):</span><br><span class="line">    os.remove(sink_file)</span><br><span class="line"></span><br><span class="line"># 创建数据源表</span><br><span class="line">t_env.connect(FileSystem().path(source_file)) \</span><br><span class="line">    .with_format(OldCsv()</span><br><span class="line">                 .line_delimiter(&apos;,&apos;)</span><br><span class="line">                 .field(&apos;word&apos;, DataTypes.STRING())) \</span><br><span class="line">    .with_schema(Schema()</span><br><span class="line">                 .field(&apos;word&apos;, DataTypes.STRING())) \</span><br><span class="line">    .register_table_source(&apos;mySource&apos;)</span><br><span class="line"></span><br><span class="line"># 创建结果表</span><br><span class="line">t_env.connect(FileSystem().path(sink_file)) \</span><br><span class="line">    .with_format(OldCsv()</span><br><span class="line">                 .field_delimiter(&apos;,&apos;)</span><br><span class="line">                 .field(&apos;word&apos;, DataTypes.STRING())</span><br><span class="line">                 .field(&apos;count&apos;, DataTypes.BIGINT())) \</span><br><span class="line">    .with_schema(Schema()</span><br><span class="line">                 .field(&apos;word&apos;, DataTypes.STRING())</span><br><span class="line">                 .field(&apos;count&apos;, DataTypes.BIGINT())) \</span><br><span class="line">    .register_table_sink(&apos;mySink&apos;)</span><br><span class="line"></span><br><span class="line"># 非常简单的word_count计算逻辑</span><br><span class="line">t_env.scan(&apos;mySource&apos;) \</span><br><span class="line">    .group_by(&apos;word&apos;) \</span><br><span class="line">    .select(&apos;word, count(1)&apos;) \</span><br><span class="line">    .insert_into(&apos;mySink&apos;)</span><br><span class="line"></span><br><span class="line"># 执行Job</span><br><span class="line">t_env.execute(&quot;wordcount&quot;)</span><br></pre></td></tr></table></figure>
+
+<h2 id="执行并查看运行结果"><a href="#执行并查看运行结果" class="headerlink" title="执行并查看运行结果"></a>执行并查看运行结果</h2><p>在执行job之前我们需要先创建一个数据源文件,在enjoyment包目录下，创建 source.csv文件，内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">enjoyment,Apache Flink,cool,Apache Flink</span><br></pre></td></tr></table></figure>
+
+<p>现在我们可以执行，job了：</p>
+<p><img src="/2019/07/25/Apache Flink 说道系列- Python Table API 开发环境搭建/270E89C8-DB14-4AD7-9EF7-EA5518FC394D.png" alt></p>
+<ol>
+<li>右键word_count.py, 2. 点击运行’word_count’。<br>运行之后，当控制台出现：”Process finished with exit code 0”，并且在enjoyment目录下出现sink.csv文件，说明我们第一个word_count就成功运行了:)<br><img src="/2019/07/25/Apache Flink 说道系列- Python Table API 开发环境搭建/34546866-F865-4660-8177-A64C5A14C002.png" alt><br>我们双击 “sink.csv”,查看运行结果，如下：<br><img src="/2019/07/25/Apache Flink 说道系列- Python Table API 开发环境搭建/0B58FCBF-4D98-41F9-98A3-13B31F939916.png" alt></li>
+</ol>
+<p>到此我们Python Table API的开发环境搭建完成。</p>
+<h1 id="项目源代码"><a href="#项目源代码" class="headerlink" title="项目源代码"></a>项目源代码</h1><p>为了方便大家快速体验本篇内容，可以下载本篇涉及到的python项目，git地址如下：<a href="https://github.com/sunjincheng121/enjoyment.code" target="_blank" rel="noopener">https://github.com/sunjincheng121/enjoyment.code</a></p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本篇是为后续Flink Python Table API 的算子介绍做铺垫，介绍如何搭建开发环境。最后以一个最简单，也是最经典的WordCount具体示例来验证开发环境。同时在开篇说道部分简单为大家分享了老子所宣扬的”曲则全”的人生智慧，希望大家在学习技术的同时也能学到为人的智慧！谢谢大家的对本篇博文的查阅！</p>
+<h1 id="关于评论"><a href="#关于评论" class="headerlink" title="关于评论"></a>关于评论</h1><p>如果你没有看到下面的评论区域，请进行翻墙！<br><img src="/2019/07/25/Apache Flink 说道系列- Python Table API 开发环境搭建/comment.png" alt></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        
+          
+        
+        <div class="post-tags">
+          
+            <a href="/archives/Flink/" rel="tag"># Flink</a>
+          
+            <a href="/archives/道德经/" rel="tag"># 道德经</a>
+          
+            <a href="/archives/曲则全/" rel="tag"># 曲则全</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/07/21/Apache Flink 说道系列- Python API 时代的产物/" rel="next" title="Apache Flink 说道系列- Python API 时代的产物">
+                <i class="fa fa-chevron-left"></i> Apache Flink 说道系列- Python API 时代的产物
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/08/08/Apache Flink 视频系列 - 2019.08.06直播(德国柏林)/" rel="prev" title="Apache Flink 视频系列 - 2019.08.06直播(德国柏林)">
+                Apache Flink 视频系列 - 2019.08.06直播(德国柏林) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="Jincheng Sun">
+            
+              <p class="site-author-name" itemprop="name">Jincheng Sun</p>
+              <div class="site-description motion-element" itemprop="description">Apache Flink</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">36</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">30</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/sunjincheng121/enjoyment" title="GitHub &rarr; https://github.com/sunjincheng121/enjoyment" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/sunjincheng121" title="Twitter &rarr; https://twitter.com/sunjincheng121" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#开篇说道-曲则全"><span class="nav-number">1.</span> <span class="nav-text">开篇说道 - 曲则全</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#概要"><span class="nav-number">2.</span> <span class="nav-text">概要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#依赖环境"><span class="nav-number">3.</span> <span class="nav-text">依赖环境</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装PyFlink"><span class="nav-number">4.</span> <span class="nav-text">安装PyFlink</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#源码构建发布包"><span class="nav-number">4.1.</span> <span class="nav-text">源码构建发布包</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#下载flink源代码"><span class="nav-number">4.1.1.</span> <span class="nav-text">下载flink源代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构建Java二进制包"><span class="nav-number">4.1.2.</span> <span class="nav-text">构建Java二进制包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构建PyFlink发布包"><span class="nav-number">4.1.3.</span> <span class="nav-text">构建PyFlink发布包</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装PyFlink-1"><span class="nav-number">4.2.</span> <span class="nav-text">安装PyFlink</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置IDE开发环境"><span class="nav-number">5.</span> <span class="nav-text">配置IDE开发环境</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#下载安装包"><span class="nav-number">5.1.</span> <span class="nav-text">下载安装包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装配置并创建项目"><span class="nav-number">5.2.</span> <span class="nav-text">安装配置并创建项目</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#开发WordCount"><span class="nav-number">6.</span> <span class="nav-text">开发WordCount</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#完整代码"><span class="nav-number">6.1.</span> <span class="nav-text">完整代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#执行并查看运行结果"><span class="nav-number">6.2.</span> <span class="nav-text">执行并查看运行结果</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#项目源代码"><span class="nav-number">7.</span> <span class="nav-text">项目源代码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">8.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于评论"><span class="nav-number">9.</span> <span class="nav-text">关于评论</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jincheng Sun</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.2.0</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="Total Visitors">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="Total Views">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.2.0"></script>
+
+  <script src="/js/motion.js?v=7.2.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.2.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.2.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.2.0"></script>
+<script src="/js/post-details.js?v=7.2.0"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.2.0"></script>
+
+
+  
+
+  
+
+  
+
+  
+  
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://http-enjoyment-cool.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+
+
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://enjoyment.cool/2019/07/25/Apache Flink 说道系列- Python Table API 开发环境搭建/";
+    this.page.identifier = "2019/07/25/Apache Flink 说道系列- Python Table API 开发环境搭建/";
+    this.page.title = 'Apache Flink 说道系列- Python Table API 开发环境搭建';
+    };
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://http-enjoyment-cool.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+  
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('3');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

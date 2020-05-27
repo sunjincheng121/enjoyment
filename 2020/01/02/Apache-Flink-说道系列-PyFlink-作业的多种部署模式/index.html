@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+<link rel="stylesheet" href="/css/main.css?v=7.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="mask-icon" href="/images/me.png?v=7.2.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.2.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":5},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="开篇说道老子说：“致虚极，守静笃。万物并作，吾以观其复”。 字里行间是告诉人们要尽量使心灵达到虚寂的极致，持之以恒的坚守宁静。老子认为“虚”和“静”是心灵的本初的状态，也应该是一种常态，即，是一种没有心机，没有成见，没有外界名利，物质诱惑，而保持的状态。当达到这个状态之后，就可以静观万物的蓬勃发展，了解万物的循环往复的变化，通晓自然之理，体悟自然之道。 “致虚极，守静笃” 并不代表对任何事情无动于">
+<meta name="keywords" content="Flink,道德经,致虚极守静笃">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Apache Flink 说道系列 - PyFlink 作业的多种部署模式">
+<meta property="og:url" content="http://enjoyment.cool/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/index.html">
+<meta property="og:site_name" content="Pretty Cool Enjoyment">
+<meta property="og:description" content="开篇说道老子说：“致虚极，守静笃。万物并作，吾以观其复”。 字里行间是告诉人们要尽量使心灵达到虚寂的极致，持之以恒的坚守宁静。老子认为“虚”和“静”是心灵的本初的状态，也应该是一种常态，即，是一种没有心机，没有成见，没有外界名利，物质诱惑，而保持的状态。当达到这个状态之后，就可以静观万物的蓬勃发展，了解万物的循环往复的变化，通晓自然之理，体悟自然之道。 “致虚极，守静笃” 并不代表对任何事情无动于">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://enjoyment.cool/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15779569378844.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15777810183663.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15777784863901.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15777821361064.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15777817105172.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15777816500228.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15777853568978.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15777878055973.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15778389671396.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15778373195478.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15778373437959.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15777972228895.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15777916683830.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15779417223687.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15779417681405.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15779449909178.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15779454827330.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15779456315383.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15779465411786.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15779503938890.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15779542617667.jpg">
+<meta property="og:updated_time" content="2020-03-27T04:17:48.888Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Apache Flink 说道系列 - PyFlink 作业的多种部署模式">
+<meta name="twitter:description" content="开篇说道老子说：“致虚极，守静笃。万物并作，吾以观其复”。 字里行间是告诉人们要尽量使心灵达到虚寂的极致，持之以恒的坚守宁静。老子认为“虚”和“静”是心灵的本初的状态，也应该是一种常态，即，是一种没有心机，没有成见，没有外界名利，物质诱惑，而保持的状态。当达到这个状态之后，就可以静观万物的蓬勃发展，了解万物的循环往复的变化，通晓自然之理，体悟自然之道。 “致虚极，守静笃” 并不代表对任何事情无动于">
+<meta name="twitter:image" content="http://enjoyment.cool/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15779569378844.jpg">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://enjoyment.cool/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Apache Flink 说道系列 - PyFlink 作业的多种部署模式 | Pretty Cool Enjoyment</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Pretty Cool Enjoyment</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">Apache Flink</h1>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-catalog">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/catalog/" rel="section"><i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Catalog</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+  
+  
+
+  
+
+  <a href="https://github.com/sunjincheng121" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://enjoyment.cool/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jincheng Sun">
+      <meta itemprop="description" content="Apache Flink">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Pretty Cool Enjoyment">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">Apache Flink 说道系列 - PyFlink 作业的多种部署模式
+
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+
+          
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2020-01-02 17:15:18" itemprop="dateCreated datePublished" datetime="2020-01-02T17:15:18+08:00">2020-01-02</time>
+            </span>
+          
+
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2020-03-27 12:17:48" itemprop="dateModified" datetime="2020-03-27T12:17:48+08:00">2020-03-27</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/archives/Apache-Flink-说道/" itemprop="url" rel="index"><span itemprop="name">Apache Flink 说道</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+              
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">Comments: </span>
+                <a href="/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+                 Views:  
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          
+
+          <br>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="开篇说道"><a href="#开篇说道" class="headerlink" title="开篇说道"></a>开篇说道</h1><p>老子说：“致虚极，守静笃。万物并作，吾以观其复”。 字里行间是告诉人们要尽量使心灵达到虚寂的极致，持之以恒的坚守宁静。老子认为“虚”和“静”是心灵的本初的状态，也应该是一种常态，即，是一种没有心机，没有成见，没有外界名利，物质诱惑，而保持的状态。当达到这个状态之后，就可以静观万物的蓬勃发展，了解万物的循环往复的变化，通晓自然之理，体悟自然之道。</p>
+<p>“致虚极，守静笃” 并不代表对任何事情无动于衷，而是通过 “致虚极，守静笃” 的方式了解万物变化的根源，就好比，看到新芽不惊，看到落叶不哀，因为我们知道，落叶归根，重归泥土之后，还会再破土而出，开始新的轮回。</p>
+<p>在2020年1月1日零点我发了一条朋友圈，对自己的祝福是：”㊗️ 2020 安”。<br><img src="/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15779569378844.jpg" alt><br>当然这里我也祝福所有看到这篇博客的你: “㊗️ 2020 安”。 祝福大家 “安”，也即祝福大家 能够在新的一年，追求内心的修炼，摒去纷纷复杂的物欲干扰，拂去心灵的灰尘，保持自己的赤子之心！ </p>
+<h1 id="道破-“天机”"><a href="#道破-“天机”" class="headerlink" title="道破 “天机”"></a>道破 “天机”</h1><p>前面一些博客大多介绍PyFlink的功能开发，比如，如何使用各种算子(Join/Window/AGG etc.)，如何使用各种Connector(Kafka, CSV, Socket etc.)，还有一些实际的案例。这些都停留在开发阶段，一旦开发完成，我们就面临激动人心的时刻，那就是 将我们精心设计开发的作业进行部署，那么问题来了，你知道怎样部署PyFlink的作业吗？这篇将为大家全面介绍部署PyFlink作业的各种模式。</p>
+<h1 id="组件栈回顾"><a href="#组件栈回顾" class="headerlink" title="组件栈回顾"></a>组件栈回顾</h1><p><img src="/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15777810183663.jpg" alt></p>
+<p>上面的组件栈除了PyFlink是第一次添加上去，其他部分大家应该非常熟悉了。目前PyFlink基于Java的Table API之上，同时在Runtime层面有Python的算子和执行容器。那么我们聚焦重点，看最底层的 Deploy部分，上图我们分成了三种部署模式，Local/Cluster/Cloud，其中Local模式还有2种不同方式，一是SingleJVM，也即是MiniCluster, 前面博客里面运行示例所使用的就是MiniCluster。二是SingleNode，也就是虽然是集群模式，但是所有角色都在一台机器上。下面我们简单介绍一下上面这几种部署模式的区别：</p>
+<ul>
+<li>Local-SingleJVM 模式- 该模式大多是开发测试阶段使用的方式，所有角色TM，JM等都在同一个JVM里面。</li>
+<li>Local-SingleNode 模式 - 意在所有角色都运行在同一台机器，直白一点就是从运行的架构上看，这种模式虽然是分布式的，但集群节点只有1个，该模式大多是测试和IoT设备上进行部署使用。</li>
+<li>Cluster 模式 - 也就是我们经常用于投产的分布式部署方式，上图根据对资源管理的方式不同又分为了多种，如：Standalone 是Flink自身进行资源管理，YARN，顾名思义就是利用资源管理框架Yarn来负责Flink运行资源的分配，还有结合Kubernetes等等。</li>
+<li>Cloud 模式- 该部署模式是结合其他云平台进行部署。</li>
+</ul>
+<p>接下来我们看看PyFlink的作业可以进行怎样的模式部署？</p>
+<h1 id="环境依赖"><a href="#环境依赖" class="headerlink" title="环境依赖"></a>环境依赖</h1><ul>
+<li>JDK 1.8+ (1.8.0_211)</li>
+<li>Maven 3.x (3.2.5)</li>
+<li>Scala 2.11+ (2.12.0)</li>
+<li>Python 3.5+ (3.7.6)</li>
+<li>Git 2.20+ (2.20.1)</li>
+</ul>
+<h1 id="PyFlink安装"><a href="#PyFlink安装" class="headerlink" title="PyFlink安装"></a>PyFlink安装</h1><p>因为目前PyFlink已经部署到PyPI上面了，安装PyFlink只需要使用如下命令：</p>
+<ol>
+<li><p>检查Python版本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ python --version</span><br><span class="line"># the version printed here must be 3.5+</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装PyFlink</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ python -m pip install apache-flink==1.10.0</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>检查核心包<br>我们核心需要apache-beam和apache-flink，如下命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ pip list</span><br><span class="line">Package                       Version  </span><br><span class="line">----------------------------- ---------</span><br><span class="line">alabaster                     0.7.12   </span><br><span class="line">apache-beam                   2.15.0   </span><br><span class="line">apache-flink                  1.10.0</span><br><span class="line">atomicwrites                  1.3.0</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p>如上信息证明你我们所需的Python依赖已经okay了，接下来回过头来在看看如何进行业务需求的开发。</p>
+<h1 id="PyFlink示例作业"><a href="#PyFlink示例作业" class="headerlink" title="PyFlink示例作业"></a>PyFlink示例作业</h1><p>接下来我们开发一个简单的PyFlink作业，源码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line">import logging</span><br><span class="line">import os</span><br><span class="line">import shutil</span><br><span class="line">import sys</span><br><span class="line">import tempfile</span><br><span class="line"></span><br><span class="line">from pyflink.table import BatchTableEnvironment, EnvironmentSettings</span><br><span class="line">from pyflink.table.descriptors import FileSystem, OldCsv, Schema</span><br><span class="line">from pyflink.table.types import DataTypes</span><br><span class="line">from pyflink.table.udf import udf</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def word_count():</span><br><span class="line">   environment_settings = EnvironmentSettings.new_instance().in_batch_mode().use_blink_planner().build()</span><br><span class="line">   t_env = BatchTableEnvironment.create(environment_settings=environment_settings)</span><br><span class="line"></span><br><span class="line">   # register Results table in table environment</span><br><span class="line">   tmp_dir = tempfile.gettempdir()</span><br><span class="line">   result_path = tmp_dir + &apos;/result&apos;</span><br><span class="line">   if os.path.exists(result_path):</span><br><span class="line">       try:</span><br><span class="line">           if os.path.isfile(result_path):</span><br><span class="line">               os.remove(result_path)</span><br><span class="line">           else:</span><br><span class="line">               shutil.rmtree(result_path)</span><br><span class="line">       except OSError as e:</span><br><span class="line">           logging.error(&quot;Error removing directory: %s - %s.&quot;, e.filename, e.strerror)</span><br><span class="line"></span><br><span class="line">   logging.info(&quot;Results directory: %s&quot;, result_path)</span><br><span class="line"></span><br><span class="line">   # we should set the Python verison here if `Python` not point</span><br><span class="line">   t_env.get_config().set_python_executable(&quot;python3&quot;)</span><br><span class="line"></span><br><span class="line">   t_env.connect(FileSystem().path(result_path)) \</span><br><span class="line">       .with_format(OldCsv()</span><br><span class="line">                    .field_delimiter(&apos;,&apos;)</span><br><span class="line">                    .field(&quot;city&quot;, DataTypes.STRING())</span><br><span class="line">                    .field(&quot;sales_volume&quot;, DataTypes.BIGINT())</span><br><span class="line">                    .field(&quot;sales&quot;, DataTypes.BIGINT())) \</span><br><span class="line">       .with_schema(Schema()</span><br><span class="line">                    .field(&quot;city&quot;, DataTypes.STRING())</span><br><span class="line">                    .field(&quot;sales_volume&quot;, DataTypes.BIGINT())</span><br><span class="line">                    .field(&quot;sales&quot;, DataTypes.BIGINT())) \</span><br><span class="line">       .register_table_sink(&quot;Results&quot;)</span><br><span class="line"></span><br><span class="line">   @udf(input_types=DataTypes.STRING(), result_type=DataTypes.ARRAY(DataTypes.STRING()))</span><br><span class="line">   def split(input_str: str):</span><br><span class="line">       return input_str.split(&quot;,&quot;)</span><br><span class="line"></span><br><span class="line">   @udf(input_types=[DataTypes.ARRAY(DataTypes.STRING()), DataTypes.INT()], result_type=DataTypes.STRING())</span><br><span class="line">   def get(arr, index):</span><br><span class="line">       return arr[index]</span><br><span class="line"></span><br><span class="line">   t_env.register_function(&quot;split&quot;, split)</span><br><span class="line">   t_env.register_function(&quot;get&quot;, get)</span><br><span class="line"></span><br><span class="line">   t_env.get_config().get_configuration().set_string(&quot;parallelism.default&quot;, &quot;1&quot;)</span><br><span class="line"></span><br><span class="line">   data = [(&quot;iPhone 11,30,5499,Beijing&quot;, ),</span><br><span class="line">           (&quot;iPhone 11 Pro,20,8699,Guangzhou&quot;, ),</span><br><span class="line">           (&quot;MacBook Pro,10,9999,Beijing&quot;, ),</span><br><span class="line">           (&quot;AirPods Pro,50,1999,Beijing&quot;, ),</span><br><span class="line">           (&quot;MacBook Pro,10,11499,Shanghai&quot;, ),</span><br><span class="line">           (&quot;iPhone 11,30,5999,Shanghai&quot;, ),</span><br><span class="line">           (&quot;iPhone 11 Pro,20,9999,Shenzhen&quot;, ),</span><br><span class="line">           (&quot;MacBook Pro,10,13899,Hangzhou&quot;, ),</span><br><span class="line">           (&quot;iPhone 11,10,6799,Beijing&quot;, ),</span><br><span class="line">           (&quot;MacBook Pro,10,18999,Beijing&quot;, ),</span><br><span class="line">           (&quot;iPhone 11 Pro,10,11799,Shenzhen&quot;, ),</span><br><span class="line">           (&quot;MacBook Pro,10,22199,Shanghai&quot;, ),</span><br><span class="line">           (&quot;AirPods Pro,40,1999,Shanghai&quot;, )]</span><br><span class="line">   t_env.from_elements(data, [&quot;line&quot;]) \</span><br><span class="line">       .select(&quot;split(line) as str_array&quot;) \</span><br><span class="line">       .select(&quot;get(str_array, 3) as city, &quot;</span><br><span class="line">               &quot;get(str_array, 1).cast(LONG) as count, &quot;</span><br><span class="line">               &quot;get(str_array, 2).cast(LONG) as unit_price&quot;) \</span><br><span class="line">       .select(&quot;city, count, count * unit_price as total_price&quot;) \</span><br><span class="line">       .group_by(&quot;city&quot;) \</span><br><span class="line">       .select(&quot;city, &quot;</span><br><span class="line">               &quot;sum(count) as sales_volume, &quot;</span><br><span class="line">               &quot;sum(total_price) as sales&quot;) \</span><br><span class="line">       .insert_into(&quot;Results&quot;)</span><br><span class="line"></span><br><span class="line">   t_env.execute(&quot;word_count&quot;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">   logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=&quot;%(message)s&quot;)</span><br><span class="line">   word_count()</span><br></pre></td></tr></table></figure>
+
+<p>接下来我们就介绍如何用不同部署模式运行PyFlink作业！</p>
+<h1 id="Local-SingleJVM-模式部署"><a href="#Local-SingleJVM-模式部署" class="headerlink" title="Local-SingleJVM 模式部署"></a>Local-SingleJVM 模式部署</h1><p>该模式多用于开发测试阶段，简单的利用<code>Python pyflink_job.py</code>命令，PyFlink就会默认启动一个Local-SingleJVM的Flink环境来执行作业，如下：</p>
+<p><img src="/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15777784863901.jpg" alt><br>首先确认你Python是3.5+，然后执行上面的PyFlink作业<code>Python deploy_demo.py</code>,结果写入到本地文件，然后<code>cat</code>计算结果，如果出现如图所示的结果，则说明准备工作已经就绪。:),如果有问题，欢迎留言！<br>这里运行时SingleJVM，在运行这个job时候大家可以查看java进程：</p>
+<p><img src="/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15777821361064.jpg" alt><br>我们发现只有一个JVM进程，里面包含了所有Flink所需角色。</p>
+<h1 id="Local-SingleNode-模式部署"><a href="#Local-SingleNode-模式部署" class="headerlink" title="Local-SingleNode 模式部署"></a>Local-SingleNode 模式部署</h1><p>这种模式一般用在单机环境中进行部署，如IoT设备中，我们从0开始进行该模式的部署操作。我们进入到<code>flink/build-target</code>目录，执行如下命令(个人爱好，我把端口改成了8888)：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">jincheng:build-target jincheng.sunjc$ bin/start-cluster.sh </span><br><span class="line">...</span><br><span class="line">Starting cluster.</span><br><span class="line">Starting standalonesession daemon on host jincheng.local.</span><br></pre></td></tr></table></figure>
+
+<p>查看一下Flink的进程：</p>
+<p><img src="/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15777817105172.jpg" alt></p>
+<p>我们发现有TM和JM两个进程，虽然在一台机器(Local）但是也是一个集群的架构。<br>上面信息证明已经启动完成，我们可以查看web界面：<a href="http://localhost:8888/" target="_blank" rel="noopener">http://localhost:8888/</a>（我个人爱好端口是8888，默认是8080）, 如下：<br><img src="/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15777816500228.jpg" alt></p>
+<p>目前集群环境已经准备完成，我们看如果将作业部署到集群中，一条简单的命令，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin/flink run -m localhost:8888 -py ~/deploy_demo.py</span><br></pre></td></tr></table></figure>
+
+<p>这里如果你不更改端口可以不添加<code>-m</code> 选项。如果一切顺利，你会得到如下输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">jincheng:build-target jincheng.sunjc$ bin/flink run -m localhost:8888 -py ~/deploy_demo.py </span><br><span class="line">Results directory: /var/folders/fp/s5wvp3md31j6v5gjkvqbkhrm0000gp/T/result</span><br><span class="line">Job has been submitted with JobID 3ae7fb8fa0d1867daa8d65fd87ed3bc6</span><br><span class="line">Program execution finished</span><br><span class="line">Job with JobID 3ae7fb8fa0d1867daa8d65fd87ed3bc6 has finished.</span><br><span class="line">Job Runtime: 5389 ms</span><br></pre></td></tr></table></figure>
+
+<p>其中<code>/var/folders/fp/s5wvp3md31j6v5gjkvqbkhrm0000gp/T/result</code> 目录是计算结果目录，我们可以产看一下，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">jincheng:build-target jincheng.sunjc$  cat /var/folders/fp/s5wvp3md31j6v5gjkvqbkhrm0000gp/T/result</span><br><span class="line">Beijing,110,622890</span><br><span class="line">Guangzhou,20,173980</span><br><span class="line">Shanghai,90,596910</span><br><span class="line">Shenzhen,30,317970</span><br><span class="line">Hangzhou,10,138990</span><br></pre></td></tr></table></figure>
+
+<p>同时我们也可以在WebUI上面进行查看，在完成的job列表中，显示如下：<br><img src="/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15777853568978.jpg" alt><br>到此，我们完成了在Local模式，其实也是只有一个节点的Standalone模式下完成PyFlink的部署。<br>最后我们为了继续下面的操作，请停止集群：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">jincheng:build-target jincheng.sunjc$ bin/stop-cluster.sh</span><br><span class="line">Stopping taskexecutor daemon (pid: 45714) on host jincheng.local.</span><br><span class="line">Stopping standalonesession daemon (pid: 45459) on host jincheng.local.</span><br></pre></td></tr></table></figure>
+
+<h1 id="Cluster-YARN-模式部署"><a href="#Cluster-YARN-模式部署" class="headerlink" title="Cluster YARN 模式部署"></a>Cluster YARN 模式部署</h1><p>这个模式部署，我们需要一个YARN环境，我们一切从简，以单机部署的方式准备YARN环境，然后再与Flink进行集成。</p>
+<h2 id="准备YARN环境"><a href="#准备YARN环境" class="headerlink" title="准备YARN环境"></a>准备YARN环境</h2><ul>
+<li>安装Hadoop</li>
+</ul>
+<p>我本机是mac系统，所以我偷懒一下直接用brew进行安装：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">jincheng:bin jincheng.sunjc$ brew install Hadoop</span><br><span class="line">Updating Homebrew...</span><br><span class="line">==&gt; Auto-updated Homebrew!</span><br><span class="line">Updated 2 taps (homebrew/core and homebrew/cask).</span><br><span class="line">==&gt; Updated Formulae</span><br><span class="line">Python ✔        doxygen         minio           ntopng          typescript</span><br><span class="line">certbot         libngspice      mitmproxy       ooniprobe</span><br><span class="line">doitlive        minimal-racket  ngspice         openimageio</span><br><span class="line"></span><br><span class="line">==&gt; Downloading https://www.apache.org/dyn/closer.cgi?path=hadoop/common/hadoop-</span><br><span class="line">==&gt; Downloading from http://mirror.bit.edu.cn/apache/hadoop/common/hadoop-3.2.1/</span><br><span class="line">######################################################################## 100.0%</span><br><span class="line"></span><br><span class="line">🍺  /usr/local/Cellar/Hadoop/3.2.1: 22,397 files, 815.6MB, built in 5 minutes 12 seconds</span><br></pre></td></tr></table></figure>
+
+<p>完成之后，检验一下hadoop版本：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jincheng:bin jincheng.sunjc$ hadoop version</span><br><span class="line">Hadoop 3.2.1</span><br></pre></td></tr></table></figure>
+
+<p>超级顺利，hadoop被安装到了<code>/usr/local/Cellar/hadoop/3.2.1/</code>目录下，<code>brew</code>还是很能提高生产力啊～</p>
+<ul>
+<li>配置免登(SSH)</li>
+</ul>
+<p>Mac系统自带了ssh，我们可以简单配置一下即可，我们先打开远程登录。 <code>系统偏好设置</code> -&gt; <code>共享</code> 中，左边勾选 <code>远程登录</code> ，右边选择 <code>仅这些用户</code> （选择<code>所有用户</code>更宽松），并添加当前用户。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jincheng:bin jincheng.sunjc$ whoami</span><br><span class="line">jincheng.sunjc</span><br></pre></td></tr></table></figure>
+
+<p>我当前用户是 <code>jincheng.sunjc</code>。 配置图如下：</p>
+<p><img src="/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15777878055973.jpg" alt></p>
+<p>然后生产证书，如下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -P &apos;&apos; -f ~/.ssh/id_rsa</span><br><span class="line">Generating public/private rsa key pair.</span><br><span class="line">/Users/jincheng.sunjc/.ssh/id_rsa already exists.</span><br><span class="line">Overwrite (y/n)? y</span><br><span class="line">Your identification has been saved in /Users/jincheng.sunjc/.ssh/id_rsa.</span><br><span class="line">Your public key has been saved in /Users/jincheng.sunjc/.ssh/id_rsa.pub.</span><br><span class="line">The key fingerprint is:</span><br><span class="line">SHA256:IkjKkOjfMx1fxWlwtQYg8hThph7Xlm9kPutAYFmQR0A jincheng.sunjc@jincheng.local</span><br><span class="line">The key&apos;s randomart image is:</span><br><span class="line">+---[RSA 2048]----+</span><br><span class="line">|       ..EB=.o.. |</span><br><span class="line">|..      =.+.+ o .|</span><br><span class="line">|+ .      B.  = o |</span><br><span class="line">|+o .    + o + .  |</span><br><span class="line">|.o. . .+S. * o   |</span><br><span class="line">|  . ..o.= + =    |</span><br><span class="line">|   . + o . . =   |</span><br><span class="line">|      o     o o  |</span><br><span class="line">|            .o   |</span><br><span class="line">+----[SHA256]-----+</span><br></pre></td></tr></table></figure>
+
+<p>接下来将公钥追加到如下文件，并修改文件权限：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jincheng.sunjc$ cat ~/.ssh/id_rsa.pub &gt;&gt; ~/.ssh/authorized_keys</span><br><span class="line">jincheng.sunjc$ chmod 0600 ~/.ssh/authorized_keys</span><br></pre></td></tr></table></figure>
+
+<p>利用ssh localhost验证，看到 Last login: 字样为ssh成功</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">jincheng:~ jincheng.sunjc$ ssh localhost</span><br><span class="line">Password:</span><br><span class="line">Last login: Tue Dec 31 18:26:48 2019 from ::1</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>设置环境变量</li>
+</ul>
+<p>设置JAVA_HOME,HADOOP_HOME和HADOOP_CONF_DIR，<code>vi ~/.bashrc</code>:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_211.jdk/Contents/Home</span><br><span class="line"></span><br><span class="line">export HADOOP_HOME=/usr/local/Cellar/hadoop/3.2.1/libexec</span><br><span class="line"></span><br><span class="line">export HADOOP_CONF_DIR=$&#123;HADOOP_HOME&#125;/etc/hadoop</span><br></pre></td></tr></table></figure>
+
+<p>NOTE: 后续操作要确保的terminal环境变量是生效哦， 如果不生效可以执行 <code>source ~/.bashrc</code>。:)</p>
+<ul>
+<li><p>修改配置</p>
+<p>  1) 修改core-site.xml</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">      &lt;name&gt;hadoop.tmp.dir&lt;/name&gt;</span><br><span class="line">      &lt;value&gt;/tmp&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">      &lt;name&gt;fs.defaultFS&lt;/name&gt;</span><br><span class="line">      &lt;value&gt;hdfs://localhost:9000&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<pre><code>2) 修改hdfs-site.xml</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line"></span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;dfs.namenode.name.dir&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;/tmp/hadoop/name&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    </span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;dfs.datanode.data.dir&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;/tmp/hadoop/data&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    </span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<pre><code>3) 修改yarn-site.xml</code></pre><p>配置 YARN 作为资源管理框架：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;mapreduce_shuffle&lt;/value&gt;    </span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;yarn.nodemanager.env-whitelist&lt;/name&gt;  &lt;value&gt;JAVA_HOME,HADOOP_COMMON_HOME,HADOOP_HDFS_HOME,HADOOP_CONF_DIR,CLASSPATH_PREPEND_DISTCACHE,HADOOP_YARN_HOME,HADOOP_MAPRED_HOME&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>简单的配置已经完成，我们执行一下简单命令启动环境：</p>
+<ul>
+<li>格式化文档系统：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">jincheng:libexec jincheng.sunjc$ hadoop namenode -format</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">2019-12-31 18:58:53,260 INFO namenode.NameNode: SHUTDOWN_MSG: </span><br><span class="line">/************************************************************</span><br><span class="line">SHUTDOWN_MSG: Shutting down NameNode at jincheng.local/127.0.0.1</span><br><span class="line">************************************************************/</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>启动服务：</li>
+</ul>
+<p>我们先启动hdf再启动yarn，如下图：<br><img src="/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15778389671396.jpg" alt></p>
+<p>Okay,一切顺利的话，我们会启动namenodes，datanodes，resourcemanager和nodemanagers。我们有几个web界面可以查看，如下：</p>
+<p> 1). Overview 界面， <a href="http://localhost:9870" target="_blank" rel="noopener">http://localhost:9870 </a>如下：<br><img src="/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15778373195478.jpg" alt></p>
+<p> 2). NodeManager界面， <a href="http://localhost:8042" target="_blank" rel="noopener">http://localhost:8042</a>，如下：<br><img src="/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15778373437959.jpg" alt="-w649"></p>
+<p> 3). ResourceManager 管理界面 <a href="http://localhost:8088/" target="_blank" rel="noopener">http://localhost:8088/</a>,如下：<br><img src="/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15777972228895.jpg" alt="-w1054"></p>
+<p>目前YARN的环境已经准备完成，我们接下来看如何与Flink进行集成。</p>
+<h2 id="Flink集成Hadoop包"><a href="#Flink集成Hadoop包" class="headerlink" title="Flink集成Hadoop包"></a>Flink集成Hadoop包</h2><p>切换到编译结果目录下<code>flink/build-target</code>,并将haddop的JAR包放到<code>lib</code>目录。<br>在官网下载hadoop包，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd lib;</span><br><span class="line">curl https://repo.maven.apache.org/maven2/org/apache/flink/flink-shaded-hadoop-2-uber/2.8.3-7.0/flink-shaded-hadoop-2-uber-2.8.3-7.0.jar &gt; flink-shaded-hadoop-2-uber-2.8.3-7.0.jar</span><br></pre></td></tr></table></figure>
+
+<p>下载后，lib目录下文件如下：<br><img src="/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15777916683830.jpg" alt></p>
+<p>到现在为止我们可以提交PyFlink的作业到由YARN进行资源分配的集群了。但为了确保集群上有正确的Python环境我们最好打包一个Python环境到集群上面。因为大部分情况下我们无法得知yarn集群上的Python版本是否符合我们的要求(Python 3.5+，装有apache-beam 2.15.0)，因此我们需要打包一个符合条件的Python环境，并随job文件提交到yarn集群上。</p>
+<h2 id="打包Python环境"><a href="#打包Python环境" class="headerlink" title="打包Python环境"></a>打包Python环境</h2><p>再次检查一下当前Python的版本是否3.5+，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jincheng:lib jincheng.sunjc$ Python</span><br><span class="line">Python 3.7.6 (default, Dec 31 2019, 09:48:30)</span><br></pre></td></tr></table></figure>
+
+<p>由于这个Python环境是用于集群的，所以打包时的系统需要和集群一致。如果不一致，比如集群是linux而本机是mac，我们需要在虚拟机或者docker中打包。以下列出两种情况的示范方法，读者根据需求选择一种即可。</p>
+<h3 id="本地打包（集群和本机操作系统一致时）"><a href="#本地打包（集群和本机操作系统一致时）" class="headerlink" title="本地打包（集群和本机操作系统一致时）"></a>本地打包（集群和本机操作系统一致时）</h3><p>如果集群所在机器的操作系统和本地一致（都是mac或者都是linux），直接通过virtualenv打包一个符合条件的Python环境：</p>
+<ul>
+<li>安装virtualenv<br>使用<code>python -m pip install virtualenv</code> 进行安装如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">jincheng:tmp jincheng.sunjc$ python -m pip install virtualenv==16.7.9</span><br><span class="line">Collecting virtualenv</span><br><span class="line">  Downloading https://files.Pythonhosted.org/packages/05/f1/2e07e8ca50e047b9cc9ad56cf4291f4e041fa73207d000a095fe478abf84/virtualenv-16.7.9-py2.py3-none-any.whl (3.4MB)</span><br><span class="line">     |████████████████████████████████| 3.4MB 2.0MB/s </span><br><span class="line">Installing collected packages: virtualenv</span><br><span class="line">Successfully installed virtualenv-16.7.9</span><br></pre></td></tr></table></figure>
+
+<p>我本地环境已经成功安装。</p>
+<ul>
+<li>创建Python环境<br>用virtualenv以always-copy方式建立一个全新的Python环境，名字随意，以venv为例，<code>virtualenv --always-copy venv</code>:</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ virtualenv --always-copy venv</span><br><span class="line">Using base prefix &apos;/usr/local/Cellar/Python/3.7.6/Frameworks/Python.framework/Versions/3.7&apos;</span><br><span class="line">New Python executable in /Users/jincheng.sunjc/temp/hadoop/tmp/venv/bin/Python3.7</span><br><span class="line">Also creating executable in /Users/jincheng.sunjc/temp/hadoop/tmp/venv/bin/Python</span><br><span class="line">Installing setuptools, pip, wheel...</span><br><span class="line">done.</span><br></pre></td></tr></table></figure>
+
+<p>接下来要copy原环境的Python标准库到<code>venv</code>中，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ VENV_PYTHON=venv/bin/python</span><br><span class="line">$ DST=`$VENV_PYTHON -c &quot;import os;import pip;print(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(pip.__file__)))))&quot;`</span><br><span class="line">$ SRC=`$VENV_PYTHON -c &quot;import os;import contextlib;print(os.path.dirname(os.path.abspath(contextlib.__file__)))&quot;`</span><br><span class="line">$ if [ &quot;$SRC&quot; != &quot;$DST&quot; ]; then find &quot;$SRC&quot; -maxdepth 1 ! -name &quot;site-packages&quot; ! -name &quot;__pycache__&quot; ! -name &quot;python3.*&quot; -exec cp -r -- &quot;&#123;&#125;&quot; &quot;$&#123;DST&#125;&quot; \; ; fi</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>在新环境中安装apache-beam 2.15.0<br>使用<code>venv/bin/pip install apache-beam==2.15.0</code>进行安装：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">jincheng:tmp jincheng.sunjc$ venv/bin/pip install apache-beam==2.15.0</span><br><span class="line">Collecting apache-beam==2.15.0</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">Successfully installed apache-beam-2.15.0 avro-Python3-1.9.1 certifi-2019.11.28 chardet-3.0.4 crcmod-1.7 dill-0.2.9 docopt-0.6.2 fastavro-0.21.24 future-0.18.2 grpcio-1.26.0 hdfs-2.5.8 httplib2-0.12.0 idna-2.8 mock-2.0.0 numpy-1.18.0 oauth2client-3.0.0 pbr-5.4.4 protobuf-3.11.2 pyarrow-0.14.1 pyasn1-0.4.8 pyasn1-modules-0.2.7 pydot-1.4.1 pymongo-3.10.0 pyparsing-2.4.6 pytz-2019.3 pyyaml-3.13 requests-2.22.0 rsa-4.0 six-1.13.0 urllib3-1.25.7</span><br></pre></td></tr></table></figure>
+
+<p>上面信息已经说明我们成功的在Python环境中安装了apache-beam==2.15.0。接下来我们打包Python环境。</p>
+<ul>
+<li>打包Python环境<br>我们将Python打包成zip文件，<code>zip -r venv.zip venv</code> 如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">zip -r venv.zip venv</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">  adding: venv/lib/Python3.7/re.py (deflated 68%)</span><br><span class="line">  adding: venv/lib/Python3.7/struct.py (deflated 46%)</span><br><span class="line">  adding: venv/lib/Python3.7/sre_parse.py (deflated 80%)</span><br><span class="line">  adding: venv/lib/Python3.7/abc.py (deflated 72%)</span><br><span class="line">  adding: venv/lib/Python3.7/_bootlocale.py (deflated 63%)</span><br></pre></td></tr></table></figure>
+
+<p>查看一下zip大小：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jincheng:tmp jincheng.sunjc$ du -sh venv.zip </span><br><span class="line"> 81M	venv.zip</span><br></pre></td></tr></table></figure>
+
+<p>这个大小实在太大了，核心问题是Beam的包非常大，后面我会持续在Beam社区提出优化建议。我们先忍一下:(。</p>
+<h3 id="Docker中打包（比如集群为linux，本机为mac时）"><a href="#Docker中打包（比如集群为linux，本机为mac时）" class="headerlink" title="Docker中打包（比如集群为linux，本机为mac时）"></a>Docker中打包（比如集群为linux，本机为mac时）</h3><p>我们选择在docker中打包，可以从以下链接下载最新版docker并安装：<br><a href="https://download.docker.com/mac/stable/Docker.dmg" target="_blank" rel="noopener">https://download.docker.com/mac/stable/Docker.dmg</a>安装完毕后重启终端，执行<code>docker version</code>确认docker安装成功：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">jincheng:tmp jincheng.sunjc$ docker version</span><br><span class="line">Client: Docker Engine - Community</span><br><span class="line"> Version:           19.03.4</span><br><span class="line"> API version:       1.40</span><br><span class="line"> Go version:        go1.12.10</span><br><span class="line"> Git commit:        9013bf5</span><br><span class="line"> Built:             Thu Oct 17 23:44:48 2019</span><br><span class="line"> OS/Arch:           darwin/amd64</span><br><span class="line"> Experimental:      false</span><br><span class="line"></span><br><span class="line">Server: Docker Engine - Community</span><br><span class="line"> Engine:</span><br><span class="line">  Version:          19.03.4</span><br><span class="line">  API version:      1.40 (minimum version 1.12)</span><br><span class="line">  Go version:       go1.12.10</span><br><span class="line">  Git commit:       9013bf5</span><br><span class="line">  Built:            Thu Oct 17 23:50:38 2019</span><br><span class="line">  OS/Arch:          linux/amd64</span><br><span class="line">  Experimental:     false</span><br><span class="line"> containerd:</span><br><span class="line">  Version:          v1.2.10</span><br><span class="line">  GitCommit:        b34a5c8af56e510852c35414db4c1f4fa6172339</span><br><span class="line"> runc:</span><br><span class="line">  Version:          1.0.0-rc8+dev</span><br><span class="line">  GitCommit:        3e425f80a8c931f88e6d94a8c831b9d5aa481657</span><br><span class="line"> docker-init:</span><br><span class="line">  Version:          0.18.0</span><br><span class="line">  GitCommit:        fec3683</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>启动容器<br>我们启动一个Python 3.7版本的容器如果是第一次启动可能需要较长时间来拉取镜像：<br><code>docker run -it Python:3.7 /bin/bash</code>, 如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">jincheng:libexec jincheng.sunjc$  docker run -it Python:3.7 /bin/bash</span><br><span class="line">Unable to find image &apos;Python:3.7&apos; locally</span><br><span class="line">3.7: Pulling from library/Python</span><br><span class="line">8f0fdd3eaac0: Pull complete </span><br><span class="line">d918eaefd9de: Pull complete </span><br><span class="line">43bf3e3107f5: Pull complete </span><br><span class="line">27622921edb2: Pull complete </span><br><span class="line">dcfa0aa1ae2c: Pull complete </span><br><span class="line">bf6840af9e70: Pull complete </span><br><span class="line">167665d59281: Pull complete </span><br><span class="line">ffc544588c7f: Pull complete </span><br><span class="line">4ebe99df65fe: Pull complete </span><br><span class="line">Digest: sha256:40d615d7617f0f3b54614fd228d41a891949b988ae2b452c0aaac5bee924888d</span><br><span class="line">Status: Downloaded newer image for Python:3.7</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>容器中安装virtualenv<br>我们在刚才启动的容器中安装virtualenv， <code>pip install virtualenv</code>,如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">root@1b48d2b526ae:/# pip install virtualenv==16.7.9</span><br><span class="line">Collecting virtualenv</span><br><span class="line">  Downloading https://files.Pythonhosted.org/packages/05/f1/2e07e8ca50e047b9cc9ad56cf4291f4e041fa73207d000a095fe478abf84/virtualenv-16.7.9-py2.py3-none-any.whl (3.4MB)</span><br><span class="line">     |████████████████████████████████| 3.4MB 2.0MB/s </span><br><span class="line">Installing collected packages: virtualenv</span><br><span class="line">Successfully installed virtualenv-16.7.9</span><br><span class="line">root@1b48d2b526ae:/#</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>创建Python环境<br>以always copy方式建立一个全新的Python环境，名字随意，以venv为例，<code>virtualenv --always-copy venv</code>, 如下：</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">root@1b48d2b526ae:/# virtualenv --always-copy venv</span><br><span class="line">Using base prefix &apos;/usr/local&apos;</span><br><span class="line">New Python executable in /venv/bin/Python</span><br><span class="line">Installing setuptools, pip, wheel...</span><br><span class="line">done.</span><br><span class="line">root@1b48d2b526ae:/#</span><br></pre></td></tr></table></figure>
+
+<p>接下来要copy原环境的Python标准库到<code>venv</code>中，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># VENV_PYTHON=venv/bin/python</span><br><span class="line"># DST=`$VENV_PYTHON -c &quot;import os;import pip;print(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(pip.__file__)))))&quot;`</span><br><span class="line"># SRC=`$VENV_PYTHON -c &quot;import os;import contextlib;print(os.path.dirname(os.path.abspath(contextlib.__file__)))&quot;`</span><br><span class="line"># if [ &quot;$SRC&quot; != &quot;$DST&quot; ]; then find &quot;$SRC&quot; -maxdepth 1 ! -name &quot;site-packages&quot; ! -name &quot;__pycache__&quot; ! -name &quot;python3.*&quot; -exec cp -r -- &quot;&#123;&#125;&quot; &quot;$&#123;DST&#125;&quot; \; ; fi</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>安装Apache Beam<br>在新的Python环境中安装apache-beam 2.15.0，<code>venv/bin/pip install apache-beam==2.15.0</code>,如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">root@1b48d2b526ae:/# venv/bin/pip install apache-beam==2.15.0</span><br><span class="line">Collecting apache-beam==2.15.0</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">Successfully installed apache-beam-2.15.0 avro-Python3-1.9.1 certifi-2019.11.28 chardet-3.0.4 crcmod-1.7 dill-0.2.9 docopt-0.6.2 fastavro-0.21.24 future-0.18.2 grpcio-1.26.0 hdfs-2.5.8 httplib2-0.12.0 idna-2.8 mock-2.0.0 numpy-1.18.0 oauth2client-3.0.0 pbr-5.4.4 protobuf-3.11.2 pyarrow-0.14.1 pyasn1-0.4.8 pyasn1-modules-0.2.7 pydot-1.4.1 pymongo-3.10.0 pyparsing-2.4.6 pytz-2019.3 pyyaml-3.13 requests-2.22.0 rsa-4.0 six-1.13.0 urllib3-1.25.7</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>查看docker中的Python环境<br>用<code>exit</code>命令退出容器，用<code>docker ps -a</code>找到docker容器的id，用于拷贝文件,如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">root@1b48d2b526ae:/# exit</span><br><span class="line">exit</span><br><span class="line">jincheng:libexec jincheng.sunjc$ docker ps -a</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                     PORTS               NAMES</span><br><span class="line">1b48d2b526ae        Python:3.7          &quot;/bin/bash&quot;         7 minutes ago       Exited (0) 8 seconds ago                       elated_visvesvaraya</span><br></pre></td></tr></table></figure>
+
+<p>由于刚刚结束，一般来说是列表中的第一条，可以根据容器的镜像名Python:3.7来分辨。我们记下最左边的容器ID。如上是<code>1b48d2b526ae</code>。</p>
+<ul>
+<li>打包Python环境<br>从将容器中的Python环境拷贝出来，我们切换到<code>flink/build-target</code>录下，拷贝 <code>docker cp 1b48d2b526ae:/venv ./</code>并打包<code>zip -r venv.zip venv</code>。<br>最终<code>flink/build-target</code>录下生成<code>venv.zip</code>。</li>
+</ul>
+<h2 id="部署作业"><a href="#部署作业" class="headerlink" title="部署作业"></a>部署作业</h2><p>终于到部署作业的环节了:), flink on yarn支持两种模式，per-job和session。per-job模式在提交job时会为每个job单独起一个flink集群，session模式先在yarn上起一个flink集群，之后提交job都提交到这个flink集群。</p>
+<h3 id="Pre-Job-模式部署作业"><a href="#Pre-Job-模式部署作业" class="headerlink" title="Pre-Job 模式部署作业"></a>Pre-Job 模式部署作业</h3><p>执行以下命令，以Pre-Job模式部署PyFlink作业：</p>
+<p>如果是Docker模式打包的话，如果宿主环境还没有安装virtualenv，那么需要首先执行如下命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ pip install virtualenv==16.7.9</span><br><span class="line">$ virtualenv --python /usr/local/bin/python3 venv</span><br></pre></td></tr></table></figure>
+
+<p>接下来激活环境并提交作业：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">$ source venv/bin/activate</span><br><span class="line">$ bin/flink run -m yarn-cluster -pyarch venv.zip -pyexec venv.zip/venv/bin/Python -py deploy_demo.py</span><br><span class="line"></span><br><span class="line">2020-01-02 13:04:52,889 WARN  org.apache.flink.yarn.cli.FlinkYarnSessionCli                 - The configuration directory (&apos;/Users/jincheng.sunjc/blog/demo_dev/flink/flink-dist/target/flink-1.10-SNAPSHOT-bin/flink-1.10-SNAPSHOT/conf&apos;) already contains a LOG4J config file.If you want to use logback, then please delete or rename the log configuration file.</span><br><span class="line">2020-01-02 13:04:52,889 WARN  org.apache.flink.yarn.cli.FlinkYarnSessionCli                 - The configuration directory (&apos;/Users/jincheng.sunjc/blog/demo_dev/flink/flink-dist/target/flink-1.10-SNAPSHOT-bin/flink-1.10-SNAPSHOT/conf&apos;) already contains a LOG4J config file.If you want to use logback, then please delete or rename the log configuration file.</span><br><span class="line">Results directory: /var/folders/fp/s5wvp3md31j6v5gjkvqbkhrm0000gp/T/result</span><br><span class="line">2020-01-02 13:04:55,945 INFO  org.apache.hadoop.yarn.client.RMProxy                         - Connecting to ResourceManager at /0.0.0.0:8032</span><br><span class="line">2020-01-02 13:04:56,049 INFO  org.apache.flink.yarn.YarnClusterDescriptor                   - No path for the flink jar passed. Using the location of class org.apache.flink.yarn.YarnClusterDescriptor to locate the jar</span><br><span class="line">2020-01-02 13:05:01,153 WARN  org.apache.flink.yarn.YarnClusterDescriptor                   - Neither the HADOOP_CONF_DIR nor the YARN_CONF_DIR environment variable is set. The Flink YARN Client needs one of these to be set to properly load the Hadoop configuration for accessing YARN.</span><br><span class="line">2020-01-02 13:05:01,177 INFO  org.apache.flink.yarn.YarnClusterDescriptor                   - Cluster specification: ClusterSpecification&#123;masterMemoryMB=1024, taskManagerMemoryMB=1024, numberTaskManagers=1, slotsPerTaskManager=1&#125;</span><br><span class="line">2020-01-02 13:05:01,294 WARN  org.apache.flink.yarn.YarnClusterDescriptor                   - The file system scheme is &apos;file&apos;. This indicates that the specified Hadoop configuration path is wrong and the system is using the default Hadoop configuration values.The Flink YARN client needs to store its files in a distributed file system</span><br><span class="line">2020-01-02 13:05:02,600 INFO  org.apache.flink.yarn.YarnClusterDescriptor                   - Submitting application master application_1577936885434_0004</span><br><span class="line">2020-01-02 13:05:02,971 INFO  org.apache.hadoop.yarn.client.api.impl.YarnClientImpl         - Submitted application application_1577936885434_0004</span><br><span class="line">2020-01-02 13:05:02,972 INFO  org.apache.flink.yarn.YarnClusterDescriptor                   - Waiting for the cluster to be allocated</span><br><span class="line">2020-01-02 13:05:02,975 INFO  org.apache.flink.yarn.YarnClusterDescriptor                   - Deploying cluster, current state ACCEPTED</span><br><span class="line">2020-01-02 13:05:23,138 INFO  org.apache.flink.yarn.YarnClusterDescriptor                   - YARN application has been deployed successfully.</span><br><span class="line">2020-01-02 13:05:23,140 INFO  org.apache.flink.yarn.YarnClusterDescriptor                   - Found Web Interface localhost:61616 of application &apos;application_1577936885434_0004&apos;.</span><br><span class="line">Job has been submitted with JobID a41d82194a500809fd715da8f29894a0</span><br><span class="line">Program execution finished</span><br><span class="line">Job with JobID a41d82194a500809fd715da8f29894a0 has finished.</span><br><span class="line">Job Runtime: 35576 ms</span><br></pre></td></tr></table></figure>
+
+<p>上面信息已经显示运行完成，在Web界面可以看到作业状态：<br><img src="/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15779417223687.jpg" alt></p>
+<p>我们再检验一下计算结果<code>cat /var/folders/fp/s5wvp3md31j6v5gjkvqbkhrm0000gp/T/result</code>：<br><img src="/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15779417681405.jpg" alt></p>
+<p>到这里，我们以Pre-Job的方式成功部署了PyFlink的作业！相比提交到本地Standalone集群，多了三个参数，我们简单说明如下：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-m yarn-cluster</td>
+<td>以Per-Job模式部署到yarn集群</td>
+</tr>
+<tr>
+<td>-pyarch venv.zip</td>
+<td>将当前目录下的venv.zip上传到yarn集群</td>
+</tr>
+<tr>
+<td>-pyexec venv.zip/venv/bin/Python</td>
+<td>指定venv.zip中的Python解释器来执行Python UDF，路径需要和zip包内部结构一致。</td>
+</tr>
+</tbody></table>
+<h3 id="Session-模式部署作业"><a href="#Session-模式部署作业" class="headerlink" title="Session 模式部署作业"></a>Session 模式部署作业</h3><p>以Session模式部署作业也非常简单，我们实际操作一下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">jincheng:build-target jincheng.sunjc$ bin/yarn-session.sh </span><br><span class="line">2020-01-02 13:58:53,049 INFO  org.apache.flink.configuration.GlobalConfiguration            - Loading configuration property: jobmanager.rpc.address, localhost</span><br><span class="line">2020-01-02 13:58:53,050 INFO  org.apache.flink.configuration.GlobalConfiguration            - Loading configuration property: jobmanager.rpc.port, 6123</span><br><span class="line">2020-01-02 13:58:53,050 INFO  org.apache.flink.configuration.GlobalConfiguration            - Loading configuration property: jobmanager.heap.size, 1024m</span><br><span class="line">2020-01-02 13:58:53,050 INFO  org.apache.flink.configuration.GlobalConfiguration            - Loading configuration property: taskmanager.memory.process.size, 1024m</span><br><span class="line">2020-01-02 13:58:53,050 INFO  org.apache.flink.configuration.GlobalConfiguration            - Loading configuration property: taskmanager.numberOfTaskSlots, 1</span><br><span class="line">2020-01-02 13:58:53,050 INFO  org.apache.flink.configuration.GlobalConfiguration            - Loading configuration property: parallelism.default, 1</span><br><span class="line">2020-01-02 13:58:53,051 INFO  org.apache.flink.configuration.GlobalConfiguration            - Loading configuration property: jobmanager.execution.failover-strategy, region</span><br><span class="line">2020-01-02 13:58:53,413 WARN  org.apache.hadoop.util.NativeCodeLoader                       - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable</span><br><span class="line">2020-01-02 13:58:53,476 INFO  org.apache.flink.runtime.security.modules.HadoopModule        - Hadoop user set to jincheng.sunjc (auth:SIMPLE)</span><br><span class="line">2020-01-02 13:58:53,509 INFO  org.apache.flink.runtime.security.modules.JaasModule          - Jaas file will be created as /var/folders/fp/s5wvp3md31j6v5gjkvqbkhrm0000gp/T/jaas-3848984206030141476.conf.</span><br><span class="line">2020-01-02 13:58:53,521 WARN  org.apache.flink.yarn.cli.FlinkYarnSessionCli                 - The configuration directory (&apos;/Users/jincheng.sunjc/blog/demo_dev/flink/flink-dist/target/flink-1.10-SNAPSHOT-bin/flink-1.10-SNAPSHOT/conf&apos;) already contains a LOG4J config file.If you want to use logback, then please delete or rename the log configuration file.</span><br><span class="line">2020-01-02 13:58:53,562 INFO  org.apache.hadoop.yarn.client.RMProxy                         - Connecting to ResourceManager at /0.0.0.0:8032</span><br><span class="line">2020-01-02 13:58:58,803 WARN  org.apache.flink.yarn.YarnClusterDescriptor                   - Neither the HADOOP_CONF_DIR nor the YARN_CONF_DIR environment variable is set. The Flink YARN Client needs one of these to be set to properly load the Hadoop configuration for accessing YARN.</span><br><span class="line">2020-01-02 13:58:58,824 INFO  org.apache.flink.yarn.YarnClusterDescriptor                   - Cluster specification: ClusterSpecification&#123;masterMemoryMB=1024, taskManagerMemoryMB=1024, numberTaskManagers=1, slotsPerTaskManager=1&#125;</span><br><span class="line">2020-01-02 13:59:03,975 WARN  org.apache.flink.yarn.YarnClusterDescriptor                   - The file system scheme is &apos;file&apos;. This indicates that the specified Hadoop configuration path is wrong and the system is using the default Hadoop configuration values.The Flink YARN client needs to store its files in a distributed file system</span><br><span class="line">2020-01-02 13:59:04,779 INFO  org.apache.flink.yarn.YarnClusterDescriptor                   - Submitting application master application_1577936885434_0005</span><br><span class="line">2020-01-02 13:59:04,799 INFO  org.apache.hadoop.yarn.client.api.impl.YarnClientImpl         - Submitted application application_1577936885434_0005</span><br><span class="line">2020-01-02 13:59:04,799 INFO  org.apache.flink.yarn.YarnClusterDescriptor                   - Waiting for the cluster to be allocated</span><br><span class="line">2020-01-02 13:59:04,801 INFO  org.apache.flink.yarn.YarnClusterDescriptor                   - Deploying cluster, current state ACCEPTED</span><br><span class="line">2020-01-02 13:59:24,711 INFO  org.apache.flink.yarn.YarnClusterDescriptor                   - YARN application has been deployed successfully.</span><br><span class="line">2020-01-02 13:59:24,713 INFO  org.apache.flink.yarn.YarnClusterDescriptor                   - Found Web Interface localhost:62247 of application &apos;application_1577936885434_0005&apos;.</span><br><span class="line">JobManager Web Interface: http://localhost:62247</span><br></pre></td></tr></table></figure>
+
+<p>执行成功后不会返回，但会启动一个JoBManager Web，地址如上<code>http://localhost:62247</code>，可复制到浏览器查看:<br><img src="/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15779449909178.jpg" alt></p>
+<p>我们可以修改conf/flink-conf.yaml中的配置参数。如果要更改某些内容，请参考<a href="https://ci.apache.org/projects/flink/flink-docs-release-1.10/ops/config.html" target="_blank" rel="noopener">官方文档</a>。接下来我们提交作业，首先按组合键Ctrl+Z将yarn-session.sh进程切换到后台，并执行bg指令让其在后台继续执行, 然后执行以下命令，即可向Session模式的flink集群提交job <code>bin/flink run -m yarn-cluster -pyarch venv.zip -pyexec venv.zip/venv/bin/Python -py deploy_demo.py</code>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">jincheng:build-target jincheng.sunjc$ bin/flink run -pyarch venv.zip -pyexec venv.zip/venv/bin/Python -py deploy_demo.py</span><br><span class="line"></span><br><span class="line">2020-01-02 14:10:48,285 INFO  org.apache.flink.yarn.YarnClusterDescriptor                   - Found Web Interface localhost:62247 of application &apos;application_1577936885434_0005&apos;.</span><br><span class="line">Job has been submitted with JobID bea33b7aa07c0f62153ab5f6e134b6bf</span><br><span class="line">Program execution finished</span><br><span class="line">Job with JobID bea33b7aa07c0f62153ab5f6e134b6bf has finished.</span><br><span class="line">Job Runtime: 34405 ms</span><br></pre></td></tr></table></figure>
+
+<p>如果在打印<code>finished</code>之前查看之前的web页面，我们会发现Session集群会有一个正确运行的作业，如下：<br><img src="/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15779454827330.jpg" alt><br>如果已经运行完成，那么我们应该会看到状态也变成结束：<br><img src="/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15779456315383.jpg" alt></p>
+<p>相比per job模式提交，少了”-m”参数。因为之前已经启动了yarn-session.sh，所以flink默认会向yarn-session.sh启动的集群上提交job。执行完毕后，别忘了关闭yarn-session.sh（session 模式）：先将yarn-session.sh调到前台，执行<code>fg</code>,然后在再按Ctrl+C结束进程或者执行<code>stop</code>，结束时yarn上的集群也会被关闭。</p>
+<h1 id="Docker-模式部署"><a href="#Docker-模式部署" class="headerlink" title="Docker 模式部署"></a>Docker 模式部署</h1><p>我们还可以将Flink Python job打包成docker镜像，然后使用docker-compose或者Kubernetes部署执行，由于现在的docker镜像打包工具并没有完美支持运行Python UDF，因此我们需要往里面添加一些额外的文件。首先是一个仅包含PythonDriver类的jar包. 我们在<code>build-target</code>目录下执行如下命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">jincheng:build-target jincheng.sunjc$ mkdir temp</span><br><span class="line">jincheng:build-target jincheng.sunjc$ cd temp</span><br><span class="line">jincheng:temp jincheng.sunjc$ unzip ../opt/flink-Python_2.11-1.10-SNAPSHOT.jar org/apache/flink/client/Python/PythonDriver.class</span><br><span class="line">Archive:  ../opt/flink-Python_2.11-1.10-SNAPSHOT.jar</span><br><span class="line">  inflating: org/apache/flink/client/Python/PythonDriver.class</span><br></pre></td></tr></table></figure>
+
+<p>解压之后，我们在进行压缩打包：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jincheng:temp jincheng.sunjc$ zip Python-driver.jar org/apache/flink/client/Python/PythonDriver.class</span><br><span class="line">  adding: org/apache/flink/client/Python/PythonDriver.class (deflated 56%)</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15779465411786.jpg" alt><br>我们得到<code>Python-driver.jar</code>。然后下载一个pyArrow的安装文件(我准备了一个大家下载直接使用即可 <a href="https://github.com/sunjincheng121/enjoyment.code/blob/master/share_resource/pyarrow-0.12.0a0-cp36-cp36m-linux_x86_64.whl" target="_blank" rel="noopener">pyarrow-0.12.0a0-cp36-cp36m-linux_x86_64.whl</a>。执行以下命令构建Docker镜像，需要作为artifacts引入的文件有作业文件，Python-driver的jar包和pyarrow安装文件,<code>./build.sh --job-artifacts ~/deploy_demo.py,Python-driver.jar,pyarrow-0.12.0a0-cp36-cp36m-linux_x86_64.whl --with-Python3 --from-local-dist</code>(进入<code>flink/flink-container/docker</code>目录)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">jincheng:docker jincheng.sunjc$ ./build.sh --job-artifacts ~/deploy_demo.py,Python-driver.jar,pyarrow-0.12.0a0-cp36-cp36m-linux_x86_64.whl --with-Python3 --from-local-dist</span><br><span class="line">Using flink dist: ../../flink-dist/target/flink-*-bin</span><br><span class="line">a .</span><br><span class="line">a ./flink-1.10-SNAPSHOT</span><br><span class="line">a ./flink-1.10-SNAPSHOT/temp</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">Removing intermediate container a0558bbcbdd1</span><br><span class="line"> ---&gt; 00ecda6117b7</span><br><span class="line">Successfully built 00ecda6117b7</span><br><span class="line">Successfully tagged flink-job:latest</span><br></pre></td></tr></table></figure>
+
+<p>构建Docker镜像需要较长时间，请耐心等待。构建完毕之后，可以输入docker images命令在镜像列表中找到构建结果<code>docker images</code>：<br><img src="/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15779503938890.jpg" alt="-w765"><br>然后我们在构建好的镜像基础上安装好Python udf所需依赖，并删除过程中产生的临时文件：</p>
+<ul>
+<li><p>启动docker容器<br><code>docker run -it --user root --entrypoint /bin/bash --name flink-job-container flink-job</code></p>
+</li>
+<li><p>安装一些依赖<br><code>apk add --no-cache g++ Python3-dev musl-dev</code></p>
+</li>
+<li><p>安装PyArrow<br><code>python -m pip3 install /opt/artifacts/pyarrow-0.12.0a0-cp36-cp36m-linux_x86_64.whl</code></p>
+</li>
+<li><p>安装Apache Beam<br><code>python -m pip3 install apache-beam==2.15.0</code></p>
+</li>
+<li><p>删除临时文件<br><code>rm -rf /root/.cache/pip</code></p>
+</li>
+</ul>
+<p>执行完如上命令我可以执行<code>exit</code>退出容器了，然后把这个容器提交为新的flink-job镜像<code>docker commit -c &#39;CMD [&quot;--help&quot;]&#39; -c &quot;USER flink&quot; -c &#39;ENTRYPOINT [&quot;/docker-entrypoint.sh&quot;]&#39; flink-job-container flink-job:latest</code>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jincheng:docker jincheng.sunjc$ docker commit -c &apos;CMD [&quot;--help&quot;]&apos; -c &quot;USER flink&quot; -c &apos;ENTRYPOINT [&quot;/docker-entrypoint.sh&quot;]&apos; flink-job-container flink-job:latest </span><br><span class="line">sha256:0740a635e2b0342ddf776f33692df263ebf0437d6373f156821f4dd044ad648b</span><br></pre></td></tr></table></figure>
+
+<p>到这里包含Python UDF 作业的Docker镜像就制作好了，这个Docker镜像既可以以docker-compose使用，也可以结合kubernetes中使用。</p>
+<p>我们以使用docker-compose执行为例，mac版docker自带docker-compose，用户可以直接使用，在<code>flink/flink-container/docker</code>目录下，使用以下命令启动作业,<code>FLINK_JOB=org.apache.flink.client.Python.PythonDriver FLINK_JOB_ARGUMENTS=&quot;-py /opt/artifacts/deploy_demo.py&quot; docker-compose up</code>:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">jincheng:docker jincheng.sunjc$ FLINK_JOB=org.apache.flink.client.Python.PythonDriver FLINK_JOB_ARGUMENTS=&quot;-py /opt/artifacts/deploy_demo.py&quot; docker-compose up</span><br><span class="line">WARNING: The SAVEPOINT_OPTIONS variable is not set. Defaulting to a blank string.</span><br><span class="line">Recreating docker_job-cluster_1 ... done</span><br><span class="line">Starting docker_taskmanager_1   ... done</span><br><span class="line">Attaching to docker_taskmanager_1, docker_job-cluster_1</span><br><span class="line">taskmanager_1  | Starting the task-manager</span><br><span class="line">job-cluster_1  | Starting the job-cluster</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">job-cluster_1  | 2020-01-02 08:35:03,796 INFO  org.apache.flink.runtime.entrypoint.ClusterEntrypoint         - Terminating cluster entrypoint process StandaloneJobClusterEntryPoint with exit code 0.</span><br><span class="line">docker_job-cluster_1 exited with code 0</span><br></pre></td></tr></table></figure>
+
+<p>在log中出现“docker_job-cluster_1 exited with code 0”表示job已执行成功，JobManager已经退出。TaskManager还需要较长的时间等待超时后才会退出，我们可以直接按快捷键Ctrl+C提前退出。</p>
+<p>查看执行结果，可以从TaskManager的容器中将结果文件拷贝出来查看,执行 <code>docker cp docker_taskmanager_1:/tmp/result ./; cat result</code><br><img src="/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/15779542617667.jpg" alt></p>
+<p>Okay, 到这里本篇要与大家分享的内容已经接近尾声了，如果你期间也很顺利的成功了，可以 Cheers 了:)</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本篇核心向大家分享了如何以多种方式部署PyFlink作业。期望在PyFlink1.10发布之后，大家能有一个顺利快速体验的快感！在开篇说道部分，为大家分享了老子倡导大家的 “致虚极，守静笃。万物并作，吾以观其复”的大道，同时也给大家带来了2020的祝福，祝福大家 “2020 安！”。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        
+          
+        
+        <div class="post-tags">
+          
+            <a href="/archives/Flink/" rel="tag"># Flink</a>
+          
+            <a href="/archives/道德经/" rel="tag"># 道德经</a>
+          
+            <a href="/archives/致虚极守静笃/" rel="tag"># 致虚极守静笃</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/" rel="next" title="Apache Flink 说道系列 - 如何在PyFlink 1.10中自定义Python UDF">
+                <i class="fa fa-chevron-left"></i> Apache Flink 说道系列 - 如何在PyFlink 1.10中自定义Python UDF
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/01/19/Three-Min-Series-Run-the-Example-of-WordCount-in-PyFlink-1-9/" rel="prev" title="Three Min Series - Run the Example of WordCount in PyFlink 1.9">
+                Three Min Series - Run the Example of WordCount in PyFlink 1.9 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="Jincheng Sun">
+            
+              <p class="site-author-name" itemprop="name">Jincheng Sun</p>
+              <div class="site-description motion-element" itemprop="description">Apache Flink</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">36</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">30</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/sunjincheng121/enjoyment" title="GitHub &rarr; https://github.com/sunjincheng121/enjoyment" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/sunjincheng121" title="Twitter &rarr; https://twitter.com/sunjincheng121" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#开篇说道"><span class="nav-number">1.</span> <span class="nav-text">开篇说道</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#道破-“天机”"><span class="nav-number">2.</span> <span class="nav-text">道破 “天机”</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#组件栈回顾"><span class="nav-number">3.</span> <span class="nav-text">组件栈回顾</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#环境依赖"><span class="nav-number">4.</span> <span class="nav-text">环境依赖</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PyFlink安装"><span class="nav-number">5.</span> <span class="nav-text">PyFlink安装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PyFlink示例作业"><span class="nav-number">6.</span> <span class="nav-text">PyFlink示例作业</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Local-SingleJVM-模式部署"><span class="nav-number">7.</span> <span class="nav-text">Local-SingleJVM 模式部署</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Local-SingleNode-模式部署"><span class="nav-number">8.</span> <span class="nav-text">Local-SingleNode 模式部署</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Cluster-YARN-模式部署"><span class="nav-number">9.</span> <span class="nav-text">Cluster YARN 模式部署</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#准备YARN环境"><span class="nav-number">9.1.</span> <span class="nav-text">准备YARN环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Flink集成Hadoop包"><span class="nav-number">9.2.</span> <span class="nav-text">Flink集成Hadoop包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#打包Python环境"><span class="nav-number">9.3.</span> <span class="nav-text">打包Python环境</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#本地打包（集群和本机操作系统一致时）"><span class="nav-number">9.3.1.</span> <span class="nav-text">本地打包（集群和本机操作系统一致时）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker中打包（比如集群为linux，本机为mac时）"><span class="nav-number">9.3.2.</span> <span class="nav-text">Docker中打包（比如集群为linux，本机为mac时）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署作业"><span class="nav-number">9.4.</span> <span class="nav-text">部署作业</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Pre-Job-模式部署作业"><span class="nav-number">9.4.1.</span> <span class="nav-text">Pre-Job 模式部署作业</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Session-模式部署作业"><span class="nav-number">9.4.2.</span> <span class="nav-text">Session 模式部署作业</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Docker-模式部署"><span class="nav-number">10.</span> <span class="nav-text">Docker 模式部署</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">11.</span> <span class="nav-text">小结</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jincheng Sun</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.2.0</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="Total Visitors">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="Total Views">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.2.0"></script>
+
+  <script src="/js/motion.js?v=7.2.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.2.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.2.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.2.0"></script>
+<script src="/js/post-details.js?v=7.2.0"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.2.0"></script>
+
+
+  
+
+  
+
+  
+
+  
+  
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://http-enjoyment-cool.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+
+
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://enjoyment.cool/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/";
+    this.page.identifier = "2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/";
+    this.page.title = 'Apache Flink 说道系列 - PyFlink 作业的多种部署模式';
+    };
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://http-enjoyment-cool.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+  
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('3');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

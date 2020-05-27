@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+<link rel="stylesheet" href="/css/main.css?v=7.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="mask-icon" href="/images/me.png?v=7.2.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.2.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":5},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="实际问题我们知道在流计算场景中，数据是源源不断的流入的，数据流永远不会结束，那么计算就永远不会结束，如果计算永远不会结束的话，那么计算结果何时输出呢？本篇将介绍Apache Flink利用持续查询来对流计算结果进行持续输出的实现原理。 数据管理在介绍持续查询之前，我们先看看Apache Flink对数据的管理和传统数据库对数据管理的区别，以MySQL为例，如下图： 如上图所示传统数据库是数据存储和">
+<meta name="keywords" content="Flink">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Apache Flink 漫谈系列 - 持续查询(Continuous Queries)">
+<meta property="og:url" content="http://enjoyment.cool/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/index.html">
+<meta property="og:site_name" content="Pretty Cool Enjoyment">
+<meta property="og:description" content="实际问题我们知道在流计算场景中，数据是源源不断的流入的，数据流永远不会结束，那么计算就永远不会结束，如果计算永远不会结束的话，那么计算结果何时输出呢？本篇将介绍Apache Flink利用持续查询来对流计算结果进行持续输出的实现原理。 数据管理在介绍持续查询之前，我们先看看Apache Flink对数据的管理和传统数据库对数据管理的区别，以MySQL为例，如下图： 如上图所示传统数据库是数据存储和">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/01/Apache%20Flink%20漫谈系列%20-%20持续查询(Continuous%20Queries)/266A687D-8E31-4266-B52F-200B75244DDB.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/01/Apache%20Flink%20漫谈系列%20-%20持续查询(Continuous%20Queries)/1401BEB3-37C3-4203-B48E-AABF6B08DB65.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/01/Apache%20Flink%20漫谈系列%20-%20持续查询(Continuous%20Queries)/166F2FE8-93FB-4966-87B7-F6C98DFF4915.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/01/Apache%20Flink%20漫谈系列%20-%20持续查询(Continuous%20Queries)/146851FF-D705-4B2D-8C3B-77528BB8DAB5.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/01/Apache%20Flink%20漫谈系列%20-%20持续查询(Continuous%20Queries)/46EA19BC-C44F-4D3A-860F-DE343E1B04EB.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/01/Apache%20Flink%20漫谈系列%20-%20持续查询(Continuous%20Queries)/E095C802-8CCF-4922-837C-6AAE54A335D8.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/01/Apache%20Flink%20漫谈系列%20-%20持续查询(Continuous%20Queries)/43A59ED3-C317-4B5D-80F3-CC332933B93B.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/01/Apache%20Flink%20漫谈系列%20-%20持续查询(Continuous%20Queries)/3446A4F4-A131-4AE5-A0C9-B117A65B9E53.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/01/Apache%20Flink%20漫谈系列%20-%20持续查询(Continuous%20Queries)/BC8FD47E-F124-4E2B-AE3A-4B99E5C13EF8.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/01/Apache%20Flink%20漫谈系列%20-%20持续查询(Continuous%20Queries)/78D31D91-3693-44C8-A7E4-71D6798A78AE.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/01/Apache%20Flink%20漫谈系列%20-%20持续查询(Continuous%20Queries)/B2EEEC59-21F9-41E1-A306-8338A7A72A64.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/01/Apache%20Flink%20漫谈系列%20-%20持续查询(Continuous%20Queries)/A415CDF6-5FE3-442B-AFDA-70CB9CEC37A9.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/01/Apache%20Flink%20漫谈系列%20-%20持续查询(Continuous%20Queries)/17FB1F6A-C813-43D4-AD6D-31FC03B84533.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/01/Apache%20Flink%20漫谈系列%20-%20持续查询(Continuous%20Queries)/A6CFC228-420F-4B1E-9F3D-1A286D604F2F.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/01/Apache%20Flink%20漫谈系列%20-%20持续查询(Continuous%20Queries)/0B59286E-D2BD-4DBC-9FEA-DF390FC1CC9B.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/01/Apache%20Flink%20漫谈系列%20-%20持续查询(Continuous%20Queries)/5BB27EDB-098E-4CC0-B9D6-7514EFE7DE3F.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/01/Apache%20Flink%20漫谈系列%20-%20持续查询(Continuous%20Queries)/BE66E18F-DE01-42EC-9336-5F6172B22636.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/01/Apache%20Flink%20漫谈系列%20-%20持续查询(Continuous%20Queries)/B5F9DD64-3574-480A-A409-BEE96561091B.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/01/Apache%20Flink%20漫谈系列%20-%20持续查询(Continuous%20Queries)/4134FE05-67E4-4625-824D-BBD7B444BFE6.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/01/Apache%20Flink%20漫谈系列%20-%20持续查询(Continuous%20Queries)/D5D7D6E8-83A1-4290-BE79-974C9913DAE5.png">
+<meta property="og:updated_time" content="2019-07-13T13:10:01.207Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Apache Flink 漫谈系列 - 持续查询(Continuous Queries)">
+<meta name="twitter:description" content="实际问题我们知道在流计算场景中，数据是源源不断的流入的，数据流永远不会结束，那么计算就永远不会结束，如果计算永远不会结束的话，那么计算结果何时输出呢？本篇将介绍Apache Flink利用持续查询来对流计算结果进行持续输出的实现原理。 数据管理在介绍持续查询之前，我们先看看Apache Flink对数据的管理和传统数据库对数据管理的区别，以MySQL为例，如下图： 如上图所示传统数据库是数据存储和">
+<meta name="twitter:image" content="http://enjoyment.cool/2019/03/01/Apache%20Flink%20漫谈系列%20-%20持续查询(Continuous%20Queries)/266A687D-8E31-4266-B52F-200B75244DDB.png">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://enjoyment.cool/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Apache Flink 漫谈系列 - 持续查询(Continuous Queries) | Pretty Cool Enjoyment</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Pretty Cool Enjoyment</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">Apache Flink</h1>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-catalog">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/catalog/" rel="section"><i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Catalog</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+  
+  
+
+  
+
+  <a href="https://github.com/sunjincheng121" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://enjoyment.cool/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jincheng Sun">
+      <meta itemprop="description" content="Apache Flink">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Pretty Cool Enjoyment">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">Apache Flink 漫谈系列 - 持续查询(Continuous Queries)
+
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+
+          
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-03-01 18:18:18" itemprop="dateCreated datePublished" datetime="2019-03-01T18:18:18+08:00">2019-03-01</time>
+            </span>
+          
+
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-07-13 21:10:01" itemprop="dateModified" datetime="2019-07-13T21:10:01+08:00">2019-07-13</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/archives/Apache-Flink-漫谈/" itemprop="url" rel="index"><span itemprop="name">Apache Flink 漫谈</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+              
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">Comments: </span>
+                <a href="/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+                 Views:  
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          
+
+          <br>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="实际问题"><a href="#实际问题" class="headerlink" title="实际问题"></a>实际问题</h1><p>我们知道在流计算场景中，数据是源源不断的流入的，数据流永远不会结束，那么计算就永远不会结束，如果计算永远不会结束的话，那么计算结果何时输出呢？本篇将介绍Apache Flink利用持续查询来对流计算结果进行持续输出的实现原理。</p>
+<h1 id="数据管理"><a href="#数据管理" class="headerlink" title="数据管理"></a>数据管理</h1><p>在介绍持续查询之前，我们先看看Apache Flink对数据的管理和传统数据库对数据管理的区别，以MySQL为例，如下图：<br><img src="/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/266A687D-8E31-4266-B52F-200B75244DDB.png" alt></p>
+<p>如上图所示传统数据库是数据存储和查询计算于一体的架构管理方式，这个很明显，oracle数据库不可能管理MySQL数据库数据，反之亦然，每种数据库厂商都有自己的数据库管理和存储的方式，各自有特有的实现。在这点上Apache Flink海纳百川(也有corner case)，将data store 进行抽象，分为source(读) 和 sink(写)两种类型接口，然后结合不同存储的特点提供常用数据存储的内置实现，当然也支持用户自定义的实现。</p>
+<p>那么在宏观设计上Apache Flink与传统数据库一样都可以对数据表进行SQL查询，并将产出的结果写入到数据存储里面，那么Apache Flink上面的SQL查询和传统数据库查询的区别是什么呢？Apache Flink又是如何做到求同(语义相同)存异(实现机制不同)，完美支持ANSI-SQL的呢？</p>
+<h1 id="静态查询"><a href="#静态查询" class="headerlink" title="静态查询"></a>静态查询</h1><p>传统数据库中对表(比如 flink_tab，有user和clicks两列，user主键)的一个查询SQL(select * from flink_tab)在数据量允许的情况下，会立刻返回表中的所有数据，在查询结果显示之后，对数据库表flink_tab的DML操作将与执行的SQL无关了。也就是说传统数据库下面对表的查询是静态查询，将计算的最终查询的结果立即输出，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">select * from flink_tab;</span><br><span class="line">+----+------+--------+</span><br><span class="line">| id | user | clicks |</span><br><span class="line">+----+------+--------+</span><br><span class="line">|  1 | Mary |      1 |</span><br><span class="line">+----+------+--------+</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+
+<p>当我执行完上面的查询，查询结果立即返回，上面情况告诉我们表 flink_tab里面只有一条记录，id=1，user=Mary,clicks=1; 这样传统数据库表的一条查询语句就完全结束了。传统数据库表在查询那一刻我们这里叫Static table，是指在查询的那一刻数据库表的内容不再变化了，查询进行一次计算完成之后表的变化也与本次查询无关了，我们将在Static Table 上面的查询叫做静态查询。</p>
+<h1 id="持续查询"><a href="#持续查询" class="headerlink" title="持续查询"></a>持续查询</h1><p>什么是连续查询呢？连续查询发生在流计算上面，在 《Apache Flink 漫谈系列 - 流表对偶(duality)性》 中我们提到过Dynamic Table，连续查询是作用在Dynamic table上面的，永远不会结束的，随着表内容的变化计算在不断的进行着…</p>
+<h1 id="静态-持续查询特点"><a href="#静态-持续查询特点" class="headerlink" title="静态/持续查询特点"></a>静态/持续查询特点</h1><p>静态查询和持续查询的特点就是《Apache Flink 漫谈系列 - 流表对偶(duality)性》中所提到的批与流的计算特点，批一次查询返回一个计算结果就结束查询，流一次查询不断修正计算结果，查询永远不结束，表格示意如下：<br>| 查询类型 | 计算次数 |计算结果  |<br>| — | — | — |<br>| 静态查询 | 1 | 最终结果 |<br>| 持续查询 | 无限 | 不断更新 |</p>
+<h1 id="静态-持续查询关系"><a href="#静态-持续查询关系" class="headerlink" title="静态/持续查询关系"></a>静态/持续查询关系</h1><p>接下来我们以flink_tab表实际操作为例，体验一下静态查询与持续查询的关系。假如我们对flink_tab表再进行一条增加和一次更新操作，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">MySQL&gt; insert into flink_tab(user, clicks) values (&apos;Bob&apos;, 1);</span><br><span class="line">Query OK, 1 row affected (0.08 sec)</span><br><span class="line"></span><br><span class="line">MySQL&gt; update flink_tab set clicks=2 where user=&apos;Mary&apos;;</span><br><span class="line">Query OK, 1 row affected (0.06 sec)</span><br></pre></td></tr></table></figure>
+
+<p>这时候我们再进行查询 <code>select * from flink_tab</code> ，结果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">MySQL&gt; select * from flink_tab;</span><br><span class="line">+----+------+--------+</span><br><span class="line">| id | user | clicks |</span><br><span class="line">+----+------+--------+</span><br><span class="line">|  1 | Mary |      2 |</span><br><span class="line">|  2 | Bob  |      1 |</span><br><span class="line">+----+------+--------+</span><br><span class="line">2 rows in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+
+<p>那么我们看见，相同的查询SQL(<code>select * from flink_tab</code>)，计算结果完全 不 一样了。这说明相同的sql语句，在不同的时刻执行计算，得到的结果可能不一样(有点像废话），就如下图一样：<br><img src="/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/1401BEB3-37C3-4203-B48E-AABF6B08DB65.png" alt></p>
+<p>假设不断的有人在对表flink_tab做操作，同时有一个人间歇性的发起对表数据的查询，上图我们只是在三个时间点进行了3次查询。并且在这段时间内数据表的内容也在变化。引起上面变化的DML如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">MySQL&gt; insert into flink_tab(user, clicks) values (&apos;Llz&apos;, 1);</span><br><span class="line">Query OK, 1 row affected (0.08 sec)</span><br><span class="line"></span><br><span class="line">MySQL&gt; update flink_tab set clicks=2 where user=&apos;Bob&apos;;</span><br><span class="line">Query OK, 1 row affected (0.01 sec)</span><br><span class="line">Rows matched: 1  Changed: 1  Warnings: 0</span><br><span class="line"></span><br><span class="line">MySQL&gt; update flink_tab set clicks=3 where user=&apos;Mary&apos;;</span><br><span class="line">Query OK, 1 row affected (0.05 sec)</span><br><span class="line">Rows matched: 1  Changed: 1  Warnings: 0</span><br></pre></td></tr></table></figure>
+
+<p>到现在我们不难想象，上面图内容的核心要点如下：</p>
+<ul>
+<li>时间 </li>
+<li>表数据变化</li>
+<li>触发计算 </li>
+<li>计算结果更新</li>
+</ul>
+<p>接下来我们利用传统数据库现有的机制模拟一下持续查询…</p>
+<h2 id="无PK的-Append-only-场景"><a href="#无PK的-Append-only-场景" class="headerlink" title="无PK的 Append only 场景"></a>无PK的 Append only 场景</h2><p>接下来我们把上面隐式存在的时间属性timestamp作为表flink_tab_ts(timestamp，user，clicks三列，无主键)的一列，再写一个 触发器(Trigger) 示例观察一下：</p>
+<table>
+<thead>
+<tr>
+<th>timestamp</th>
+<th>user</th>
+<th>clicks</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1525099013</td>
+<td>Mary</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1525099026</td>
+<td>Bob</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1525099035</td>
+<td>Mary</td>
+<td>2</td>
+</tr>
+<tr>
+<td>1525099047</td>
+<td>Llz</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1525099056</td>
+<td>Bob</td>
+<td>2</td>
+</tr>
+<tr>
+<td>1525099065</td>
+<td>Mary</td>
+<td>3</td>
+</tr>
+</tbody></table>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// INSERT 的时候查询一下数据flink_tab_ts，将结果写到trigger.sql中</span><br><span class="line"> DELIMITER ;;</span><br><span class="line">create trigger flink_tab_ts_trigger_insert after insert</span><br><span class="line">on flink_tab_ts for each row</span><br><span class="line">  begin</span><br><span class="line">       select ts, user, clicks from flink_tab_ts into OUTFILE &apos;/Users/jincheng.sunjc/testdir/atas/trigger.sql&apos;;</span><br><span class="line">  end ;;</span><br><span class="line">DELIMITER ;</span><br></pre></td></tr></table></figure>
+
+<p>上面的trigger要将查询结果写入本地文件，默认MySQL是不允许写入的，我们查看一下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">MySQL&gt; show variables like &apos;%secure%&apos;;</span><br><span class="line">+--------------------------+-------+</span><br><span class="line">| Variable_name            | Value |</span><br><span class="line">+--------------------------+-------+</span><br><span class="line">| require_secure_transport | OFF   |</span><br><span class="line">| secure_file_priv         | NULL  |</span><br><span class="line">+--------------------------+-------+</span><br><span class="line">2 rows in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+
+<p>上面secure_file_priv属性为NULL，说明MySQL不允许写入file，我需要修改my.cnf在添加secure_file_priv=’’打开写文件限制；</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">MySQL&gt; show variables like &apos;%secure%&apos;;</span><br><span class="line">+--------------------------+-------+</span><br><span class="line">| Variable_name            | Value |</span><br><span class="line">+--------------------------+-------+</span><br><span class="line">| require_secure_transport | OFF   |</span><br><span class="line">| secure_file_priv         |       |</span><br><span class="line">+--------------------------+-------+</span><br><span class="line">2 rows in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+
+<p>下面我们对flink_tab_ts进行INSERT操作：</p>
+<p><img src="/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/166F2FE8-93FB-4966-87B7-F6C98DFF4915.png" alt></p>
+<p>我们再来看看6次trigger 查询计算的结果：</p>
+<p><img src="/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/146851FF-D705-4B2D-8C3B-77528BB8DAB5.png" alt></p>
+<p>大家到这里发现我写了Trigger的存储过程之后，每次在数据表flink_tab_ts进行DML操作的时候，Trigger就会触发一次查询计算，产出一份新的计算结果，观察上面的查询结果发现，结果表不停的增加（Append only)。</p>
+<h2 id="有PK的Update场景"><a href="#有PK的Update场景" class="headerlink" title="有PK的Update场景"></a>有PK的Update场景</h2><p>我们利用flink_tab_ts的6次DML操作和自定义的触发器TriggerL来介绍了什么是持续查询，做处理静态查询与持续查询的关系。那么上面的演示目的是为了说明持续查询，所有操作都是insert，没有基于主键的更新，也就是说Trigger产生的结果都是append only的，那么大家想一想，如果我们操作flink_tab这张表，按主键user进行插入和更新操作，同样利用Trigger机制来进行持续查询，结果是怎样的的呢？ 初始化表，trigger：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">drop table flink_tab;</span><br><span class="line">create table flink_tab(</span><br><span class="line">    user VARCHAR(100) NOT NULL,</span><br><span class="line">    clicks INT NOT NULL,</span><br><span class="line">    PRIMARY KEY (user)</span><br><span class="line"> );</span><br><span class="line"></span><br><span class="line"> DELIMITER ;;</span><br><span class="line">create trigger flink_tab_trigger_insert after insert</span><br><span class="line">on flink_tab for each row</span><br><span class="line">  begin</span><br><span class="line">       select user, clicks from flink_tab into OUTFILE &apos;/tmp/trigger.sql&apos;;</span><br><span class="line">  end ;;</span><br><span class="line">DELIMITER ;</span><br><span class="line"></span><br><span class="line">DELIMITER ;;</span><br><span class="line">create trigger flink_tab_trigger_ after update</span><br><span class="line">on flink_tab for each row</span><br><span class="line">  begin</span><br><span class="line">        select ts, user, clicks from flink_tab into OUTFILE &apos;/tmp/trigger.sql&apos;;</span><br><span class="line">  end ;;</span><br><span class="line">DELIMITER ;</span><br></pre></td></tr></table></figure>
+
+<p> 同样我做如下6次DML操作，Trigger 6次查询计算：</p>
+<p><img src="/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/46EA19BC-C44F-4D3A-860F-DE343E1B04EB.png" alt></p>
+<p>在来看看这次的结果与append only 有什么不同？</p>
+<p><img src="/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/E095C802-8CCF-4922-837C-6AAE54A335D8.png" alt></p>
+<p>我想大家早就知道这结果了，数据库里面定义的PK所有变化会按PK更新，那么触发的6次计算中也会得到更新后的结果，这应该不难理解，查询结果也是不断更新的(Update)!</p>
+<h2 id="关系定义"><a href="#关系定义" class="headerlink" title="关系定义"></a>关系定义</h2><p>上面Append Only 和 Update两种场景在MySQL上面都可以利用Trigger机制模拟 持续查询的概念，也就是说数据表中每次数据变化，我们都触发一次相同的查询计算（只是计算时候数据的集合发生了变化），因为数据表不断的变化，这个表就可以看做是一个动态表Dynamic Table，而查询SQL(<code>select * from flink_tab_ts</code>) 被触发器Trigger在满足某种条件后不停的触发计算，进而也不断地产生新的结果。这种作用在Dynamic Table，并且有某种机制(Trigger)不断的触发计算的查询我们就称之为 持续查询。</p>
+<p>那么到底静态查询和动态查询的关系是什么呢？在语义上 持续查询 中的每一次查询计算的触发都是一次静态查询(相对于当时查询的时间点),  在实现上 Apache Flink会利用上一次查询结果+当前记录 以增量的方式完成查询计算。</p>
+<p><strong>特别说明：</strong> 上面我们利用 数据变化+Trigger方式描述了持续查询的概念，这里有必要特别强调一下的是数据库中trigger机制触发的查询，每次都是一个全量查询，这与Apache Flink上面流计算的持续查询概念相同，但实现机制完全不同，Apache Flink上面的持续查询内部实现是增量处理的，随着时间的推移，每条数据的到来实时处理当前的那一条记录，不会处理曾经来过的历史记录!</p>
+<h1 id="Apache-Flink-如何做到持续查询"><a href="#Apache-Flink-如何做到持续查询" class="headerlink" title="Apache Flink 如何做到持续查询"></a>Apache Flink 如何做到持续查询</h1><h2 id="动态表上面持续查询"><a href="#动态表上面持续查询" class="headerlink" title="动态表上面持续查询"></a>动态表上面持续查询</h2><p>在 《Apache Flink 漫谈系列 - 流表对偶(duality)性》 中我们了解到流和表可以相互转换，在Apache Flink流计算中携带流事件的Schema，经过算子计算之后再产生具有新的Schema的事件，流入下游节点，在产生新的Schema的Event和不断流转的过程就是持续查询作用的结果，如下图：<br><img src="/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/43A59ED3-C317-4B5D-80F3-CC332933B93B.png" alt></p>
+<h2 id="增量计算"><a href="#增量计算" class="headerlink" title="增量计算"></a>增量计算</h2><p>我们进行查询大多数场景是进行数据聚合，比如查询SQL中利用count，sum等aggregate function进行聚合统计，那么流上的数据源源不断的流入，我们既不能等所有事件流入结束（永远不会结束）再计算，也不会每次来一条事件就像传统数据库一样将全部事件集合重新整体计算一次，在持续查询的计算过程中，Apache Flink采用增量计算的方式，也就是每次计算都会将计算结果存储到state中，下一条事件到来的时候利用上次计算的结果和当前的事件进行聚合计算，比如 有一个订单表，如下：</p>
+<p><img src="/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/3446A4F4-A131-4AE5-A0C9-B117A65B9E53.png" alt></p>
+<p>一个简单的计数和求和查询SQL：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 求订单总数和所有订单的总金额</span><br><span class="line">select count(id) as cnt，sum(amount)as sumAmount from order_tab;</span><br></pre></td></tr></table></figure>
+
+<p>这样一个简单的持续查询计算，Apache Flink内部是如何处理的呢？如下图：<br><img src="/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/BC8FD47E-F124-4E2B-AE3A-4B99E5C13EF8.png" alt></p>
+<p>如上图，Apache Flink中每来一条事件,就进行一次计算，并且每次计算后结果会存储到state中，供下一条事件到来时候进行计算,即:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">result(n) = calculation(result(n-1), n)。</span><br></pre></td></tr></table></figure>
+
+<h3 id="无PK的Append-Only-场景"><a href="#无PK的Append-Only-场景" class="headerlink" title="无PK的Append Only 场景"></a>无PK的Append Only 场景</h3><p>在实际的业务场景中，我们只需要进行简单的数据统计，然后就将统计结果写入到业务的数据存储系统里面，比如上面统计订单数量和总金额的场景，订单表本身是一个append only的数据源(假设没有更新，截止到2018.5.14日，Apache Flink内部支持的数据源都是append only的)，在持续查询过程中经过count(id),sum(amount)统计计算之后产生的动态表也是append only的，种场景Apache Flink内部只需要进行aggregate function的聚合统计计算就可以，如下：</p>
+<p><img src="/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/78D31D91-3693-44C8-A7E4-71D6798A78AE.png" alt></p>
+<h3 id="有PK的Update-场景"><a href="#有PK的Update-场景" class="headerlink" title="有PK的Update 场景"></a>有PK的Update 场景</h3><p>现在我们将上面的订单场景稍微变化一下，在数据表上面我们将金额字段amount，变为地区字段region，数据如下：</p>
+<p><img src="/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/B2EEEC59-21F9-41E1-A306-8338A7A72A64.png" alt></p>
+<p>查询统计的变为，在计算具有相同订单数量的地区数量；查询SQL如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"> CREATE TABLE order_tab(</span><br><span class="line">   id BIGINT,</span><br><span class="line">   region VARCHAR</span><br><span class="line"> ) </span><br><span class="line"></span><br><span class="line">CREATE TABLE region_count_sink(</span><br><span class="line">   order_cnt BIGINT, </span><br><span class="line">   region_cnt BIGINT,</span><br><span class="line">   PRIMARY KEY(order_cnt) -- 主键</span><br><span class="line">) </span><br><span class="line"></span><br><span class="line">-- 按地区分组计算每个地区的订单数量</span><br><span class="line">CREATE VIEW order_count_view AS</span><br><span class="line">    SELECT</span><br><span class="line">        region, count(id) AS order_cnt</span><br><span class="line">    FROM  order_tab </span><br><span class="line">    GROUP BY region;</span><br><span class="line"></span><br><span class="line">-- 按订单数量分组统计具有相同订单数量的地区数量</span><br><span class="line">INSERT INTO region_count_sink </span><br><span class="line">    SELECT </span><br><span class="line">        order_cnt,</span><br><span class="line">        count(region) as region_cnt</span><br><span class="line">    FROM order_count_view </span><br><span class="line">    GROUP BY order_cnt;</span><br></pre></td></tr></table></figure>
+
+<p>上面查询SQL的代码结构如下(这个图示在Alibaba 企业版Flink的集成IDE环境生成的，<a href="https://data.aliyun.com/product/sc" target="_blank" rel="noopener">了解更多</a>)：<br><img src="/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/A415CDF6-5FE3-442B-AFDA-70CB9CEC37A9.png" alt></p>
+<p>上面SQL中我们发现有两层查询计算逻辑，第一个查询计算逻辑是与SOURCE相连的按地区统计订单数量的分组统计，第二个查询计算逻辑是在第一个查询产出的动态表上面进行按订单数量统计地区数量的分组统计，我们一层一层分析。</p>
+<h3 id="错误处理"><a href="#错误处理" class="headerlink" title="错误处理"></a>错误处理</h3><ul>
+<li><p>第一层分析：<code>SELECT region, count(id) AS order_cnt FROM order_tab GROUP BY region;</code><br><img src="/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/17FB1F6A-C813-43D4-AD6D-31FC03B84533.png" alt></p>
+</li>
+<li><p>第二层分析：<code>SELECT order_cnt, count(region) as region_cnt FROM order_count_view GROUP BY order_cnt;</code><br><img src="/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/A6CFC228-420F-4B1E-9F3D-1A286D604F2F.png" alt></p>
+</li>
+</ul>
+<p>按照第一层分析的结果，再分析第二层产出的结果，我们分析的过程是对的，但是最终写到sink表的计算结果是错误的，那我们错在哪里了呢？</p>
+<p>其实当 (SH,2)这条记录来的时候，以前来过的(SH, 1)已经是脏数据了，当(BJ, 2)来的时候，已经参与过计算的(BJ, 1)也变成脏数据了，同样当(BJ, 3)来的时候，(BJ, 2)也是脏数据了，上面的分析，没有处理脏数据进而导致最终结果的错误。那么Apache Flink内部是如何正确处理的呢？</p>
+<h3 id="正确处理"><a href="#正确处理" class="headerlink" title="正确处理"></a>正确处理</h3><ul>
+<li><p>第一层分析：<code>SELECT region, count(id) AS order_cnt FROM order_tab GROUP BY region;</code><br><img src="/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/0B59286E-D2BD-4DBC-9FEA-DF390FC1CC9B.png" alt></p>
+</li>
+<li><p>第二层分析：<code>SELECT order_cnt, count(region) as region_cnt FROM order_count_view GROUP BY order_cnt;</code><br><img src="/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/5BB27EDB-098E-4CC0-B9D6-7514EFE7DE3F.png" alt></p>
+</li>
+</ul>
+<p>上面我们将有更新的事件进行打标的方式来处理脏数据，这样在Apache Flink内部计算的时候 算子会根据事件的打标来处理事件，在aggregate function中有两个对应的方法(retract和accumulate)来处理不同标识的事件,如上面用到的count AGG，内部实现如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">def accumulate(acc: CountAccumulator): Unit = &#123;</span><br><span class="line">    acc.f0 += 1L // acc.f0 存储记数</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">def retract(acc: CountAccumulator, value: Any): Unit = &#123;</span><br><span class="line">    if (value != null) &#123;</span><br><span class="line">      acc.f0 -= 1L //acc.f0 存储记数</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Apache Flink内部这种为事件进行打标的机制叫做 retraction。retraction机制保障了在流上已经流转到下游的脏数据需要被撤回问题，进而保障了持续查询的正确语义。</p>
+<h1 id="Apache-Flink-Connector-类型"><a href="#Apache-Flink-Connector-类型" class="headerlink" title="Apache Flink Connector 类型"></a>Apache Flink Connector 类型</h1><p>本篇一开始就对比了MySQL的数据存储和Apache Flink数据存储的区别，Apache Flink目前是一个计算平台，将数据的存储以高度抽象的插件机制与各种已有的数据存储无缝对接。目前Apache Flink中将数据插件称之为链接器Connector，Connnector又按数据的读和写分成Soruce（读）和Sink（写）两种类型。对于传统数据库表，PK是一个很重要的属性，在频繁的按某些字段(PK)进行更新的场景,在表上定义PK非常重要。那么作为完全支持ANSI-SQL的Apache Flink平台在Connector上面是否也支持PK的定义呢？</p>
+<h2 id="Apache-Flink-Source"><a href="#Apache-Flink-Source" class="headerlink" title="Apache Flink Source"></a>Apache Flink Source</h2><p>现在(2018.11.5)Apache Flink中用于数据流驱动的Source Connector上面无法定义PK，这样在某些业务场景下会造成数据量较大，造成计算资源不必要的浪费，甚至有聚合结果不是用户“期望”的情况。我们以双流JOIN为例来说明：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">SQL：</span><br><span class="line"></span><br><span class="line">CREATE TABLE inventory_tab(</span><br><span class="line">   product_id VARCHAR,</span><br><span class="line">   product_count BIGINT</span><br><span class="line">); </span><br><span class="line"></span><br><span class="line">CREATE TABLE sales_tab(</span><br><span class="line">   product_id VARCHAR,</span><br><span class="line">   sales_count BIGINT</span><br><span class="line">  ) ;</span><br><span class="line"></span><br><span class="line">CREATE TABLE join_sink(</span><br><span class="line">   product_id VARCHAR, </span><br><span class="line">   product_count BIGINT,</span><br><span class="line">   sales_count BIGINT,</span><br><span class="line">   PRIMARY KEY(product_id)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">CREATE VIEW join_view AS</span><br><span class="line">    SELECT</span><br><span class="line">        l.product_id, </span><br><span class="line">        l.product_count,</span><br><span class="line">        r.sales_count</span><br><span class="line">    FROM inventory_tab l </span><br><span class="line">        JOIN  sales_tab r </span><br><span class="line">        ON l.product_id = r.product_id;</span><br><span class="line"></span><br><span class="line">INSERT INTO join_sink </span><br><span class="line">  SELECT </span><br><span class="line">      product_id, </span><br><span class="line">      product_count,</span><br><span class="line">      sales_count</span><br><span class="line">  FROM join_view ;</span><br></pre></td></tr></table></figure>
+
+
+<p>代码结构图：</p>
+<p><img src="/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/BE66E18F-DE01-42EC-9336-5F6172B22636.png" alt></p>
+<p>实现示意图：</p>
+<p><img src="/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/B5F9DD64-3574-480A-A409-BEE96561091B.png" alt></p>
+<p>上图描述了一个双流JOIN的场景，双流JOIN的底层实现会将左(L)右(R)两面的数据都持久化到Apache Flink的State中，当L流入一条事件，首先会持久化到LState，然后在和RState中存储的R中所有事件进行条件匹配，这样的逻辑如果R流product_id为P001的产品销售记录已经流入4条，L流的(P001, 48) 流入的时候会匹配4条事件流入下游(join_sink)。</p>
+<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>上面双流JOIN的场景，我们发现其实inventory和sales表是有业务的PK的，也就是两张表上面的product_id是唯一的，但是由于我们在Sorure上面无法定义PK字段，表上面所有的数据都会以append only的方式从source流入到下游计算节点JOIN，这样就导致了JOIN内部所有product_id相同的记录都会被匹配流入下游，上面的例子是 (P001, 48) 来到的时候，就向下游流入了4条记录，不难想象每个product_id相同的记录都会与历史上所有事件进行匹配，进而操作下游数据压力。</p>
+<p>那么这样的压力是必要的吗？从业务的角度看，不是必要的，因为对于product_id相同的记录，我们只需要对左右两边最新的记录进行JOIN匹配就可以了。比如(P001, 48)到来了，业务上面只需要右流的(P001, 22)匹配就好，流入下游一条事件(P001, 48, 22)。 那么目前在Apache Flink上面如何做到这样的优化呢？</p>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>上面的问题根本上我们要构建一张有PK的动态表，这样按照业务PK进行更新处理，我们可以在Source后面添加group by 操作生产一张有PK的动态表。如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">SQL:</span><br><span class="line"></span><br><span class="line">CREATE TABLE inventory_tab(</span><br><span class="line">   product_id VARCHAR,</span><br><span class="line">   product_count BIGINT</span><br><span class="line">  ) </span><br><span class="line"></span><br><span class="line"> CREATE TABLE sales_tab(</span><br><span class="line">   product_id VARCHAR,</span><br><span class="line">   sales_count BIGINT</span><br><span class="line">  )</span><br><span class="line">CREATE VIEW inventory_view AS</span><br><span class="line">    SELECT </span><br><span class="line">    product_id,</span><br><span class="line">    LAST_VALUE(product_count) AS product_count</span><br><span class="line">    FROM inventory_tab</span><br><span class="line">    GROUP BY product_id;</span><br><span class="line"></span><br><span class="line">CREATE VIEW sales_view AS</span><br><span class="line">    SELECT </span><br><span class="line">    product_id,</span><br><span class="line">    LAST_VALUE(sales_count) AS sales_count</span><br><span class="line">    FROM sales_tab</span><br><span class="line">    GROUP BY product_id;</span><br><span class="line"></span><br><span class="line">CREATE TABLE join_sink(</span><br><span class="line">   product_id VARCHAR, </span><br><span class="line">   product_count BIGINT,</span><br><span class="line">   sales_count BIGINT,</span><br><span class="line">   PRIMARY KEY(product_id)</span><br><span class="line">)WITH (</span><br><span class="line">    type = &apos;print&apos;</span><br><span class="line">) ;</span><br><span class="line"></span><br><span class="line">CREATE VIEW join_view AS</span><br><span class="line">    SELECT</span><br><span class="line">        l.product_id, </span><br><span class="line">        l.product_count,</span><br><span class="line">        r.sales_count</span><br><span class="line">    FROM inventory_view l </span><br><span class="line">        JOIN  sales_view r </span><br><span class="line">        ON l.product_id = r.product_id;</span><br><span class="line"></span><br><span class="line"> INSERT INTO join_sink </span><br><span class="line">  SELECT </span><br><span class="line">      product_id, </span><br><span class="line">      product_count,</span><br><span class="line">      sales_count</span><br><span class="line">  FROM join_view ;</span><br></pre></td></tr></table></figure>
+
+<p>代码结构：</p>
+<p><img src="/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/4134FE05-67E4-4625-824D-BBD7B444BFE6.png" alt></p>
+<p>示意图:<br><img src="/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/D5D7D6E8-83A1-4290-BE79-974C9913DAE5.png" alt></p>
+<p>如上方式可以将无PK的source经过一次节点变成有PK的动态表，以Apache Flink的retract机制和业务要素解决数据瓶颈，减少计算资源的消耗。</p>
+<p><strong>说明1： 上面方案LAST_VALUE是Alibaba企业版Flink的功能，社区还没有支持。</strong></p>
+<h2 id="Apache-Flink-Sink"><a href="#Apache-Flink-Sink" class="headerlink" title="Apache Flink Sink"></a>Apache Flink Sink</h2><p>在Apache Flink上面可以根据实际外部存储的特点（是否支持PK），以及整体job的执行plan来动态推导Sink的执行模式，具体有如下三种类型:</p>
+<ul>
+<li>Append 模式 - 该模式用户在定义Sink的DDL时候不定义PK，在Apache Flink内部生成的所有只有INSERT语句；</li>
+<li>Upsert 模式 - 该模式用户在定义Sink的DDL时候可以定义PK，在Apache Flink内部会根据事件打标(retract机制)生成INSERT/UPDATE和DELETE 语句,其中如果定义了PK， UPDATE语句按PK进行更新，如果没有定义PK UPDATE会按整行更新；</li>
+<li>Retract 模式 - 该模式下会产生INSERT和DELETE两种信息，Sink Connector 根据这两种信息构造对应的数据操作指令；</li>
+</ul>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本篇以MySQL为例介绍了传统数据库的静态查询和利用MySQL的Trigger+DML操作来模拟持续查询，并介绍了Apache Flink上面利用增量模式完成持续查询，并以双流JOIN为例说明了持续查询可能会遇到的问题，并且介绍Apache Flink以为事件打标产生delete事件的方式解决持续查询的问题，进而保证语义的正确性，完美的在流计算上支持续查询。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        
+          
+        
+        <div class="post-tags">
+          
+            <a href="/archives/Flink/" rel="tag"># Flink</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/05/Apache Flink 漫谈系列 - 概述/" rel="next" title="Apache Flink 漫谈系列 - 概述">
+                <i class="fa fa-chevron-left"></i> Apache Flink 漫谈系列 - 概述
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/06/Apache Flink 漫谈系列 - JOIN 算子/" rel="prev" title="Apache Flink 漫谈系列 - JOIN 算子">
+                Apache Flink 漫谈系列 - JOIN 算子 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="Jincheng Sun">
+            
+              <p class="site-author-name" itemprop="name">Jincheng Sun</p>
+              <div class="site-description motion-element" itemprop="description">Apache Flink</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">36</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">30</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/sunjincheng121/enjoyment" title="GitHub &rarr; https://github.com/sunjincheng121/enjoyment" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/sunjincheng121" title="Twitter &rarr; https://twitter.com/sunjincheng121" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#实际问题"><span class="nav-number">1.</span> <span class="nav-text">实际问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据管理"><span class="nav-number">2.</span> <span class="nav-text">数据管理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#静态查询"><span class="nav-number">3.</span> <span class="nav-text">静态查询</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#持续查询"><span class="nav-number">4.</span> <span class="nav-text">持续查询</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#静态-持续查询特点"><span class="nav-number">5.</span> <span class="nav-text">静态/持续查询特点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#静态-持续查询关系"><span class="nav-number">6.</span> <span class="nav-text">静态/持续查询关系</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#无PK的-Append-only-场景"><span class="nav-number">6.1.</span> <span class="nav-text">无PK的 Append only 场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#有PK的Update场景"><span class="nav-number">6.2.</span> <span class="nav-text">有PK的Update场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关系定义"><span class="nav-number">6.3.</span> <span class="nav-text">关系定义</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Apache-Flink-如何做到持续查询"><span class="nav-number">7.</span> <span class="nav-text">Apache Flink 如何做到持续查询</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#动态表上面持续查询"><span class="nav-number">7.1.</span> <span class="nav-text">动态表上面持续查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#增量计算"><span class="nav-number">7.2.</span> <span class="nav-text">增量计算</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#无PK的Append-Only-场景"><span class="nav-number">7.2.1.</span> <span class="nav-text">无PK的Append Only 场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#有PK的Update-场景"><span class="nav-number">7.2.2.</span> <span class="nav-text">有PK的Update 场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#错误处理"><span class="nav-number">7.2.3.</span> <span class="nav-text">错误处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#正确处理"><span class="nav-number">7.2.4.</span> <span class="nav-text">正确处理</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Apache-Flink-Connector-类型"><span class="nav-number">8.</span> <span class="nav-text">Apache Flink Connector 类型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Apache-Flink-Source"><span class="nav-number">8.1.</span> <span class="nav-text">Apache Flink Source</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题"><span class="nav-number">8.1.1.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决方案"><span class="nav-number">8.1.2.</span> <span class="nav-text">解决方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Apache-Flink-Sink"><span class="nav-number">8.2.</span> <span class="nav-text">Apache Flink Sink</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">9.</span> <span class="nav-text">小结</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jincheng Sun</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.2.0</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="Total Visitors">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="Total Views">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.2.0"></script>
+
+  <script src="/js/motion.js?v=7.2.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.2.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.2.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.2.0"></script>
+<script src="/js/post-details.js?v=7.2.0"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.2.0"></script>
+
+
+  
+
+  
+
+  
+
+  
+  
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://http-enjoyment-cool.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+
+
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://enjoyment.cool/2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/";
+    this.page.identifier = "2019/03/01/Apache Flink 漫谈系列 - 持续查询(Continuous Queries)/";
+    this.page.title = 'Apache Flink 漫谈系列 - 持续查询(Continuous Queries)';
+    };
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://http-enjoyment-cool.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+  
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('3');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

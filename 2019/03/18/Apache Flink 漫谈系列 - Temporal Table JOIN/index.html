@@ -1,0 +1,1724 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+<link rel="stylesheet" href="/css/main.css?v=7.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="mask-icon" href="/images/me.png?v=7.2.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.2.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":5},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="什么是Temporal Table在《Apache Flink 漫谈系列 - JOIN LATERAL》中提到了Temporal Table JOIN，本篇就向大家详细介绍什么是Temporal Table JOIN。 在ANSI-SQL 2011 中提出了Temporal 的概念，Oracle，SQLServer，DB2等大的数据库厂商也先后实现了这个标准。Temporal Table记录了历史">
+<meta name="keywords" content="Flink">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Apache Flink 漫谈系列 - Temporal Table JOIN">
+<meta property="og:url" content="http://enjoyment.cool/2019/03/18/Apache Flink 漫谈系列 - Temporal Table JOIN/index.html">
+<meta property="og:site_name" content="Pretty Cool Enjoyment">
+<meta property="og:description" content="什么是Temporal Table在《Apache Flink 漫谈系列 - JOIN LATERAL》中提到了Temporal Table JOIN，本篇就向大家详细介绍什么是Temporal Table JOIN。 在ANSI-SQL 2011 中提出了Temporal 的概念，Oracle，SQLServer，DB2等大的数据库厂商也先后实现了这个标准。Temporal Table记录了历史">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/18/Apache%20Flink%20漫谈系列%20-%20Temporal%20Table%20JOIN/D05B8A19-6D97-4809-8723-B4B95FE075A7.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/18/Apache%20Flink%20漫谈系列%20-%20Temporal%20Table%20JOIN/BF868DDE-D746-4529-878D-91F1A0D7486F.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/18/Apache%20Flink%20漫谈系列%20-%20Temporal%20Table%20JOIN/364BB800-5D85-411A-A4E5-A9E4FAD4A8D2.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/18/Apache%20Flink%20漫谈系列%20-%20Temporal%20Table%20JOIN/BF868DDE-D746-4529-878D-91F1A0D7486F.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/18/Apache%20Flink%20漫谈系列%20-%20Temporal%20Table%20JOIN/172A63B1-C30D-43EA-B04E-B9BE8706838B.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/18/Apache%20Flink%20漫谈系列%20-%20Temporal%20Table%20JOIN/6EAC4329-C402-4497-BAE2-7E7B778E613B.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/18/Apache%20Flink%20漫谈系列%20-%20Temporal%20Table%20JOIN/3D6C354F-BC2C-40E4-95AE-7303B47E3BDE.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/18/Apache%20Flink%20漫谈系列%20-%20Temporal%20Table%20JOIN/75AC8012-59C7-4105-AE66-4453384E762B.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/18/Apache%20Flink%20漫谈系列%20-%20Temporal%20Table%20JOIN/274B8B4C-28DD-4B34-9AFE-DDACDBB05621.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/18/Apache%20Flink%20漫谈系列%20-%20Temporal%20Table%20JOIN/A94E2FAD-F04A-4691-8C34-3C697FF81476.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/18/Apache%20Flink%20漫谈系列%20-%20Temporal%20Table%20JOIN/82C7A5DC-7E84-4965-9A0A-4DD12615B24E.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/18/Apache%20Flink%20漫谈系列%20-%20Temporal%20Table%20JOIN/44FDFE22-3B21-4514-8E91-E339F9188E4E.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/18/Apache%20Flink%20漫谈系列%20-%20Temporal%20Table%20JOIN/A05E658F-C511-45E2-870F-5E3227A94570.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/18/Apache%20Flink%20漫谈系列%20-%20Temporal%20Table%20JOIN/07A663B1-7CCF-4A80-9F07-2C1E87A9C1B6.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/18/Apache%20Flink%20漫谈系列%20-%20Temporal%20Table%20JOIN/A936792A-9239-4D86-BA0C-4EE85DFDDA7D.png">
+<meta property="og:updated_time" content="2019-07-13T13:09:56.043Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Apache Flink 漫谈系列 - Temporal Table JOIN">
+<meta name="twitter:description" content="什么是Temporal Table在《Apache Flink 漫谈系列 - JOIN LATERAL》中提到了Temporal Table JOIN，本篇就向大家详细介绍什么是Temporal Table JOIN。 在ANSI-SQL 2011 中提出了Temporal 的概念，Oracle，SQLServer，DB2等大的数据库厂商也先后实现了这个标准。Temporal Table记录了历史">
+<meta name="twitter:image" content="http://enjoyment.cool/2019/03/18/Apache%20Flink%20漫谈系列%20-%20Temporal%20Table%20JOIN/D05B8A19-6D97-4809-8723-B4B95FE075A7.png">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://enjoyment.cool/2019/03/18/Apache Flink 漫谈系列 - Temporal Table JOIN/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Apache Flink 漫谈系列 - Temporal Table JOIN | Pretty Cool Enjoyment</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Pretty Cool Enjoyment</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">Apache Flink</h1>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-catalog">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/catalog/" rel="section"><i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Catalog</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+  
+  
+
+  
+
+  <a href="https://github.com/sunjincheng121" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://enjoyment.cool/2019/03/18/Apache Flink 漫谈系列 - Temporal Table JOIN/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jincheng Sun">
+      <meta itemprop="description" content="Apache Flink">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Pretty Cool Enjoyment">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">Apache Flink 漫谈系列 - Temporal Table JOIN
+
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+
+          
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-03-18 18:18:18" itemprop="dateCreated datePublished" datetime="2019-03-18T18:18:18+08:00">2019-03-18</time>
+            </span>
+          
+
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-07-13 21:09:56" itemprop="dateModified" datetime="2019-07-13T21:09:56+08:00">2019-07-13</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/archives/Apache-Flink-漫谈/" itemprop="url" rel="index"><span itemprop="name">Apache Flink 漫谈</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+              
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">Comments: </span>
+                <a href="/2019/03/18/Apache Flink 漫谈系列 - Temporal Table JOIN/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/03/18/Apache Flink 漫谈系列 - Temporal Table JOIN/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+                 Views:  
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          
+
+          <br>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="什么是Temporal-Table"><a href="#什么是Temporal-Table" class="headerlink" title="什么是Temporal Table"></a>什么是Temporal Table</h1><p>在《Apache Flink 漫谈系列 - JOIN LATERAL》中提到了Temporal Table JOIN，本篇就向大家详细介绍什么是Temporal Table JOIN。</p>
+<p>在<a href="https://sigmodrecord.org/publications/sigmodRecord/1209/pdfs/07.industry.kulkarni.pdf" target="_blank" rel="noopener">ANSI-SQL 2011</a> 中提出了Temporal 的概念，Oracle，SQLServer，DB2等大的数据库厂商也先后实现了这个标准。Temporal Table记录了历史上任何时间点所有的数据改动，Temporal Table的工作流程如下：<br><img src="/2019/03/18/Apache Flink 漫谈系列 - Temporal Table JOIN/D05B8A19-6D97-4809-8723-B4B95FE075A7.png" alt><br>上图示意Temporal Table具有普通table的特性，有具体独特的DDL/DML/QUERY语法，时间是其核心属性。历史意味着时间，意味着快照Snapshot。</p>
+<h1 id="ANSI-SQL-2011-Temporal-Table示例"><a href="#ANSI-SQL-2011-Temporal-Table示例" class="headerlink" title="ANSI-SQL 2011 Temporal Table示例"></a>ANSI-SQL 2011 Temporal Table示例</h1><p>我们以一个DDL和一套DML示例说明Temporal Table的原理，DDL定义PK是可选的，下面的示例我们以不定义PK的为例进行说明：</p>
+<ul>
+<li><p>DDL 示例</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE Emp</span><br><span class="line">ENo INTEGER,</span><br><span class="line">Sys_Start TIMESTAMP(12) GENERATED</span><br><span class="line">ALWAYS AS ROW Start,</span><br><span class="line">Sys_end TIMESTAMP(12) GENERATED</span><br><span class="line">ALWAYS AS ROW END,</span><br><span class="line">EName VARCHAR(30),</span><br><span class="line">PERIOD FOR SYSTEM_TIME (Sys_Start,Sys_end)</span><br><span class="line">) WITH SYSTEM VERSIONING</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>DML 示例</p>
+</li>
+</ul>
+<ol>
+<li>INSERT<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">INSERT INTO Emp (ENo, EName) VALUES (22217, &apos;Joe&apos;)</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p><img src="/2019/03/18/Apache Flink 漫谈系列 - Temporal Table JOIN/BF868DDE-D746-4529-878D-91F1A0D7486F.png" alt><br><strong>说明: 其中Sys_Start和Sys_End是数据库系统默认填充的。</strong></p>
+<ol start="2">
+<li>UPDATE</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UPDATE Emp SET EName = &apos;Tom&apos; WHERE ENo = 22217</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2019/03/18/Apache Flink 漫谈系列 - Temporal Table JOIN/364BB800-5D85-411A-A4E5-A9E4FAD4A8D2.png" alt></p>
+<p><strong>说明: 假设是在 2012-02-03 10:00:00 执行的UPDATE，执行之后上一个值”Joe”的Sys_End值由9999-12-31 23:59:59 变成了 2012-02-03 10:00:00, 也就是下一个值”Tom”生效的开始时间。可见我们执行的是UPDATE但是数据库里面会存在两条数据，数据值和有效期不同，也就是版本不同。</strong></p>
+<ol start="3">
+<li>DELETE (假设执行DELETE之前的表内容如下)<br><img src="/2019/03/18/Apache Flink 漫谈系列 - Temporal Table JOIN/BF868DDE-D746-4529-878D-91F1A0D7486F.png" alt><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DELETE FROM Emp WHERE ENo = 22217</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p><img src="/2019/03/18/Apache Flink 漫谈系列 - Temporal Table JOIN/172A63B1-C30D-43EA-B04E-B9BE8706838B.png" alt></p>
+<p><strong>说明: 假设我们是在2012-06-01 00:00:00执行的DELETE，则Sys_End值由9999-12-31 23:59:59 变成了 2012-06-01 00:00:00, 也就是在执行DELETE时候没有真正的删除符合条件的行，而是系统将符合条件的行的Sys_end修改为执行DELETE的操作时间。标识数据的有效期到DELETE执行那一刻为止。</strong></p>
+<ol start="4">
+<li>SELECT<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SELECT ENo,EName,Sys_Start,Sys_End FROM Emp </span><br><span class="line">FOR SYSTEM_TIME AS OF TIMESTAMP &apos;2011-01-02 00:00:00&apos;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p><strong>说明: 这个查询会返回所有Sys_Start &lt;= 2011-01-02 00:00:00 并且 Sys_end &gt; 2011-01-02 00:00:00 的记录。</strong></p>
+<h1 id="SQLServer-Temporal-Table-示例"><a href="#SQLServer-Temporal-Table-示例" class="headerlink" title="SQLServer Temporal Table 示例"></a>SQLServer Temporal Table 示例</h1><h2 id="DDL"><a href="#DDL" class="headerlink" title="DDL"></a>DDL</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE Department</span><br><span class="line">(</span><br><span class="line">DeptID int NOT NULL PRIMARY KEY CLUSTERED</span><br><span class="line">, DeptName varchar(50) NOT NULL</span><br><span class="line">, ManagerID INT NULL</span><br><span class="line">, ParentDeptID int NULL</span><br><span class="line">, SysStartTime datetime2 GENERATED ALWAYS AS ROW Start NOT NULL</span><br><span class="line">, SysEndTime datetime2 GENERATED ALWAYS AS ROW END NOT NULL</span><br><span class="line">, PERIOD FOR SYSTEM_TIME (SysStartTime,SysEndTime)</span><br><span class="line">)</span><br><span class="line">WITH (SYSTEM_VERSIONING = ON);</span><br></pre></td></tr></table></figure>
+
+<p>执行上面的语句，在数据库会创建当前表和历史表，如下图：<br><img src="/2019/03/18/Apache Flink 漫谈系列 - Temporal Table JOIN/6EAC4329-C402-4497-BAE2-7E7B778E613B.png" alt><br>Department 显示是有版本控制的，历史表是默认的名字，我也可以指定名字如：<code>SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.DepartmentHistory)。</code></p>
+<h2 id="DML"><a href="#DML" class="headerlink" title="DML"></a>DML</h2><ul>
+<li>INSERT - 插入列不包含SysStartTime和SysEndTime列<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">INSERT INTO [dbo].[Department] ([DeptID] ,[DeptName] ,[ManagerID] ,[ParentDeptID])</span><br><span class="line">VALUES(10, &apos;Marketing&apos;, 101, 1);</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>执行之后我们分别查询当前表和历史表，如下图：<img src="/2019/03/18/Apache Flink 漫谈系列 - Temporal Table JOIN/3D6C354F-BC2C-40E4-95AE-7303B47E3BDE.png" alt><br>我们第一条INSERT语句数据值的有效时间是操作那一刻<code>2018-06-06 05:50:20.7913985</code> 到永远 <code>9999-12-31 23:59:59.9999999</code>，但这时刻历史表还没有任何信息。我们接下来进行更新操作。</p>
+<ul>
+<li>UPDATE<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UPDATE [dbo].[Department] SET [ManagerID] = 501 WHERE [DeptID] = 10</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>执行之后当前表信息会更新并在历史表里面产生一条历史信息，如下：<img src="/2019/03/18/Apache Flink 漫谈系列 - Temporal Table JOIN/75AC8012-59C7-4105-AE66-4453384E762B.png" alt><br>注意当前表的SysStartTime意见发生了变化,历史表产生了一条记录，SyStartTIme是原当前表记录的SysStartTime，SysEndTime是当前表记录的SystemStartTime。我们再更新一次：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UPDATE [dbo].[Department] SET [ManagerID] = 201 WHERE [DeptID] = 10</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2019/03/18/Apache Flink 漫谈系列 - Temporal Table JOIN/274B8B4C-28DD-4B34-9AFE-DDACDBB05621.png" alt><br>到这里我们了解到SQLServer里面关于Temporal Table的逻辑是有当前表和历史表来存储数据，并且数据库内部以StartTime和EndTime的方式管理数据的版本。</p>
+<ul>
+<li>SELECT <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SELECT [DeptID], [DeptName], [SysStartTime],[SysEndTime]</span><br><span class="line">FROM [dbo].[Department]</span><br><span class="line">FOR SYSTEM_TIME AS OF &apos;2018-06-06 05:50:21.0000000&apos; ;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p><img src="/2019/03/18/Apache Flink 漫谈系列 - Temporal Table JOIN/A94E2FAD-F04A-4691-8C34-3C697FF81476.png" alt><br>SELECT语句查询的是Department的表，实际返回的数据是从历史表里面查询出来的，查询的底层逻辑就是 <code>SysStartTime &lt;= &#39;2018-06-06 05:50:21.0000000&#39; and SysEndTime &gt; &#39;2018-06-06 05:50:21.0000000&#39;</code> 。</p>
+<h1 id="Apache-Flink-Temporal-Table"><a href="#Apache-Flink-Temporal-Table" class="headerlink" title="Apache Flink Temporal Table"></a>Apache Flink Temporal Table</h1><p>我们不止一次的提到Apache Flink遵循ANSI-SQL标准，Apache Flink中Temporal Table的概念也源于ANSI-2011的标准语义，但目前的实现在语法层面和ANSI-SQL略有差别，上面看到ANSI-2011中使用<code>FOR SYSTEM_TIME AS OF</code>的语法，目前Apache Flink中使用 <code>LATERAL TABLE(TemporalTableFunction)</code>的语法。这一点后续需要推动社区进行改进。</p>
+<h2 id="为啥需要-Temporal-Table"><a href="#为啥需要-Temporal-Table" class="headerlink" title="为啥需要 Temporal Table"></a>为啥需要 Temporal Table</h2><p>我们以具体的查询示例来说明为啥需要Temporal Table，假设我们有一张实时变化的汇率表(RatesHistory)，如下：</p>
+<table>
+<thead>
+<tr>
+<th>rowtime(ts)</th>
+<th>currency(pk)</th>
+<th>rate</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>09:00:00</td>
+<td>US Dollar</td>
+<td>102</td>
+</tr>
+<tr>
+<td>09:00:00</td>
+<td>Euro</td>
+<td>114</td>
+</tr>
+<tr>
+<td>09:00:00</td>
+<td>Yen</td>
+<td>1</td>
+</tr>
+<tr>
+<td>10:45:00</td>
+<td>Euro</td>
+<td>116</td>
+</tr>
+<tr>
+<td>11:15:00</td>
+<td>Euro</td>
+<td>119</td>
+</tr>
+<tr>
+<td>11:49:00</td>
+<td>Pounds</td>
+<td>108</td>
+</tr>
+</tbody></table>
+<p>RatesHistory代表了Yen汇率(Yen汇率为1),是不断变化的Append only的汇率表。例如，Euro兑Yen汇率从09:00至10:45的汇率为114。从10点45分到11点15分是116。</p>
+<p>假设我们想在10:58输出所有当前汇率，我们需要以下SQL查询来计算结果表：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">SELECT *</span><br><span class="line">FROM RatesHistory AS r</span><br><span class="line">WHERE r.rowtime = (</span><br><span class="line">  SELECT MAX(rowtime)</span><br><span class="line">  FROM RatesHistory AS r2</span><br><span class="line">  WHERE r2.currency = r.currency</span><br><span class="line">  AND r2.rowtime &lt;= &apos;10:58&apos;);</span><br></pre></td></tr></table></figure>
+
+<p>相应Flink代码如下：</p>
+<ul>
+<li><p>定义数据源-genRatesHistorySource </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">def genRatesHistorySource: CsvTableSource = &#123;</span><br><span class="line"></span><br><span class="line">    val csvRecords = Seq(</span><br><span class="line">      &quot;rowtime ,currency   ,rate&quot;,</span><br><span class="line">    &quot;09:00:00   ,US Dollar  , 102&quot;,</span><br><span class="line">    &quot;09:00:00   ,Euro       , 114&quot;,</span><br><span class="line">    &quot;09:00:00  ,Yen        ,   1&quot;,</span><br><span class="line">    &quot;10:45:00   ,Euro       , 116&quot;,</span><br><span class="line">    &quot;11:15:00   ,Euro       , 119&quot;,</span><br><span class="line">    &quot;11:49:00   ,Pounds     , 108&quot;</span><br><span class="line">    )</span><br><span class="line">    // 测试数据写入临时文件</span><br><span class="line">    val tempFilePath =</span><br><span class="line"> writeToTempFile(csvRecords.mkString(&quot;$&quot;), &quot;csv_source_&quot;, &quot;tmp&quot;)</span><br><span class="line"></span><br><span class="line">    // 创建Source connector</span><br><span class="line">    new CsvTableSource(</span><br><span class="line">      tempFilePath,</span><br><span class="line">      Array(&quot;rowtime&quot;,&quot;currency&quot;,&quot;rate&quot;),</span><br><span class="line">      Array(</span><br><span class="line">        Types.STRING,Types.STRING,Types.STRING</span><br><span class="line">      ),</span><br><span class="line">      fieldDelim = &quot;,&quot;,</span><br><span class="line">      rowDelim = &quot;$&quot;,</span><br><span class="line">      ignoreFirstLine = true,</span><br><span class="line">      ignoreComments = &quot;%&quot;</span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  def writeToTempFile(</span><br><span class="line">    contents: String,</span><br><span class="line">    filePrefix: String,</span><br><span class="line">    fileSuffix: String,</span><br><span class="line">    charset: String = &quot;UTF-8&quot;): String = &#123;</span><br><span class="line">    val tempFile = File.createTempFile(filePrefix, fileSuffix)</span><br><span class="line">    val tmpWriter = new OutputStreamWriter(new FileOutputStream(tempFile), charset)</span><br><span class="line">    tmpWriter.write(contents)</span><br><span class="line">    tmpWriter.close()</span><br><span class="line">    tempFile.getAbsolutePath</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>主程序代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">def main(args: Array[String]): Unit = &#123;</span><br><span class="line">    // Streaming 环境</span><br><span class="line">    val env = StreamExecutionEnvironment.getExecutionEnvironment</span><br><span class="line">    val tEnv = TableEnvironment.getTableEnvironment(env)</span><br><span class="line"></span><br><span class="line">    //方便我们查出输出数据</span><br><span class="line">    env.setParallelism(1)</span><br><span class="line"></span><br><span class="line">    val sourceTableName = &quot;RatesHistory&quot;</span><br><span class="line">    // 创建CSV source数据结构</span><br><span class="line">    val tableSource = CsvTableSourceUtils.genRatesHistorySource</span><br><span class="line">    // 注册source</span><br><span class="line">    tEnv.registerTableSource(sourceTableName, tableSource)</span><br><span class="line"></span><br><span class="line">    // 注册retract sink</span><br><span class="line">    val sinkTableName = &quot;retractSink&quot;</span><br><span class="line">    val fieldNames = Array(&quot;rowtime&quot;, &quot;currency&quot;, &quot;rate&quot;)</span><br><span class="line">    val fieldTypes: Array[TypeInformation[_]] = Array(Types.STRING, Types.STRING, Types.STRING)</span><br><span class="line"></span><br><span class="line">    tEnv.registerTableSink(</span><br><span class="line">      sinkTableName,</span><br><span class="line">      fieldNames,</span><br><span class="line">      fieldTypes,</span><br><span class="line">      new MemoryRetractSink)</span><br><span class="line"></span><br><span class="line">    val SQL =</span><br><span class="line">      &quot;&quot;&quot;</span><br><span class="line">        |SELECT *</span><br><span class="line">        |FROM RatesHistory AS r</span><br><span class="line">        |WHERE r.rowtime = (</span><br><span class="line">        |  SELECT MAX(rowtime)</span><br><span class="line">        |  FROM RatesHistory AS r2</span><br><span class="line">        |  WHERE r2.currency = r.currency</span><br><span class="line">        |  AND r2.rowtime &lt;= &apos;10:58:00&apos;  )</span><br><span class="line">      &quot;&quot;&quot;.stripMargin</span><br><span class="line"></span><br><span class="line">    // 执行查询</span><br><span class="line">    val result = tEnv.SQLQuery(SQL)</span><br><span class="line"></span><br><span class="line">    // 将结果插入sink</span><br><span class="line">    result.insertInto(sinkTableName)</span><br><span class="line">    env.execute()</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>执行结果如下图：<br><img src="/2019/03/18/Apache Flink 漫谈系列 - Temporal Table JOIN/82C7A5DC-7E84-4965-9A0A-4DD12615B24E.png" alt><br>结果表格化一下：</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>rowtime(ts)</th>
+<th>currency(pk)</th>
+<th>rate</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>09:00:00</td>
+<td>US Dollar</td>
+<td>102</td>
+</tr>
+<tr>
+<td>09:00:00</td>
+<td>Yen</td>
+<td>1</td>
+</tr>
+<tr>
+<td>10:45:00</td>
+<td>Euro</td>
+<td>116</td>
+</tr>
+</tbody></table>
+<p>Temporal Table的概念旨在简化此类查询，加速它们的执行。Temporal Table是Append Only表上的参数化视图，它把Append  Only的表变化解释为表的Changelog，并在特定时间点提供该表的版本（时间版本）。将Applend Only表解释为changelog需要指定主键属性和时间戳属性。主键确定覆盖哪些行，时间戳确定行有效的时间，也就是数据版本，与上面SQL Server示例的有效期的概念一致。</p>
+<p>在上面的示例中，currency是RatesHistory表的主键，而rowtime是timestamp属性。</p>
+<h2 id="如何定义Temporal-Table"><a href="#如何定义Temporal-Table" class="headerlink" title="如何定义Temporal Table"></a>如何定义Temporal Table</h2><p>在Apache Flink中扩展了TableFunction的接口，在TableFunction接口的基础上添加了时间属性和pk属性。</p>
+<ul>
+<li><p>内部TemporalTableFunction定义如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">class TemporalTableFunction private(</span><br><span class="line">    @transient private val underlyingHistoryTable: Table,</span><br><span class="line">    // 时间属性，相当于版本信息</span><br><span class="line">    private val timeAttribute: Expression,</span><br><span class="line">    // 主键定义</span><br><span class="line">    private val primaryKey: String,</span><br><span class="line">    private val resultType: RowTypeInfo)</span><br><span class="line">  extends TableFunction[Row] &#123;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>用户创建TemporalTableFunction方式<br>在<code>Table</code>中添加了<code>createTemporalTableFunction</code>方法，该方法需要传入时间属性和主键，接口定义如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// Creates TemporalTableFunction backed up by this table as a history table.</span><br><span class="line"></span><br><span class="line">def createTemporalTableFunction(</span><br><span class="line">      timeAttribute: Expression,</span><br><span class="line">      primaryKey: Expression): TemporalTableFunction = &#123;</span><br><span class="line">   ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>用户通过如下方式调用就可以得到一个TemporalTableFunction的实例，代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">val tab = ...</span><br><span class="line">val temporalTableFunction = tab.createTemporalTableFunction(&apos;time, &apos;pk)</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<h2 id="案例代码"><a href="#案例代码" class="headerlink" title="案例代码"></a>案例代码</h2><ul>
+<li>需求描述<br>假设我们有一张订单表Orders和一张汇率表Rates，那么订单来自于不同的地区，所以支付的币种各不一样，那么假设需要统计每个订单在下单时候Yen币种对应的金额。</li>
+<li>Orders 数据</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>amount</th>
+<th>currency</th>
+<th>order_time</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2</td>
+<td>Euro</td>
+<td>2</td>
+</tr>
+<tr>
+<td>1</td>
+<td>US Dollar</td>
+<td>3</td>
+</tr>
+<tr>
+<td>50</td>
+<td>Yen</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Euro</td>
+<td>5</td>
+</tr>
+</tbody></table>
+<ul>
+<li>Rates 数据</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>currency</th>
+<th>rate</th>
+<th>rate_time</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>US Dollar</td>
+<td>102</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Euro</td>
+<td>114</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Yen</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Euro</td>
+<td>116</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Euro</td>
+<td>117</td>
+<td>7</td>
+</tr>
+</tbody></table>
+<ul>
+<li><p>统计需求对应的SQL</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">SELECT o.currency, o.amount, r.rate</span><br><span class="line">  o.amount * r.rate AS yen_amount</span><br><span class="line">FROM</span><br><span class="line">  Orders AS o,</span><br><span class="line">  LATERAL TABLE (Rates(o.rowtime)) AS r</span><br><span class="line">WHERE r.currency = o.currency</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>预期结果</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>currency</th>
+<th>amount</th>
+<th>rate</th>
+<th>yen_amount</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>US Dollar</td>
+<td>1</td>
+<td>102</td>
+<td>102</td>
+</tr>
+<tr>
+<td>Yen</td>
+<td>50</td>
+<td>1</td>
+<td>50</td>
+</tr>
+<tr>
+<td>Euro</td>
+<td>2</td>
+<td>114</td>
+<td>228</td>
+</tr>
+<tr>
+<td>Euro</td>
+<td>3</td>
+<td>116</td>
+<td>348</td>
+</tr>
+</tbody></table>
+<h3 id="Without-connnector-实现代码"><a href="#Without-connnector-实现代码" class="headerlink" title="Without connnector 实现代码"></a>Without connnector 实现代码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">object TemporalTableJoinTest &#123;</span><br><span class="line">  def main(args: Array[String]): Unit = &#123;</span><br><span class="line">    val env = StreamExecutionEnvironment.getExecutionEnvironment</span><br><span class="line">    val tEnv = TableEnvironment.getTableEnvironment(env)</span><br><span class="line">    env.setParallelism(1)</span><br><span class="line">// 设置时间类型是 event-time  env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)</span><br><span class="line">    // 构造订单数据</span><br><span class="line">    val ordersData = new mutable.MutableList[(Long, String, Timestamp)]</span><br><span class="line">    ordersData.+=((2L, &quot;Euro&quot;, new Timestamp(2L)))</span><br><span class="line">    ordersData.+=((1L, &quot;US Dollar&quot;, new Timestamp(3L)))</span><br><span class="line">    ordersData.+=((50L, &quot;Yen&quot;, new Timestamp(4L)))</span><br><span class="line">    ordersData.+=((3L, &quot;Euro&quot;, new Timestamp(5L)))</span><br><span class="line"></span><br><span class="line">    //构造汇率数据</span><br><span class="line">    val ratesHistoryData = new mutable.MutableList[(String, Long, Timestamp)]</span><br><span class="line">    ratesHistoryData.+=((&quot;US Dollar&quot;, 102L, new Timestamp(1L)))</span><br><span class="line">    ratesHistoryData.+=((&quot;Euro&quot;, 114L, new Timestamp(1L)))</span><br><span class="line">    ratesHistoryData.+=((&quot;Yen&quot;, 1L, new Timestamp(1L)))</span><br><span class="line">    ratesHistoryData.+=((&quot;Euro&quot;, 116L, new Timestamp(5L)))</span><br><span class="line">    ratesHistoryData.+=((&quot;Euro&quot;, 119L, new Timestamp(7L)))</span><br><span class="line"></span><br><span class="line">// 进行订单表 event-time 的提取</span><br><span class="line">    val orders = env</span><br><span class="line">      .fromCollection(ordersData)</span><br><span class="line">      .assignTimestampsAndWatermarks(new OrderTimestampExtractor[Long, String]())</span><br><span class="line">      .toTable(tEnv, &apos;amount, &apos;currency, &apos;rowtime.rowtime)</span><br><span class="line"></span><br><span class="line">// 进行汇率表 event-time 的提取</span><br><span class="line">    val ratesHistory = env</span><br><span class="line">      .fromCollection(ratesHistoryData)</span><br><span class="line">      .assignTimestampsAndWatermarks(new OrderTimestampExtractor[String, Long]())</span><br><span class="line">      .toTable(tEnv, &apos;currency, &apos;rate, &apos;rowtime.rowtime)</span><br><span class="line"></span><br><span class="line">// 注册订单表和汇率表</span><br><span class="line">    tEnv.registerTable(&quot;Orders&quot;, orders)</span><br><span class="line">    tEnv.registerTable(&quot;RatesHistory&quot;, ratesHistory)</span><br><span class="line">    val tab = tEnv.scan(&quot;RatesHistory&quot;);</span><br><span class="line">// 创建TemporalTableFunction</span><br><span class="line">    val temporalTableFunction = tab.createTemporalTableFunction(&apos;rowtime, &apos;currency)</span><br><span class="line">//注册TemporalTableFunction</span><br><span class="line">tEnv.registerFunction(&quot;Rates&quot;,temporalTableFunction)</span><br><span class="line"></span><br><span class="line">    val SQLQuery =</span><br><span class="line">      &quot;&quot;&quot;</span><br><span class="line">        |SELECT o.currency, o.amount, r.rate,</span><br><span class="line">        |  o.amount * r.rate AS yen_amount</span><br><span class="line">        |FROM</span><br><span class="line">        |  Orders AS o,</span><br><span class="line">        |  LATERAL TABLE (Rates(o.rowtime)) AS r</span><br><span class="line">        |WHERE r.currency = o.currency</span><br><span class="line">        |&quot;&quot;&quot;.stripMargin</span><br><span class="line"></span><br><span class="line">    tEnv.registerTable(&quot;TemporalJoinResult&quot;, tEnv.SQLQuery(SQLQuery))</span><br><span class="line"></span><br><span class="line">    val result = tEnv.scan(&quot;TemporalJoinResult&quot;).toAppendStream[Row]</span><br><span class="line">    // 打印查询结果</span><br><span class="line">    result.print()</span><br><span class="line">    env.execute()</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在运行上面代码之前需要注意上面代码中对EventTime时间提取的过程,也就是说Apache Flink的<code>TimeCharacteristic.EventTime</code> 模式，需要调用<code>assignTimestampsAndWatermarks</code>方法设置EventTime的生成方式，这种方式也非常灵活，用户可以控制业务数据的EventTime的值和WaterMark的产生，WaterMark相关内容可以查阅《Apache Flink 漫谈系列(03) -  Watermark》。 在本示例中提取EventTime的完整代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">import java.SQL.Timestamp</span><br><span class="line"></span><br><span class="line">import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor</span><br><span class="line">import org.apache.flink.streaming.api.windowing.time.Time</span><br><span class="line"></span><br><span class="line">class OrderTimestampExtractor[T1, T2]</span><br><span class="line">  extends BoundedOutOfOrdernessTimestampExtractor[(T1, T2, Timestamp)](Time.seconds(10)) &#123;</span><br><span class="line">  override def extractTimestamp(element: (T1, T2, Timestamp)): Long = &#123;</span><br><span class="line">    element._3.getTime</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>查看运行结果:<br><img src="/2019/03/18/Apache Flink 漫谈系列 - Temporal Table JOIN/44FDFE22-3B21-4514-8E91-E339F9188E4E.png" alt></p>
+<h3 id="With-CSVConnector-实现代码"><a href="#With-CSVConnector-实现代码" class="headerlink" title="With CSVConnector 实现代码"></a>With CSVConnector 实现代码</h3><p>在实际的生产开发中，都需要实际的Connector的定义，下面我们以CSV格式的Connector定义来开发Temporal Table JOIN Demo。</p>
+<ul>
+<li><p>genEventRatesHistorySource</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">def genEventRatesHistorySource: CsvTableSource = &#123;</span><br><span class="line"></span><br><span class="line">    val csvRecords = Seq(</span><br><span class="line">      &quot;ts#currency#rate&quot;,</span><br><span class="line">      &quot;1#US Dollar#102&quot;,</span><br><span class="line">      &quot;1#Euro#114&quot;,</span><br><span class="line">      &quot;1#Yen#1&quot;,</span><br><span class="line">      &quot;3#Euro#116&quot;,</span><br><span class="line">      &quot;5#Euro#119&quot;,</span><br><span class="line">      &quot;7#Pounds#108&quot;</span><br><span class="line">    )</span><br><span class="line">    // 测试数据写入临时文件</span><br><span class="line">    val tempFilePath =</span><br><span class="line">      FileUtils.writeToTempFile(csvRecords.mkString(CommonUtils.line), &quot;csv_source_rate&quot;, &quot;tmp&quot;)</span><br><span class="line"></span><br><span class="line">    // 创建Source connector</span><br><span class="line">    new CsvTableSource(</span><br><span class="line">      tempFilePath,</span><br><span class="line">      Array(&quot;ts&quot;,&quot;currency&quot;,&quot;rate&quot;),</span><br><span class="line">      Array(</span><br><span class="line">        Types.LONG,Types.STRING,Types.LONG</span><br><span class="line">      ),</span><br><span class="line">      fieldDelim = &quot;#&quot;,</span><br><span class="line">      rowDelim = CommonUtils.line,</span><br><span class="line">      ignoreFirstLine = true,</span><br><span class="line">      ignoreComments = &quot;%&quot;</span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>genRatesOrderSource</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">def genRatesOrderSource: CsvTableSource = &#123;</span><br><span class="line"></span><br><span class="line">    val csvRecords = Seq(</span><br><span class="line">      &quot;ts#currency#amount&quot;,</span><br><span class="line">      &quot;2#Euro#10&quot;,</span><br><span class="line">      &quot;4#Euro#10&quot;</span><br><span class="line">    )</span><br><span class="line">    // 测试数据写入临时文件</span><br><span class="line">    val tempFilePath =</span><br><span class="line">      FileUtils.writeToTempFile(csvRecords.mkString(CommonUtils.line), &quot;csv_source_order&quot;, &quot;tmp&quot;)</span><br><span class="line"></span><br><span class="line">    // 创建Source connector</span><br><span class="line">    new CsvTableSource(</span><br><span class="line">      tempFilePath,</span><br><span class="line">      Array(&quot;ts&quot;,&quot;currency&quot;, &quot;amount&quot;),</span><br><span class="line">      Array(</span><br><span class="line">        Types.LONG,Types.STRING,Types.LONG</span><br><span class="line">      ),</span><br><span class="line">      fieldDelim = &quot;#&quot;,</span><br><span class="line">      rowDelim = CommonUtils.line,</span><br><span class="line">      ignoreFirstLine = true,</span><br><span class="line">      ignoreComments = &quot;%&quot;</span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>主程序代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * Licensed to the Apache Software Foundation (ASF) under one</span><br><span class="line"> * or more contributor license agreements.  See the NOTICE file</span><br><span class="line"> * distributed with this work for additional information</span><br><span class="line"> * regarding copyright ownership.  The ASF licenses this file</span><br><span class="line"> * to you under the Apache License, Version 2.0 (the</span><br><span class="line"> * &quot;License&quot;); you may not use this file except in compliance</span><br><span class="line"> * with the License.  You may obtain a copy of the License at</span><br><span class="line"> *</span><br><span class="line"> *     http://www.apache.org/licenses/LICENSE-2.0</span><br><span class="line"> *</span><br><span class="line"> * Unless required by applicable law or agreed to in writing, software</span><br><span class="line"> * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span><br><span class="line"> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span><br><span class="line"> * See the License for the specific language governing permissions and</span><br><span class="line"> * limitations under the License.</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">package org.apache.flink.book.connectors</span><br><span class="line"></span><br><span class="line">import java.io.File</span><br><span class="line"></span><br><span class="line">import org.apache.flink.api.common.typeinfo.&#123;TypeInformation, Types&#125;</span><br><span class="line">import org.apache.flink.book.utils.&#123;CommonUtils, FileUtils&#125;</span><br><span class="line">import org.apache.flink.table.sinks.&#123;CsvTableSink, TableSink&#125;</span><br><span class="line">import org.apache.flink.table.sources.CsvTableSource</span><br><span class="line">import org.apache.flink.types.Row</span><br><span class="line"></span><br><span class="line">object CsvTableSourceUtils &#123;</span><br><span class="line"></span><br><span class="line">  def genWordCountSource: CsvTableSource = &#123;</span><br><span class="line">    val csvRecords = Seq(</span><br><span class="line">      &quot;words&quot;,</span><br><span class="line">      &quot;Hello Flink&quot;,</span><br><span class="line">      &quot;Hi, Apache Flink&quot;,</span><br><span class="line">      &quot;Apache FlinkBook&quot;</span><br><span class="line">    )</span><br><span class="line">    // 测试数据写入临时文件</span><br><span class="line">    val tempFilePath =</span><br><span class="line">      FileUtils.writeToTempFile(csvRecords.mkString(&quot;$&quot;), &quot;csv_source_&quot;, &quot;tmp&quot;)</span><br><span class="line"></span><br><span class="line">    // 创建Source connector</span><br><span class="line">    new CsvTableSource(</span><br><span class="line">      tempFilePath,</span><br><span class="line">      Array(&quot;words&quot;),</span><br><span class="line">      Array(</span><br><span class="line">        Types.STRING</span><br><span class="line">      ),</span><br><span class="line">      fieldDelim = &quot;#&quot;,</span><br><span class="line">      rowDelim = &quot;$&quot;,</span><br><span class="line">      ignoreFirstLine = true,</span><br><span class="line">      ignoreComments = &quot;%&quot;</span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  def genRatesHistorySource: CsvTableSource = &#123;</span><br><span class="line"></span><br><span class="line">    val csvRecords = Seq(</span><br><span class="line">      &quot;rowtime ,currency   ,rate&quot;,</span><br><span class="line">    &quot;09:00:00   ,US Dollar  , 102&quot;,</span><br><span class="line">    &quot;09:00:00   ,Euro       , 114&quot;,</span><br><span class="line">    &quot;09:00:00  ,Yen        ,   1&quot;,</span><br><span class="line">    &quot;10:45:00   ,Euro       , 116&quot;,</span><br><span class="line">    &quot;11:15:00   ,Euro       , 119&quot;,</span><br><span class="line">    &quot;11:49:00   ,Pounds     , 108&quot;</span><br><span class="line">    )</span><br><span class="line">    // 测试数据写入临时文件</span><br><span class="line">    val tempFilePath =</span><br><span class="line">      FileUtils.writeToTempFile(csvRecords.mkString(&quot;$&quot;), &quot;csv_source_&quot;, &quot;tmp&quot;)</span><br><span class="line"></span><br><span class="line">    // 创建Source connector</span><br><span class="line">    new CsvTableSource(</span><br><span class="line">      tempFilePath,</span><br><span class="line">      Array(&quot;rowtime&quot;,&quot;currency&quot;,&quot;rate&quot;),</span><br><span class="line">      Array(</span><br><span class="line">        Types.STRING,Types.STRING,Types.STRING</span><br><span class="line">      ),</span><br><span class="line">      fieldDelim = &quot;,&quot;,</span><br><span class="line">      rowDelim = &quot;$&quot;,</span><br><span class="line">      ignoreFirstLine = true,</span><br><span class="line">      ignoreComments = &quot;%&quot;</span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  def genEventRatesHistorySource: CsvTableSource = &#123;</span><br><span class="line"></span><br><span class="line">    val csvRecords = Seq(</span><br><span class="line">      &quot;ts#currency#rate&quot;,</span><br><span class="line">      &quot;1#US Dollar#102&quot;,</span><br><span class="line">      &quot;1#Euro#114&quot;,</span><br><span class="line">      &quot;1#Yen#1&quot;,</span><br><span class="line">      &quot;3#Euro#116&quot;,</span><br><span class="line">      &quot;5#Euro#119&quot;,</span><br><span class="line">      &quot;7#Pounds#108&quot;</span><br><span class="line">    )</span><br><span class="line">    // 测试数据写入临时文件</span><br><span class="line">    val tempFilePath =</span><br><span class="line">      FileUtils.writeToTempFile(csvRecords.mkString(CommonUtils.line), &quot;csv_source_rate&quot;, &quot;tmp&quot;)</span><br><span class="line"></span><br><span class="line">    // 创建Source connector</span><br><span class="line">    new CsvTableSource(</span><br><span class="line">      tempFilePath,</span><br><span class="line">      Array(&quot;ts&quot;,&quot;currency&quot;,&quot;rate&quot;),</span><br><span class="line">      Array(</span><br><span class="line">        Types.LONG,Types.STRING,Types.LONG</span><br><span class="line">      ),</span><br><span class="line">      fieldDelim = &quot;#&quot;,</span><br><span class="line">      rowDelim = CommonUtils.line,</span><br><span class="line">      ignoreFirstLine = true,</span><br><span class="line">      ignoreComments = &quot;%&quot;</span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  def genRatesOrderSource: CsvTableSource = &#123;</span><br><span class="line"></span><br><span class="line">    val csvRecords = Seq(</span><br><span class="line">      &quot;ts#currency#amount&quot;,</span><br><span class="line">      &quot;2#Euro#10&quot;,</span><br><span class="line">      &quot;4#Euro#10&quot;</span><br><span class="line">    )</span><br><span class="line">    // 测试数据写入临时文件</span><br><span class="line">    val tempFilePath =</span><br><span class="line">      FileUtils.writeToTempFile(csvRecords.mkString(CommonUtils.line), &quot;csv_source_order&quot;, &quot;tmp&quot;)</span><br><span class="line"></span><br><span class="line">    // 创建Source connector</span><br><span class="line">    new CsvTableSource(</span><br><span class="line">      tempFilePath,</span><br><span class="line">      Array(&quot;ts&quot;,&quot;currency&quot;, &quot;amount&quot;),</span><br><span class="line">      Array(</span><br><span class="line">        Types.LONG,Types.STRING,Types.LONG</span><br><span class="line">      ),</span><br><span class="line">      fieldDelim = &quot;#&quot;,</span><br><span class="line">      rowDelim = CommonUtils.line,</span><br><span class="line">      ignoreFirstLine = true,</span><br><span class="line">      ignoreComments = &quot;%&quot;</span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  /**</span><br><span class="line">    * Example:</span><br><span class="line">    * genCsvSink(</span><br><span class="line">    *   Array[String](&quot;word&quot;, &quot;count&quot;),</span><br><span class="line">    *   Array[TypeInformation[_] ](Types.STRING, Types.LONG))</span><br><span class="line">    */</span><br><span class="line">  def genCsvSink(fieldNames: Array[String], fieldTypes: Array[TypeInformation[_]]): TableSink[Row] = &#123;</span><br><span class="line">    val tempFile = File.createTempFile(&quot;csv_sink_&quot;, &quot;tem&quot;)</span><br><span class="line">    if (tempFile.exists()) &#123;</span><br><span class="line">      tempFile.delete()</span><br><span class="line">    &#125;</span><br><span class="line">    new CsvTableSink(tempFile.getAbsolutePath).configure(fieldNames, fieldTypes)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>运行结果如下 ：<br><img src="/2019/03/18/Apache Flink 漫谈系列 - Temporal Table JOIN/A05E658F-C511-45E2-870F-5E3227A94570.png" alt></p>
+<h2 id="内部实现原理"><a href="#内部实现原理" class="headerlink" title="内部实现原理"></a>内部实现原理</h2><p>我们还是以订单和汇率关系示例来说明Apache Flink内部实现Temporal Table JOIN的原理，如下图所示:</p>
+<p><img src="/2019/03/18/Apache Flink 漫谈系列 - Temporal Table JOIN/07A663B1-7CCF-4A80-9F07-2C1E87A9C1B6.png" alt></p>
+<h1 id="Temporal-Table-JOIN-vs-双流JOIN-vs-Lateral-JOIN"><a href="#Temporal-Table-JOIN-vs-双流JOIN-vs-Lateral-JOIN" class="headerlink" title="Temporal Table JOIN vs 双流JOIN vs Lateral JOIN"></a>Temporal Table JOIN vs 双流JOIN vs Lateral JOIN</h1><p>在《Apache Flink 漫谈系列(09) - JOIN算子》中我们介绍了双流JOIN，在《Apache Flink 漫谈系列(10) - JOIN LATERAL 》中我们介绍了 JOIN LATERAL(TableFunction)，那么本篇介绍的Temporal Table JOIN和双流JOIN/JOIN LATERAL(TableFunction)有什么本质区别呢？</p>
+<ul>
+<li>双流JOIN - 双流JOIN本质很明确是 Stream JOIN Stream,双流驱动。 </li>
+<li>LATERAL JOIN - Lateral JOIN的本质是Steam JOIN Table Function， 是单流驱动。</li>
+<li>Temporal Table JOIN - Temporal Table JOIN 的本质就是 Stream JOIN Temporal Table  或者 Stream JOIN Table with snapshot。Temporal Table JOIN 特点<br>单流驱动，Temporal Table 是被动查询。</li>
+</ul>
+<h2 id="Temporal-Table-JOIN-vs-LATERAL-JOIN"><a href="#Temporal-Table-JOIN-vs-LATERAL-JOIN" class="headerlink" title="Temporal Table JOIN vs  LATERAL JOIN"></a>Temporal Table JOIN vs  LATERAL JOIN</h2><p>从功能上说Temporal Table JOIN和 LATERAL JOIN都是由左流一条数据获取多行数据，也就是单流驱动，并且都是被动查询，那么Temporal JOIN和LATERAL JOIN最本质的区别是什么呢？这里我们说最关键的一点是 State 的管理，LATERAL JOIN是一个TableFunction，不具备state的管理能力，数据不具备版本特性。而Temporal Table JOIN是一个具备版本信息的数据表。</p>
+<h2 id="Temporal-Table-JOIN-vs-双流-JOIN"><a href="#Temporal-Table-JOIN-vs-双流-JOIN" class="headerlink" title="Temporal Table JOIN vs 双流 JOIN"></a>Temporal Table JOIN vs 双流 JOIN</h2><p>Temporal Table JOIN 和 双流 JOIN都可以管理State，那么他们的本质区别是什么? 那就是计算驱动的差别，Temporal Table JOIN是单边驱动，Temporal Table是被动的查询，而双流JOIN是双边驱动，两边都是主动的进行JOIN计算。</p>
+<h1 id="Temporal-Table-JOIN改进"><a href="#Temporal-Table-JOIN改进" class="headerlink" title="Temporal Table JOIN改进"></a>Temporal Table JOIN改进</h1><p>个人认为Apache Flink的Temporal Table JOIN功能不论在语法和语义上面都要遵循ANSI-SQL标准，后期会推动社区在Temporal Table上面支持ANSI-SQL的<code>FOR SYSTEM_TIME AS OF</code>标准语法。改进后的处理逻辑示意图:<br><img src="/2019/03/18/Apache Flink 漫谈系列 - Temporal Table JOIN/A936792A-9239-4D86-BA0C-4EE85DFDDA7D.png" alt><br>其中cache是一种性能考虑的优化，详细内容待社区完善后再细述。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本篇结合ANSI-SQL标准和SQL Server对Temporal Table的支持来开篇，然后介绍目前Apache Flink对Temporal Table的支持现状，以代码示例和内部处理逻辑示意图的方式让大家直观体验Temporal Table JOIN的语法和语义。</p>
+<h1 id="关于点赞和评论"><a href="#关于点赞和评论" class="headerlink" title="关于点赞和评论"></a>关于点赞和评论</h1><p>本系列文章难免有很多缺陷和不足，真诚希望读者对有收获的篇章给予点赞鼓励，对有不足的篇章给予反馈和建议，先行感谢大家!</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        
+          
+        
+        <div class="post-tags">
+          
+            <a href="/archives/Flink/" rel="tag"># Flink</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/" rel="next" title="Apache Flink 漫谈系列 - JOIN LATERAL">
+                <i class="fa fa-chevron-left"></i> Apache Flink 漫谈系列 - JOIN LATERAL
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/22/Apache Flink 漫谈系列 - Time Interval JOIN/" rel="prev" title="Apache Flink 漫谈系列 - Time Interval JOIN">
+                Apache Flink 漫谈系列 - Time Interval JOIN <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="Jincheng Sun">
+            
+              <p class="site-author-name" itemprop="name">Jincheng Sun</p>
+              <div class="site-description motion-element" itemprop="description">Apache Flink</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">36</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">30</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/sunjincheng121/enjoyment" title="GitHub &rarr; https://github.com/sunjincheng121/enjoyment" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/sunjincheng121" title="Twitter &rarr; https://twitter.com/sunjincheng121" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#什么是Temporal-Table"><span class="nav-number">1.</span> <span class="nav-text">什么是Temporal Table</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ANSI-SQL-2011-Temporal-Table示例"><span class="nav-number">2.</span> <span class="nav-text">ANSI-SQL 2011 Temporal Table示例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SQLServer-Temporal-Table-示例"><span class="nav-number">3.</span> <span class="nav-text">SQLServer Temporal Table 示例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#DDL"><span class="nav-number">3.1.</span> <span class="nav-text">DDL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DML"><span class="nav-number">3.2.</span> <span class="nav-text">DML</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Apache-Flink-Temporal-Table"><span class="nav-number">4.</span> <span class="nav-text">Apache Flink Temporal Table</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#为啥需要-Temporal-Table"><span class="nav-number">4.1.</span> <span class="nav-text">为啥需要 Temporal Table</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何定义Temporal-Table"><span class="nav-number">4.2.</span> <span class="nav-text">如何定义Temporal Table</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#案例代码"><span class="nav-number">4.3.</span> <span class="nav-text">案例代码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Without-connnector-实现代码"><span class="nav-number">4.3.1.</span> <span class="nav-text">Without connnector 实现代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#With-CSVConnector-实现代码"><span class="nav-number">4.3.2.</span> <span class="nav-text">With CSVConnector 实现代码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#内部实现原理"><span class="nav-number">4.4.</span> <span class="nav-text">内部实现原理</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Temporal-Table-JOIN-vs-双流JOIN-vs-Lateral-JOIN"><span class="nav-number">5.</span> <span class="nav-text">Temporal Table JOIN vs 双流JOIN vs Lateral JOIN</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Temporal-Table-JOIN-vs-LATERAL-JOIN"><span class="nav-number">5.1.</span> <span class="nav-text">Temporal Table JOIN vs  LATERAL JOIN</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Temporal-Table-JOIN-vs-双流-JOIN"><span class="nav-number">5.2.</span> <span class="nav-text">Temporal Table JOIN vs 双流 JOIN</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Temporal-Table-JOIN改进"><span class="nav-number">6.</span> <span class="nav-text">Temporal Table JOIN改进</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">7.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于点赞和评论"><span class="nav-number">8.</span> <span class="nav-text">关于点赞和评论</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jincheng Sun</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.2.0</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="Total Visitors">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="Total Views">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.2.0"></script>
+
+  <script src="/js/motion.js?v=7.2.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.2.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.2.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.2.0"></script>
+<script src="/js/post-details.js?v=7.2.0"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.2.0"></script>
+
+
+  
+
+  
+
+  
+
+  
+  
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://http-enjoyment-cool.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+
+
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://enjoyment.cool/2019/03/18/Apache Flink 漫谈系列 - Temporal Table JOIN/";
+    this.page.identifier = "2019/03/18/Apache Flink 漫谈系列 - Temporal Table JOIN/";
+    this.page.title = 'Apache Flink 漫谈系列 - Temporal Table JOIN';
+    };
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://http-enjoyment-cool.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+  
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('3');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

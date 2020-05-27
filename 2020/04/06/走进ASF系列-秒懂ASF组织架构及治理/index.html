@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+<link rel="stylesheet" href="/css/main.css?v=7.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="mask-icon" href="/images/me.png?v=7.2.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.2.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":5},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="费曼技巧（The Feynman Technique）费曼技巧是一种 “以教为学” 的学习方式，源于诺贝尔物理奖获得者，理查德·费曼(Richard Feynman)。这个学习方法的秘诀是尝试用最简单的语言说清楚你要表达的内容，哪怕是一个深奥的科学理论，你也能用简单的表达方式让5岁的孩子或者60岁的老人很容易的理解和熟记。由于我也是在上周（2020.04.03)刚刚收到的成为ASF Member的">
+<meta name="keywords" content="ASF，走进ASF系列,初识ASF组织架构及治理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="走进ASF系列 - 初识ASF组织架构及治理">
+<meta property="og:url" content="http://enjoyment.cool/2020/04/06/走进ASF系列-秒懂ASF组织架构及治理/index.html">
+<meta property="og:site_name" content="Pretty Cool Enjoyment">
+<meta property="og:description" content="费曼技巧（The Feynman Technique）费曼技巧是一种 “以教为学” 的学习方式，源于诺贝尔物理奖获得者，理查德·费曼(Richard Feynman)。这个学习方法的秘诀是尝试用最简单的语言说清楚你要表达的内容，哪怕是一个深奥的科学理论，你也能用简单的表达方式让5岁的孩子或者60岁的老人很容易的理解和熟记。由于我也是在上周（2020.04.03)刚刚收到的成为ASF Member的">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://enjoyment.cool/2020/04/06/走进ASF系列-秒懂ASF组织架构及治理/15861860728010.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/04/06/走进ASF系列-秒懂ASF组织架构及治理/15861860895769.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/04/06/走进ASF系列-秒懂ASF组织架构及治理/15861861053824.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/04/06/走进ASF系列-秒懂ASF组织架构及治理/15861861168266.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/04/06/走进ASF系列-秒懂ASF组织架构及治理/15861861329174.jpg">
+<meta property="og:updated_time" content="2020-04-10T15:23:47.899Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="走进ASF系列 - 初识ASF组织架构及治理">
+<meta name="twitter:description" content="费曼技巧（The Feynman Technique）费曼技巧是一种 “以教为学” 的学习方式，源于诺贝尔物理奖获得者，理查德·费曼(Richard Feynman)。这个学习方法的秘诀是尝试用最简单的语言说清楚你要表达的内容，哪怕是一个深奥的科学理论，你也能用简单的表达方式让5岁的孩子或者60岁的老人很容易的理解和熟记。由于我也是在上周（2020.04.03)刚刚收到的成为ASF Member的">
+<meta name="twitter:image" content="http://enjoyment.cool/2020/04/06/走进ASF系列-秒懂ASF组织架构及治理/15861860728010.jpg">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://enjoyment.cool/2020/04/06/走进ASF系列-秒懂ASF组织架构及治理/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>走进ASF系列 - 初识ASF组织架构及治理 | Pretty Cool Enjoyment</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Pretty Cool Enjoyment</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">Apache Flink</h1>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-catalog">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/catalog/" rel="section"><i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Catalog</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+  
+  
+
+  
+
+  <a href="https://github.com/sunjincheng121" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://enjoyment.cool/2020/04/06/走进ASF系列-秒懂ASF组织架构及治理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jincheng Sun">
+      <meta itemprop="description" content="Apache Flink">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Pretty Cool Enjoyment">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">走进ASF系列 - 初识ASF组织架构及治理
+
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+
+          
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2020-04-06 23:12:47" itemprop="dateCreated datePublished" datetime="2020-04-06T23:12:47+08:00">2020-04-06</time>
+            </span>
+          
+
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2020-04-10 23:23:47" itemprop="dateModified" datetime="2020-04-10T23:23:47+08:00">2020-04-10</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/archives/走进ASF系列/" itemprop="url" rel="index"><span itemprop="name">走进ASF系列</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+              
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">Comments: </span>
+                <a href="/2020/04/06/走进ASF系列-秒懂ASF组织架构及治理/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/04/06/走进ASF系列-秒懂ASF组织架构及治理/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+                 Views:  
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          
+
+          <br>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="费曼技巧（The-Feynman-Technique）"><a href="#费曼技巧（The-Feynman-Technique）" class="headerlink" title="费曼技巧（The Feynman Technique）"></a>费曼技巧（The Feynman Technique）</h1><p>费曼技巧是一种 “以教为学” 的学习方式，源于诺贝尔物理奖获得者，理查德·费曼(Richard Feynman)。这个学习方法的秘诀是尝试用最简单的语言说清楚你要表达的内容，哪怕是一个深奥的科学理论，你也能用简单的表达方式让5岁的孩子或者60岁的老人很容易的理解和熟记。由于我也是在上周（2020.04.03)刚刚收到的成为ASF Member的邀请，所以《走进ASF系列》文章与其说是和大家分享，不如说是和大家一起学习！</p>
+<h1 id="ASF-是什么？"><a href="#ASF-是什么？" class="headerlink" title="ASF 是什么？"></a>ASF 是什么？</h1><p>我想“ ASF 是什么？”是一个最简单的问题，也是一个最难回答的问题。简单是因为你可以以任何一个角度去描述，就像盲人摸象。而困难是因为你很难用一句话就完整全面的定义“ ASF 是什么？”。所以面对这样的问题我的考虑是，先描述表象，再探究其细节。就像我们回答宝马是什么，我们会说“别摸我”，奥迪是什么？我们会说“四个圈”。那么 ASF是什么？我想说，ASF是下面这个漂亮的羽毛 ；）</p>
+<p><img src="/2020/04/06/走进ASF系列-秒懂ASF组织架构及治理/15861860728010.jpg" alt></p>
+<p>了解Logo也许是欣赏一个新事物最好的开始。那么下一秒你将有一连串的问题浮现出来？她多大了？干什么的？怎么运作的？和我有什么关系？接下来我们慢慢道来…</p>
+<h2 id="与阿里同龄"><a href="#与阿里同龄" class="headerlink" title="与阿里同龄"></a>与阿里同龄</h2><p> Apache软件基金会（ASF）是在美国注册的503©3非营利的公共慈善组织，与1999年成立。那么成立的最终目的是什么呢？ASF最核心的目的如下：</p>
+<ul>
+<li>通过提供硬件、通讯工具以及业务基础架构，为开放式协作开发软件项目提供基础。</li>
+<li>建立独立法人实体，任何公司和个人可以向其进行捐赠，并能够确保这些捐赠将用于公共利益。</li>
+<li>为个人志愿者提供避免针对基金会项目的法律诉讼的手段。</li>
+<li>保护应用于其软件产品的“Apache”品牌免受其他组织的滥用。</li>
+</ul>
+<p>所以ASF是有着美好愿景和伟大使命的公益性组织。ASF和阿里巴巴一样都成立于1999年，而且在利他方面可谓英雄所见略同，阿里巴巴以“让天下没有难做的生意”为使命， ASF则致力于开源软件生态的营造，让软件技术能够在全球共享，这是ASF无比耀眼的魅力所在！</p>
+<h2 id="逐本溯源"><a href="#逐本溯源" class="headerlink" title="逐本溯源"></a>逐本溯源</h2><p>ASF的成立并非凭空出世，在ASF的前身其实是叫“Apache 小组”，这个小组当时在维护由NCSA编写的HTTPD Web服务器。从1995到1999年，由“Apache小组”所领导开发的 Apache HTTPD web服务成为了市场的领导者，一直持续到现在，目前仍占据了市场65%的份额。当年使用该服务的人越来越多，但是最初的开发人员对该项目失去了兴趣，并转移到其他项目上，从而使用户失去了支持。于是一个叫Brian Behlendorf的大牛在自己的计算机上创建了一个邮件列表，供这些用户协作以修复，维护和改进该软件。从1995年2月不到12位软件工程师通过电子邮件共享代码补丁开始，到后面的有了Apache网站，网站上又托管了很多关联项目（例如mod_ perl项目，PHP项目，Java Apache项目），这样的情形面临的问题越来越多，比如，潜在的个人被法律攻击等，进而越来越需要一个更加协调和结构化的组织来解决这些问题。于是到1999年6月ASF便注册成立了！：）</p>
+<h2 id="成长的苦恼"><a href="#成长的苦恼" class="headerlink" title="成长的苦恼"></a>成长的苦恼</h2><p>随着软件产品的不断成熟，用户越来越多，反馈的问题和软件增强的建议也越来越多，同时参与进行代码修补的人也越来越多。问题也随即而来，最初的几位创始人根本没有办法处理所有的问题，Review所有的代码补丁，Merge所以的提交，那么怎么办呢？当时Apache成员认为如果某位开发者，已经“赢得”了成为社区的一员的资格时，他们就授予此开发者对代码仓库的直接访问权限，也就是目前我们说的Committer，这样不断的增加团队的力量，也提高了团队开发项目的能力，进而更有效地维护和发展了团队。当然这只是冰山一角，ASF的治理当然不仅仅是Committer的发展了，下面章节我们进行系统的介绍。</p>
+<h1 id="ASF治理"><a href="#ASF治理" class="headerlink" title="ASF治理"></a>ASF治理</h1><p>目前ASF拥有超过140多个跨技术范围的项目，涉及350多个具体项目，7000+的代码贡献者，参与人员覆盖了全球230多个国家，为保障其健康的发展必须有一套简单高效的组织架构和治理手段。那么ASF的治理将涉及到ASF组织本身的治理和ASF对Apache网站所托管的项目的治理。</p>
+<h2 id="公司的治理"><a href="#公司的治理" class="headerlink" title="公司的治理"></a>公司的治理</h2><p>总的来看，ASF的治理相当简单：由成员(Member)来选举董事会；董事会任命各种管理人员并创建PMCs；PMCs定期向董事会报告，大多数其他管理人员向总裁然汇报，然后总裁向董事会报告。</p>
+<h3 id="组织架构"><a href="#组织架构" class="headerlink" title="组织架构"></a>组织架构</h3><p>ASF公司治理首先要有一个完善的组织架构，和分工明确的角色职责。如下图所示：</p>
+<p><img src="/2020/04/06/走进ASF系列-秒懂ASF组织架构及治理/15861860895769.jpg" alt></p>
+<p>上面的组织架构整体围绕的“董事会”进行角色构建，董事会有主席(Chair)和副主席(Vice Char)。 公司设有总裁，副总裁，秘书，财务总监，法律顾问等职位。每种角色各肩其职。作为初识ASF的文章，我们简单了解如下宏观的内容即可：</p>
+<ul>
+<li><p>ASF 由董事会来管理，董事会由成员构成。</p>
+</li>
+<li><p>现有成员(Member)会定期提名和选举新成员，每年提名并选举9名董事加入董事会。</p>
+</li>
+<li><p>董事会任命业务官员，并将特定政策或业务领域的责任分配给每位官员。例如，法律事务委员会副总裁负责为ASF和所有Apache项目设置法律政策，并与公司顾问进行合作。</p>
+</li>
+<li><p>董事会任命执行官，包括总裁，秘书，财务总监等，他们负责ASF的特定领域运营。</p>
+</li>
+<li><p>大多数<a href="https://www.apache.org/foundation/records/minutes/2012/board_minutes_2012_10_17.txt" target="_blank" rel="noopener">官员每月直接向总裁报告</a>，而总裁则每月向董事会报告ASF的整体运营状况。</p>
+</li>
+<li><p>基础设施副总裁向总裁汇报，并对基础设施团队的运营进行宏观监督。在团队中，带薪的基础设施 管理者角色有助于管理日常操作，带薪人员确定工作优先级，并维护所有Apache项目中使用的服务。</p>
+</li>
+</ul>
+<p>那么这些角色是如何产生的呢？ASF还需要一套选举任命的机制来保证整个组织的健康运行。</p>
+<h3 id="选举和任命"><a href="#选举和任命" class="headerlink" title="选举和任命"></a>选举和任命</h3><p>董事会负责创建并更新项目管理委员会（ PMCs ）。董事会只是批准孵化器的合理构建请求（毕业成为 TLPs ）或来自 PMCs 自身（添加或删除 PMC 成员）的请求。在每种情况下，向董事会建议进行的变更都已经由相关的 PMC 完成了投票。如下图所示：</p>
+<p><img src="/2020/04/06/走进ASF系列-秒懂ASF组织架构及治理/15861861053824.jpg" alt></p>
+<ul>
+<li><p>董事会(Board)<br>董事会由9名懂事组成，负责管理和监督ASF的各种事物。包括人员，资产（资金，知识产权，商标和支持项目所需要的基础设施）以及为项目分配资源。</p>
+</li>
+<li><p>项目管理委员会（PMC）<br>项目管理委员会由董事会决议设立，负责具体一个项目的事物管理。每个PMC由至少一名ASF官员组成，并指定一名成员为主席。每个PMC中的主席就是ASF在各个项目中的眼睛和耳朵，对ASF至关重要。当然PMC负责发展各自新的PMC成员和发展项目的Committer。</p>
+</li>
+<li><p>各种VP<br>ASF有这种VP，他们大多数<a href="https://www.apache.org/foundation/records/minutes/2012/board_minutes_2012_10_17.txt" target="_blank" rel="noopener">官员每月直接向总裁报告</a>，而总裁则每月向董事会报告ASF的整体运营状况。</p>
+</li>
+</ul>
+<p>也许这些内容对于刚刚了解ASF或者刚刚加入ASF开源建设的同学简单了解一下即可，因为似乎距离还很“遥远”。（加引号原因是，我认为是 思想认为 的遥远，不是真的那么远）。接下来我们看看和具体项目贡献者密切相关的内容 - ASF项目治理。</p>
+<h2 id="项目的治理"><a href="#项目的治理" class="headerlink" title="项目的治理"></a>项目的治理</h2><p>每个项目都由项目的PMC进行独立管理，PMC以Apache的方式，遵循由所有官员为所有项目设置的一些核心原则。如下图所示：</p>
+<p><img src="/2020/04/06/走进ASF系列-秒懂ASF组织架构及治理/15861861168266.jpg" alt></p>
+<p>上图我以Apache Flink项目为例勾勒了项目治理的概要图。每个PMC都由ASF董事会进行管理，每个PMC都会负责制定自己项目的技术方向。</p>
+<ul>
+<li><p>PMC每季度直接向董事会报告一次。董事会对PMC进行监督，以确保PMC健康发展，顺利的管理社区，确保PMC遵守Apache的原则。项目的技术方向由PMC指定，董事会不对项目提供技术治理。</p>
+</li>
+<li><p>每个PMC的主席都是该项目的副总裁，因此也是ASF的官员。<a href="http://www.apache.org/dev/pmc.html#chair" target="_blank" rel="noopener">主席的主要职责</a>是确保项目报告全面，并提交到董事会。</p>
+</li>
+<li><p>PMC对软件版本发布进行投票。PMC进行适当的发布治理，进而确保了所有的源代码版本发布都是ASF官方行为。</p>
+</li>
+<li><p>PMCs为项目提名并选举新提交者(Committer)。PMCs还负责提名并投票新的PMC成员，然后PMCs向董事会汇报建议的变化。</p>
+</li>
+<li><p>Apache孵化器(Incubator)是一种特殊的（I）PMC：它的工作是指导新建立的Podling社区，以帮助他们学习Apache Way。在每个Podling对他们的软件发布进行投票后，IPMC成员也对该Podling的发布过程进行监督和投票，以确保Podling逐渐成长为一个合格的Apache项目。</p>
+</li>
+<li><p>根据政策，只有个人可以充当会员，提交者(Committer)或PMC成员(Member)或管理人员。这是ASF和<a href="http://community.apache.org/projectIndependence" target="_blank" rel="noopener">Apache项目保持其独立性的一种方式</a>。</p>
+</li>
+</ul>
+<p>同时每个项目都有不同的参与角色，比如：用户（Users)，贡献者(Contributors)，提交者(Committers)，新的PMC Members等等。不同角色的职责如下：</p>
+<ul>
+<li><p>用户(Users) - 就是使用项目润君的的大众，他们以错误报告和功能建议的形式向开发人员提供反馈进而为项目做贡献。</p>
+</li>
+<li><p>贡献者(Contributors) - 就是开发人员，以写代码或写文档的形式为项目做贡献。开发人员可以多种方式共享社区，比如参加者邮件列表讨论、提交代码补丁、提交文档等等。</p>
+</li>
+<li><p>提交者(Committers) - 提交者是一批特殊的贡献者，他们是拥有代码仓库写操作权限的开发者。</p>
+</li>
+<li><p>PMC 成员(Member) - 项目管理委员会（PMC）成员，是由在项目的开发中表现突出的提交者（Committers）选举出来的，他们拥有写入代码仓库的权限、拥有社区相关事务的投票权、以及有权提名新的PMC成员和Committer的权利和职责。</p>
+</li>
+</ul>
+<h1 id="ASF-董事会现状"><a href="#ASF-董事会现状" class="headerlink" title="ASF 董事会现状"></a>ASF 董事会现状</h1><p>今年ASF年度成员会议, 在3.31～4.2期间举行， ASF 董事会选情相当激烈，有16为ASF Member参与竞选。竞选结果是去年的九席董事换了七位，二位董事 Craig Russell 和 Shane Curcuru 获得了连任。 目前同时会成员如下：</p>
+<ul>
+<li>Shane Curcuru (连任董事)</li>
+<li>Bertrand Delacretaz（原董事）</li>
+<li>Roy Fielding（原董事）</li>
+<li>Niclas Hedhman（新任董事）</li>
+<li>Justin Mclean（新任董事）</li>
+<li>Craig Russell (连任董事)</li>
+<li>Sam Ruby（原董事）</li>
+<li>Patricia Shanahan （新任董事）</li>
+<li>Sander Striker （原董事）</li>
+</ul>
+<h1 id="2020-新晋ASF-Member"><a href="#2020-新晋ASF-Member" class="headerlink" title="2020 新晋ASF Member"></a>2020 新晋ASF Member</h1><p>上面的竞选和任命章节已经介绍过，ASF一年一度的成员会议中，不仅仅会选举9名董事成员，也会提名和投票新的ASF Member 。</p>
+<p>（此处省略。。。等待官宣）</p>
+<p>恭喜他们（当然也祝福一下我自己的幸运）！据最新统计（2020.04.06) ASF Member 全球有765名，其中在中国的有20+人。</p>
+<h1 id="ASF-一张图"><a href="#ASF-一张图" class="headerlink" title="ASF 一张图"></a>ASF 一张图</h1><p>对于初识的用户来说，上面的内容也许太多了，记住一个Logo容易，记住一张图似乎比上面的文字要简单许多：）</p>
+<p><img src="/2020/04/06/走进ASF系列-秒懂ASF组织架构及治理/15861861329174.jpg" alt></p>
+<p>ASF金字塔描述了不同角色的群体特征，越上面人群越小，但对ASF肩负的责任越大，越下面人群越大，但对ASF的责任越小，参与越容易！ 记住 “ASF是什么？” 从 羽毛 Logo开始，参与ASF贡献从 用户 开始。</p>
+<h1 id="ASF-一句话"><a href="#ASF-一句话" class="headerlink" title="ASF 一句话"></a>ASF 一句话</h1><p>图可以描述表象，文字可以表述内涵，开篇的羽毛代表了ASF，但怎么描述这个漂亮的羽毛呢？“ASF是一个与阿里巴巴同龄（成立于1999年)，有完整的组织(董事会)架构管理，以软件（140个领域）技术全球（覆盖230个国家）共享为使命的公益组织”。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本篇是《走进ASF系列》的第一篇，我努力尝试在我自己身上体验“费曼技巧”，从概要介绍了什么ASF，进而推进介绍ASF组织架构，ASF公司治理和项目治理，意在让 想要 或 刚刚 参与ASF贡献的同学对ASF有一个初步认知。最后介绍了目前ASF董事会成员和2020年新晋的中国ASF Member。同时，为了方便大家记忆，以一张图，一句话的方式收尾本篇内容。</p>
+<p>** 同时《走进ASF系列》与我之前的《Apache Flink 漫谈系列》不同，讨论ASF更多的是非技术的分享，容易变成无重点，无内容，无收获的乏味分享，这是我最不愿意看见的现象。所以肯请大家在本系列的初期多给我一些或好或坏的评论建议，以便我们共同成长！谢谢大家～ ** </p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p>[1] <a href="http://www.apache.org/foundation/governance/orgchart" target="_blank" rel="noopener">http://www.apache.org/foundation/governance/orgchart</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        
+          
+        
+        <div class="post-tags">
+          
+            <a href="/archives/ASF，走进ASF系列/" rel="tag"># ASF，走进ASF系列</a>
+          
+            <a href="/archives/初识ASF组织架构及治理/" rel="tag"># 初识ASF组织架构及治理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/04/06/走进ASF系列-序/" rel="next" title="走进ASF系列 - 序">
+                <i class="fa fa-chevron-left"></i> 走进ASF系列 - 序
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/04/10/走进ASF系列-Apache-董事会是如何选举的？/" rel="prev" title="走进ASF系列 - Apache 董事会是如何选举的？">
+                走进ASF系列 - Apache 董事会是如何选举的？ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="Jincheng Sun">
+            
+              <p class="site-author-name" itemprop="name">Jincheng Sun</p>
+              <div class="site-description motion-element" itemprop="description">Apache Flink</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">36</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">30</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/sunjincheng121/enjoyment" title="GitHub &rarr; https://github.com/sunjincheng121/enjoyment" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/sunjincheng121" title="Twitter &rarr; https://twitter.com/sunjincheng121" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#费曼技巧（The-Feynman-Technique）"><span class="nav-number">1.</span> <span class="nav-text">费曼技巧（The Feynman Technique）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ASF-是什么？"><span class="nav-number">2.</span> <span class="nav-text">ASF 是什么？</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#与阿里同龄"><span class="nav-number">2.1.</span> <span class="nav-text">与阿里同龄</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#逐本溯源"><span class="nav-number">2.2.</span> <span class="nav-text">逐本溯源</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#成长的苦恼"><span class="nav-number">2.3.</span> <span class="nav-text">成长的苦恼</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ASF治理"><span class="nav-number">3.</span> <span class="nav-text">ASF治理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#公司的治理"><span class="nav-number">3.1.</span> <span class="nav-text">公司的治理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#组织架构"><span class="nav-number">3.1.1.</span> <span class="nav-text">组织架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#选举和任命"><span class="nav-number">3.1.2.</span> <span class="nav-text">选举和任命</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#项目的治理"><span class="nav-number">3.2.</span> <span class="nav-text">项目的治理</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ASF-董事会现状"><span class="nav-number">4.</span> <span class="nav-text">ASF 董事会现状</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2020-新晋ASF-Member"><span class="nav-number">5.</span> <span class="nav-text">2020 新晋ASF Member</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ASF-一张图"><span class="nav-number">6.</span> <span class="nav-text">ASF 一张图</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ASF-一句话"><span class="nav-number">7.</span> <span class="nav-text">ASF 一句话</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">8.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">9.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jincheng Sun</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.2.0</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="Total Visitors">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="Total Views">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.2.0"></script>
+
+  <script src="/js/motion.js?v=7.2.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.2.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.2.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.2.0"></script>
+<script src="/js/post-details.js?v=7.2.0"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.2.0"></script>
+
+
+  
+
+  
+
+  
+
+  
+  
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://http-enjoyment-cool.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+
+
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://enjoyment.cool/2020/04/06/走进ASF系列-秒懂ASF组织架构及治理/";
+    this.page.identifier = "2020/04/06/走进ASF系列-秒懂ASF组织架构及治理/";
+    this.page.title = '走进ASF系列 - 初识ASF组织架构及治理';
+    };
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://http-enjoyment-cool.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+  
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('3');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

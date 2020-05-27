@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+<link rel="stylesheet" href="/css/main.css?v=7.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="mask-icon" href="/images/me.png?v=7.2.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.2.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":5},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="聊什么上一篇《Apache Flink 漫谈系列 - JOIN算子》我们对最常见的JOIN做了详尽的分析，本篇介绍一个特殊的JOIN，那就是JOIN LATERAL。JOIN LATERAL为什么特殊呢，直观说因为JOIN的右边不是一个实际的物理表，而是一个VIEW或者Table-valued Funciton。 如下图所示：  本篇会先介绍传统数据库对LATERAL JOIN的支持，然后介绍Ap">
+<meta name="keywords" content="Flink">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Apache Flink 漫谈系列 - JOIN LATERAL">
+<meta property="og:url" content="http://enjoyment.cool/2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/index.html">
+<meta property="og:site_name" content="Pretty Cool Enjoyment">
+<meta property="og:description" content="聊什么上一篇《Apache Flink 漫谈系列 - JOIN算子》我们对最常见的JOIN做了详尽的分析，本篇介绍一个特殊的JOIN，那就是JOIN LATERAL。JOIN LATERAL为什么特殊呢，直观说因为JOIN的右边不是一个实际的物理表，而是一个VIEW或者Table-valued Funciton。 如下图所示：  本篇会先介绍传统数据库对LATERAL JOIN的支持，然后介绍Ap">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/11/Apache%20Flink%20漫谈系列%20-%20JOIN%20LATERAL/1C9522A6-61E8-4A5F-8222-7F335B6E09FF.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/11/Apache%20Flink%20漫谈系列%20-%20JOIN%20LATERAL/3471F756-4FBF-4C3F-A28B-7D8F22CF5D80.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/11/Apache%20Flink%20漫谈系列%20-%20JOIN%20LATERAL/5DA82C35-6E03-43AD-B695-35C85D85D641.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/11/Apache%20Flink%20漫谈系列%20-%20JOIN%20LATERAL/E3709EBB-89AE-44EA-98C7-06A2794597D9.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/11/Apache%20Flink%20漫谈系列%20-%20JOIN%20LATERAL/ED960882-39B0-40FD-9400-60D0D66F366E.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/11/Apache%20Flink%20漫谈系列%20-%20JOIN%20LATERAL/28AB4B72-87D6-464A-AA67-CD0A50A8BA36.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/11/Apache%20Flink%20漫谈系列%20-%20JOIN%20LATERAL/D0B3ADED-7C0D-4D10-BBF2-B6FEA4F5137E.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/11/Apache%20Flink%20漫谈系列%20-%20JOIN%20LATERAL/37259B89-DD8F-4349-A378-000AAA886479.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/11/Apache%20Flink%20漫谈系列%20-%20JOIN%20LATERAL/42B8EBC9-CD5B-498C-B191-F4241C91483F.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/11/Apache%20Flink%20漫谈系列%20-%20JOIN%20LATERAL/A3A08123-0490-41BA-9E07-95B4557A19F5.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/11/Apache%20Flink%20漫谈系列%20-%20JOIN%20LATERAL/C6CC909F-7990-4C8B-AE79-CB06A830C9B7.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/11/Apache%20Flink%20漫谈系列%20-%20JOIN%20LATERAL/90BC2538-6A12-4F5F-AE42-B87BA5C12871.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/11/Apache%20Flink%20漫谈系列%20-%20JOIN%20LATERAL/32183E30-E096-46DE-A855-932377D70BFE.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/11/Apache%20Flink%20漫谈系列%20-%20JOIN%20LATERAL/C1F61F90-B7F6-4E11-B91C-9B1366C3EED3.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/11/Apache%20Flink%20漫谈系列%20-%20JOIN%20LATERAL/DCC358D8-1CAC-4CA2-965A-B53C1842DA69.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/03/11/Apache%20Flink%20漫谈系列%20-%20JOIN%20LATERAL/645848C4-9ACC-4DFD-AF35-F15EB9B2BE20.png">
+<meta property="og:updated_time" content="2019-07-13T13:09:34.845Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Apache Flink 漫谈系列 - JOIN LATERAL">
+<meta name="twitter:description" content="聊什么上一篇《Apache Flink 漫谈系列 - JOIN算子》我们对最常见的JOIN做了详尽的分析，本篇介绍一个特殊的JOIN，那就是JOIN LATERAL。JOIN LATERAL为什么特殊呢，直观说因为JOIN的右边不是一个实际的物理表，而是一个VIEW或者Table-valued Funciton。 如下图所示：  本篇会先介绍传统数据库对LATERAL JOIN的支持，然后介绍Ap">
+<meta name="twitter:image" content="http://enjoyment.cool/2019/03/11/Apache%20Flink%20漫谈系列%20-%20JOIN%20LATERAL/1C9522A6-61E8-4A5F-8222-7F335B6E09FF.png">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://enjoyment.cool/2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Apache Flink 漫谈系列 - JOIN LATERAL | Pretty Cool Enjoyment</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Pretty Cool Enjoyment</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">Apache Flink</h1>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-catalog">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/catalog/" rel="section"><i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Catalog</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+  
+  
+
+  
+
+  <a href="https://github.com/sunjincheng121" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://enjoyment.cool/2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jincheng Sun">
+      <meta itemprop="description" content="Apache Flink">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Pretty Cool Enjoyment">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">Apache Flink 漫谈系列 - JOIN LATERAL
+
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+
+          
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-03-11 18:18:18" itemprop="dateCreated datePublished" datetime="2019-03-11T18:18:18+08:00">2019-03-11</time>
+            </span>
+          
+
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-07-13 21:09:34" itemprop="dateModified" datetime="2019-07-13T21:09:34+08:00">2019-07-13</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/archives/Apache-Flink-漫谈/" itemprop="url" rel="index"><span itemprop="name">Apache Flink 漫谈</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+              
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">Comments: </span>
+                <a href="/2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+                 Views:  
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          
+
+          <br>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="聊什么"><a href="#聊什么" class="headerlink" title="聊什么"></a>聊什么</h1><p>上一篇《Apache Flink 漫谈系列 - JOIN算子》我们对最常见的JOIN做了详尽的分析，本篇介绍一个特殊的JOIN，那就是JOIN LATERAL。JOIN LATERAL为什么特殊呢，直观说因为JOIN的右边不是一个实际的物理表，而是一个VIEW或者Table-valued Funciton。</p>
+<p>如下图所示：</p>
+<p><img src="/2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/1C9522A6-61E8-4A5F-8222-7F335B6E09FF.png" alt></p>
+<p>本篇会先介绍传统数据库对LATERAL JOIN的支持，然后介绍Apache Flink目前对LATERAL JOIN的支持情况。</p>
+<h1 id="实际问题"><a href="#实际问题" class="headerlink" title="实际问题"></a>实际问题</h1><p>假设我们有两张表，一张是Customers表(消费者id, 所在城市), 一张是Orders表(订单id,消费者id)，两张表的DDL(SQL Server)如下：</p>
+<ul>
+<li>Customers<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE Customers (</span><br><span class="line">  customerid char(5) NOT NULL,</span><br><span class="line">  city varchar (10) NOT NULL</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">insert into Customers values(&apos;C001&apos;,&apos;Beijing&apos;);</span><br><span class="line">insert into Customers values(&apos;C002&apos;,&apos;Beijing&apos;);</span><br><span class="line">insert into Customers values(&apos;C003&apos;,&apos;Beijing&apos;);</span><br><span class="line">insert into Customers values(&apos;C004&apos;,&apos;HangZhou&apos;);</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>查看数据：<br><img src="/2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/3471F756-4FBF-4C3F-A28B-7D8F22CF5D80.png" alt></p>
+<ul>
+<li>Orders<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE Orders(</span><br><span class="line">  orderid char(5) NOT NULL,</span><br><span class="line">  customerid char(5) NULL</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">insert into Orders values(&apos;O001&apos;,&apos;C001&apos;);</span><br><span class="line">insert into Orders values(&apos;O002&apos;,&apos;C001&apos;);</span><br><span class="line">insert into Orders values(&apos;O003&apos;,&apos;C003&apos;);</span><br><span class="line">insert into Orders values(&apos;O004&apos;,&apos;C001&apos;);</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>查看数据：<br><img src="/2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/5DA82C35-6E03-43AD-B695-35C85D85D641.png" alt></p>
+<h2 id="问题示例"><a href="#问题示例" class="headerlink" title="问题示例"></a>问题示例</h2><p>假设我们想查询所有Customers的客户ID，地点和订单信息,我们想得到的信息是：<br><img src="/2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/E3709EBB-89AE-44EA-98C7-06A2794597D9.png" alt></p>
+<h3 id="用INNER-JOIN解决"><a href="#用INNER-JOIN解决" class="headerlink" title="用INNER JOIN解决"></a>用INNER JOIN解决</h3><p>如果大家查阅了《Apache Flink 漫谈系列 - JOIN算子》，我想看到这样的查询需求会想到INNER JOIN来解决，SQL如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">SELECT </span><br><span class="line">    c.customerid, c.city, o.orderid </span><br><span class="line">FROM Customers c JOIN Orders o </span><br><span class="line">	ON o.customerid = c.customerid</span><br></pre></td></tr></table></figure>
+
+<p>查询结果如下：<br><img src="/2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/ED960882-39B0-40FD-9400-60D0D66F366E.png" alt></p>
+<p>但如果我们真的用上面的方式来解决，就不会有本篇要介绍的内容了，所以我们换一种写法。</p>
+<h2 id="用-Correlated-subquery解决"><a href="#用-Correlated-subquery解决" class="headerlink" title="用 Correlated subquery解决"></a>用 Correlated subquery解决</h2><p>Correlated subquery 是在subquery中使用关联表的字段，subquery可以在FROM Clause中也可以在WHERE Clause中。</p>
+<ul>
+<li>WHERE Clause<br>用WHERE Clause实现上面的查询需求，SQL如下：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">SELECT </span><br><span class="line">    c.customerid, c.city</span><br><span class="line">FROM Customers c WHERE c.customerid IN (</span><br><span class="line">    SELECT </span><br><span class="line">      o.customerid, o.orderid</span><br><span class="line">    FROM Orders o</span><br><span class="line">    WHERE o.customerid = c.customerid</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>执行情况：<br><img src="/2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/28AB4B72-87D6-464A-AA67-CD0A50A8BA36.png" alt></p>
+<p>上面的问题是用在WHERE Clause里面subquery的查询列必须和需要比较的列对应，否则我们无法对<code>o.orderid</code>进行投影, 上面查询我为什么要加一个<code>o.orderid</code>呢，因为查询需求是需要<code>o.orderid</code>的，去掉<code>o.orderid</code>查询能成功，但是拿到的结果并不是我们想要的，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">SELECT </span><br><span class="line">    c.customerid, c.city</span><br><span class="line">FROM Customers c WHERE c.customerid IN (</span><br><span class="line">    SELECT </span><br><span class="line">      o.customerid</span><br><span class="line">    FROM Orders o</span><br><span class="line">    WHERE o.customerid = c.customerid</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>查询结果：<br><img src="/2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/D0B3ADED-7C0D-4D10-BBF2-B6FEA4F5137E.png" alt></p>
+<p>可见上面查询结果缺少了<code>o.orderid</code>,不能满足我们的查询需求。</p>
+<ul>
+<li>FROM Clause<br>用FROM Clause实现上面的查询需求，SQL如下：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">SELECT </span><br><span class="line">    c.customerid, c.city, o.orderid </span><br><span class="line">FROM Customers c, (</span><br><span class="line">    SELECT </span><br><span class="line">      o.orderid, o.customerid </span><br><span class="line">    FROM Orders o</span><br><span class="line">    WHERE o.customerid = c.customerid</span><br><span class="line">) as o</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>我们会得到如下错误：<br><img src="/2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/37259B89-DD8F-4349-A378-000AAA886479.png" alt><br>错误信息提示我们无法识别<code>c.customerid</code>。在ANSI-SQL里面FROM Clause里面的subquery是无法引用左边表信息的，所以简单的用FROM Clause里面的subquery，也无法解决上面的问题，<br>那么上面的查询需求除了<code>INNER JOIN</code> 我们还可以如何解决呢？</p>
+<h1 id="JOIN-LATERAL"><a href="#JOIN-LATERAL" class="headerlink" title="JOIN LATERAL"></a>JOIN LATERAL</h1><p>我们分析上面的需求，本质上是根据左表Customers的customerid，去查询右表的Orders信息，就像一个For循环一样，外层是遍历左表Customers所有数据，内层是根据左表Customers的每一个Customerid去右表Orders中进行遍历查询，然后再将符合条件的左右表数据进行JOIN，这种根据左表逐条数据动态生成右表进行JOIN的语义，SQL标准里面提出了<code>LATERAL</code>关键字，也叫做 <code>lateral drive table</code>。</p>
+<h2 id="CROSS-APPLY和LATERAL"><a href="#CROSS-APPLY和LATERAL" class="headerlink" title="CROSS APPLY和LATERAL"></a>CROSS APPLY和LATERAL</h2><p>上面的示例我们用的是SQL Server进行测试的，这里在多提一下在SQL Server里面是如何支持 <code>LATERAL</code> 的呢？SQL Server是用自己的方言 <code>CROSS APPLY</code> 来支持的。那么为啥不用ANSI-SQL的<code>LATERAL</code>而用<code>CROSS APPLY</code>呢？ 可能的原因是当时SQL Server为了解决TVF问题而引入的，同时<code>LATERAL</code>是SQL2003引入的，而<code>CROSS APPLY</code>是SQL Server 2005就支持了，SQL Server 2005的开发是在2000年就进行了，这个可能也有个时间差，等<code>LATERAL</code>出来的时候，<code>CROSS APPLY</code>在SQL Server里面已经开发完成了。所以种种原因SQL Server里面就采用了<code>CROSS APPLY</code>，但<code>CROSS APPLY</code>的语义与<code>LATERAL</code>却完全一致，同时后续支持<code>LATERAL</code>的Oracle12和PostgreSQL94同时支持了<code>LATERAL</code>和<code>CROSS APPLY</code>。</p>
+<h2 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h2><p>那么我们回到上面的问题，我们用SQL Server的<code>CROSS APPLY</code>来解决上面问题，SQL如下：<br><img src="/2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/42B8EBC9-CD5B-498C-B191-F4241C91483F.png" alt></p>
+<p>上面得到的结果完全满足查询需求。</p>
+<h1 id="JOIN-LATERAL-与-INNER-JOIN-关系"><a href="#JOIN-LATERAL-与-INNER-JOIN-关系" class="headerlink" title="JOIN LATERAL 与 INNER JOIN 关系"></a>JOIN LATERAL 与 INNER JOIN 关系</h1><p>上面的查询需求并没有体现<code>JOIN LATERAL</code>和<code>INNER JOIN</code>的区别，我们还是以SQL Server中两个查询执行Plan来观察一下：<br><img src="/2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/A3A08123-0490-41BA-9E07-95B4557A19F5.png" alt></p>
+<p>上面我们发现经过SQL Server优化器优化之后的两个执行plan完全一致，那么为啥还要再造一个<code>LATERAL</code> 出来呢？</p>
+<h2 id="性能方面"><a href="#性能方面" class="headerlink" title="性能方面"></a>性能方面</h2><p>我们将上面的查询需求稍微改变一下，我们查询所有Customer和Customers的第一份订单信息。</p>
+<ul>
+<li>LATERAL 的写法<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">SELECT </span><br><span class="line">    c.customerid, c.city, o.orderid </span><br><span class="line">FROM Customers c CROSS APPLY (</span><br><span class="line">    SELECT </span><br><span class="line">     TOP(1) o.orderid, o.customerid </span><br><span class="line">    FROM Orders o </span><br><span class="line">    WHERE o.customerid = c.customerid</span><br><span class="line">	ORDER BY o.customerid, o.orderid</span><br><span class="line">) as o</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>查询结果：<br><img src="/2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/C6CC909F-7990-4C8B-AE79-CB06A830C9B7.png" alt><br>我们发现虽然C001的Customer有三笔订单，但是我们查询的TOP1信息。</p>
+<ul>
+<li>JOIN 写法<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">SELECT  c.customerid, c.city, o.orderid</span><br><span class="line"> FROM    Customers c</span><br><span class="line">  JOIN (</span><br><span class="line">   SELECT </span><br><span class="line">     o2.*, </span><br><span class="line">	 ROW_NUMBER() OVER (</span><br><span class="line">		PARTITION BY customerid </span><br><span class="line">		ORDER BY orderid</span><br><span class="line">	  ) AS rn</span><br><span class="line">   FROM    Orders o2</span><br><span class="line"> ) o</span><br><span class="line">ON c.customerid = o.customerid AND o.rn = 1</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>查询结果：<br><img src="/2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/90BC2538-6A12-4F5F-AE42-B87BA5C12871.png" alt></p>
+<p>如上我们都完成了查询需求，我们在来看一下执行Plan，如下：<br><img src="/2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/32183E30-E096-46DE-A855-932377D70BFE.png" alt><br>我们直观发现完成相同功能，使用<code>CROSS APPLY</code>进行查询，执行Plan简单许多。</p>
+<h2 id="功能方面"><a href="#功能方面" class="headerlink" title="功能方面"></a>功能方面</h2><p>在功能方面<code>INNER JOIN</code>本身在ANSI-SQL中是不允许 JOIN 一个Function的，这也是SQL Server当时引入<code>CROSS APPLY</code>的根本原因。我们以一个SQL Server中DMV（相当于TVF）查询为例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">SELECT </span><br><span class="line">   name, log_backup_time </span><br><span class="line">FROM sys.databases AS s</span><br><span class="line"> CROSS APPLY sys.dm_db_log_stats(s.database_id);</span><br></pre></td></tr></table></figure>
+
+<p>查询结果：<br><img src="/2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/C1F61F90-B7F6-4E11-B91C-9B1366C3EED3.png" alt></p>
+<h1 id="Apache-Flink对-LATERAL的支持"><a href="#Apache-Flink对-LATERAL的支持" class="headerlink" title="Apache Flink对 LATERAL的支持"></a>Apache Flink对 LATERAL的支持</h1><p>前面我花费了大量的章节来向大家介绍ANSI-SQL和传统数据库以SQL Server为例如何支持<code>LATERAL</code>的，接下来我们看看Apache Flink对<code>LATERAL</code>的支持情况。</p>
+<h2 id="Calcite"><a href="#Calcite" class="headerlink" title="Calcite"></a>Calcite</h2><p>Apache Flink 利用 Calcite进行SQL的解析和优化，目前Calcite完全支持<code>LATERAL</code>语法，示例如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">SELECT </span><br><span class="line">    e.NAME, e.DEPTNO, d.NAME </span><br><span class="line">FROM EMPS e, LATERAL (</span><br><span class="line">    SELECT </span><br><span class="line">    *</span><br><span class="line">    FORM DEPTS d </span><br><span class="line">    WHERE e.DEPTNO=d.DEPTNO</span><br><span class="line"> ) as d;</span><br></pre></td></tr></table></figure>
+
+<p>查询结果：<br><img src="/2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/DCC358D8-1CAC-4CA2-965A-B53C1842DA69.png" alt><br>我使用的是Calcite官方自带测试数据。</p>
+<h2 id="Flink"><a href="#Flink" class="headerlink" title="Flink"></a>Flink</h2><p>截止到Flink-1.6.2，Apache Flink 中有两种场景使用<code>LATERAL</code>，如下：</p>
+<ul>
+<li>UDTF(TVF) - User-defined Table Funciton </li>
+<li>Temporal Table - 涉及内容会在后续篇章单独介绍。</li>
+</ul>
+<p>本篇我们以在TVF(UDTF)为例说明 Apache Fink中如何支持<code>LATERAL</code>。</p>
+<h3 id="UDTF"><a href="#UDTF" class="headerlink" title="UDTF"></a>UDTF</h3><p>UDTF- User-defined Table Function是Apache Flink中三大用户自定义函数（UDF，UDTF，UDAGG)之一。 自定义接口如下：</p>
+<ul>
+<li><p>基类</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line">  * Base class for all user-defined functions such as scalar functions, table functions,</span><br><span class="line">  * or aggregation functions.</span><br><span class="line">  */</span><br><span class="line">abstract class UserDefinedFunction extends Serializable &#123;</span><br><span class="line">  // 关键是FunctionContext中提供了若干高级属性（在UDX篇会详细介绍）</span><br><span class="line">  def open(context: FunctionContext): Unit = &#123;&#125;</span><br><span class="line">  def close(): Unit = &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>TableFunction</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line">  * Base class for a user-defined table function (UDTF). A user-defined table functions works on</span><br><span class="line">  * zero, one, or multiple scalar values as input and returns multiple rows as output.</span><br><span class="line">  *</span><br><span class="line">  * The behavior of a [[TableFunction]] can be defined by implementing a custom evaluation</span><br><span class="line">  * method. An evaluation method must be declared publicly, not static and named &quot;eval&quot;.</span><br><span class="line">  * Evaluation methods can also be overloaded by implementing multiple methods named &quot;eval&quot;.</span><br><span class="line">  *</span><br><span class="line">  * User-defined functions must have a default constructor and must be instantiable during runtime.</span><br><span class="line">  *</span><br><span class="line">  * By default the result type of an evaluation method is determined by Flink&apos;s type extraction</span><br><span class="line">  * facilities. This is sufficient for basic types or simple POJOs but might be wrong for more</span><br><span class="line">  * complex, custom, or composite types. In these cases [[TypeInformation]] of the result type</span><br><span class="line">  * can be manually defined by overriding [[getResultType()]].</span><br><span class="line">  */</span><br><span class="line">abstract class TableFunction[T] extends UserDefinedFunction &#123;</span><br><span class="line"></span><br><span class="line">  // 对于泛型T，如果是基础类型那么Flink框架可以自动识别，</span><br><span class="line">  // 对于用户自定义的复杂对象，需要用户overwrite这个实现。</span><br><span class="line">  def getResultType: TypeInformation[T] = null</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>上面定义的核心是要求用户实现<code>eval</code>方法，我们写一个具体示例。</p>
+<ul>
+<li>示例<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// 定义一个简单的UDTF返回类型，对应接口上的 T </span><br><span class="line">case class SimpleUser(name: String, age: Int)</span><br><span class="line">// 继承TableFunction，并实现evale方法</span><br><span class="line">// 核心功能是解析以#分割的字符串</span><br><span class="line">class SplitTVF extends TableFunction[SimpleUser] &#123;</span><br><span class="line">  // make sure input element&apos;s format is &quot;&lt;string&gt;#&lt;int&gt;&quot;</span><br><span class="line">  def eval(user: String): Unit = &#123;</span><br><span class="line">    if (user.contains(&quot;#&quot;)) &#123;</span><br><span class="line">      val splits = user.split(&quot;#&quot;)</span><br><span class="line">      collect(SimpleUser(splits(0), splits(1).toInt))</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="示例-完整的ITCase-："><a href="#示例-完整的ITCase-：" class="headerlink" title="示例(完整的ITCase)："></a>示例(完整的ITCase)：</h3><ul>
+<li>测试数据<br>我们构造一个只包含一个data字段的用户表，用户表数据如下：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>data</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Sunny#8</td>
+</tr>
+<tr>
+<td>Kevin#36</td>
+</tr>
+<tr>
+<td>Panpan#36</td>
+</tr>
+<tr>
+<td>* 查询需求</td>
+</tr>
+<tr>
+<td>查询的需求是将data字段flatten成为name和age两个字段的表，期望得到：</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>name</th>
+<th>age</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Sunny</td>
+<td>8</td>
+</tr>
+<tr>
+<td>Kevin</td>
+<td>36</td>
+</tr>
+<tr>
+<td>Panpan</td>
+<td>36</td>
+</tr>
+</tbody></table>
+<ul>
+<li>查询示例<br>我们以ITCase方式完成如上查询需求，完整代码如下：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">@Test</span><br><span class="line">  def testLateralTVF(): Unit = &#123;</span><br><span class="line">    val env = StreamExecutionEnvironment.getExecutionEnvironment</span><br><span class="line">    val tEnv = TableEnvironment.getTableEnvironment(env)</span><br><span class="line">    env.setStateBackend(getStateBackend)</span><br><span class="line">    StreamITCase.clear</span><br><span class="line"></span><br><span class="line">    val userData = new mutable.MutableList[(String)]</span><br><span class="line">    userData.+=((&quot;Sunny#8&quot;))</span><br><span class="line">    userData.+=((&quot;Kevin#36&quot;))</span><br><span class="line">    userData.+=((&quot;Panpan#36&quot;))</span><br><span class="line"></span><br><span class="line">    val SQLQuery = &quot;SELECT data, name, age FROM userTab, LATERAL TABLE(splitTVF(data)) AS T(name, age)&quot;</span><br><span class="line"></span><br><span class="line">    val users = env.fromCollection(userData).toTable(tEnv, &apos;data)</span><br><span class="line"></span><br><span class="line">    val tvf = new SplitTVF()</span><br><span class="line">    tEnv.registerTable(&quot;userTab&quot;, users)</span><br><span class="line">    tEnv.registerFunction(&quot;splitTVF&quot;, tvf)</span><br><span class="line"></span><br><span class="line">    val result = tEnv.SQLQuery(SQLQuery).toAppendStream[Row]</span><br><span class="line">    result.addSink(new StreamITCase.StringSink[Row])</span><br><span class="line">    env.execute()</span><br><span class="line">    StreamITCase.testResults.foreach(println(_))</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>运行结果：<br><img src="/2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/645848C4-9ACC-4DFD-AF35-F15EB9B2BE20.png" alt></p>
+<p>上面的核心语句是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">val SQLQuery = &quot;SELECT data, name, age FROM userTab, LATERAL TABLE(splitTVF(data)) AS T(name, age)&quot;</span><br></pre></td></tr></table></figure>
+
+<p>如果大家想运行上面的示例，请查阅《Apache Flink 漫谈系列 - SQL概览》中 源码方式 搭建测试环境。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本篇重点向大家介绍了一种新的<code>JOIN</code>类型 - <code>JOIN LATERAL</code>。并向大家介绍了SQL Server中对<code>LATERAL</code>的支持方式，详细分析了<code>JOIN LATERAL</code>和<code>INNER JOIN</code>的区别与联系，最后切入到Apache Flink中，以<code>UDTF</code>示例说明了Apache Flink中对<code>JOIN LATERAL</code>的支持，后续篇章会介绍Apache Flink中另一种使用<code>LATERAL</code>的场景，就是Temporal JION，Temporal JION也是一种新的JOIN类型，我们下一篇再见!</p>
+<h1 id="关于点赞和评论"><a href="#关于点赞和评论" class="headerlink" title="关于点赞和评论"></a>关于点赞和评论</h1><p>本系列文章难免有很多缺陷和不足，真诚希望读者对有收获的篇章给予点赞鼓励，对有不足的篇章给予反馈和建议，先行感谢大家!</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        
+          
+        
+        <div class="post-tags">
+          
+            <a href="/archives/Flink/" rel="tag"># Flink</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/06/Apache Flink 漫谈系列 - JOIN 算子/" rel="next" title="Apache Flink 漫谈系列 - JOIN 算子">
+                <i class="fa fa-chevron-left"></i> Apache Flink 漫谈系列 - JOIN 算子
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/18/Apache Flink 漫谈系列 - Temporal Table JOIN/" rel="prev" title="Apache Flink 漫谈系列 - Temporal Table JOIN">
+                Apache Flink 漫谈系列 - Temporal Table JOIN <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="Jincheng Sun">
+            
+              <p class="site-author-name" itemprop="name">Jincheng Sun</p>
+              <div class="site-description motion-element" itemprop="description">Apache Flink</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">36</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">30</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/sunjincheng121/enjoyment" title="GitHub &rarr; https://github.com/sunjincheng121/enjoyment" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/sunjincheng121" title="Twitter &rarr; https://twitter.com/sunjincheng121" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#聊什么"><span class="nav-number">1.</span> <span class="nav-text">聊什么</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实际问题"><span class="nav-number">2.</span> <span class="nav-text">实际问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题示例"><span class="nav-number">2.1.</span> <span class="nav-text">问题示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#用INNER-JOIN解决"><span class="nav-number">2.1.1.</span> <span class="nav-text">用INNER JOIN解决</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#用-Correlated-subquery解决"><span class="nav-number">2.2.</span> <span class="nav-text">用 Correlated subquery解决</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#JOIN-LATERAL"><span class="nav-number">3.</span> <span class="nav-text">JOIN LATERAL</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#CROSS-APPLY和LATERAL"><span class="nav-number">3.1.</span> <span class="nav-text">CROSS APPLY和LATERAL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题解决"><span class="nav-number">3.2.</span> <span class="nav-text">问题解决</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#JOIN-LATERAL-与-INNER-JOIN-关系"><span class="nav-number">4.</span> <span class="nav-text">JOIN LATERAL 与 INNER JOIN 关系</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#性能方面"><span class="nav-number">4.1.</span> <span class="nav-text">性能方面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#功能方面"><span class="nav-number">4.2.</span> <span class="nav-text">功能方面</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Apache-Flink对-LATERAL的支持"><span class="nav-number">5.</span> <span class="nav-text">Apache Flink对 LATERAL的支持</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Calcite"><span class="nav-number">5.1.</span> <span class="nav-text">Calcite</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Flink"><span class="nav-number">5.2.</span> <span class="nav-text">Flink</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#UDTF"><span class="nav-number">5.2.1.</span> <span class="nav-text">UDTF</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例-完整的ITCase-："><span class="nav-number">5.2.2.</span> <span class="nav-text">示例(完整的ITCase)：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">6.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于点赞和评论"><span class="nav-number">7.</span> <span class="nav-text">关于点赞和评论</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jincheng Sun</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.2.0</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="Total Visitors">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="Total Views">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.2.0"></script>
+
+  <script src="/js/motion.js?v=7.2.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.2.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.2.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.2.0"></script>
+<script src="/js/post-details.js?v=7.2.0"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.2.0"></script>
+
+
+  
+
+  
+
+  
+
+  
+  
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://http-enjoyment-cool.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+
+
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://enjoyment.cool/2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/";
+    this.page.identifier = "2019/03/11/Apache Flink 漫谈系列 - JOIN LATERAL/";
+    this.page.title = 'Apache Flink 漫谈系列 - JOIN LATERAL';
+    };
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://http-enjoyment-cool.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+  
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('3');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

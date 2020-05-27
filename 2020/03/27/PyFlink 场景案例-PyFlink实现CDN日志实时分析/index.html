@@ -1,0 +1,1526 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+<link rel="stylesheet" href="/css/main.css?v=7.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="mask-icon" href="/images/me.png?v=7.2.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.2.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":5},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="放空自己三十辐共一毂，当其无，有车之用。埏埴以为器，当其无，有器之用。凿户牖以为室，当其无，有室之用。— 深悟 “空” 之道。 CDN 日志实时分析综述CDN将源站资源缓存至遍布全球的加速节点上，当终端用户请求获取该资源时，无需回源，系统自动调用离终端用户最近的CDN节点上已缓存的资源，那么如何进行实时日志分析呢？ 架构CDN日志的解析一般有一个通用的架构模式，就是首先要将各个边缘节点的日志数据进">
+<meta name="keywords" content="Flink,PyFlink,场景案例,CDN日志">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PyFlink 场景案例 - PyFlink实现CDN日志实时分析">
+<meta property="og:url" content="http://enjoyment.cool/2020/03/27/PyFlink 场景案例-PyFlink实现CDN日志实时分析/index.html">
+<meta property="og:site_name" content="Pretty Cool Enjoyment">
+<meta property="og:description" content="放空自己三十辐共一毂，当其无，有车之用。埏埴以为器，当其无，有器之用。凿户牖以为室，当其无，有室之用。— 深悟 “空” 之道。 CDN 日志实时分析综述CDN将源站资源缓存至遍布全球的加速节点上，当终端用户请求获取该资源时，无需回源，系统自动调用离终端用户最近的CDN节点上已缓存的资源，那么如何进行实时日志分析呢？ 架构CDN日志的解析一般有一个通用的架构模式，就是首先要将各个边缘节点的日志数据进">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://enjoyment.cool/2020/03/27/PyFlink%20场景案例-PyFlink实现CDN日志实时分析/15852891954996.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/03/27/PyFlink%20场景案例-PyFlink实现CDN日志实时分析/15852895311783.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/03/27/PyFlink%20场景案例-PyFlink实现CDN日志实时分析/15852909825765.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/03/27/PyFlink%20场景案例-PyFlink实现CDN日志实时分析/15852908860940.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/03/27/PyFlink%20场景案例-PyFlink实现CDN日志实时分析/15852958397459.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/03/27/PyFlink%20场景案例-PyFlink实现CDN日志实时分析/15852974922403.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/03/27/PyFlink%20场景案例-PyFlink实现CDN日志实时分析/15853000193511.jpg">
+<meta property="og:updated_time" content="2020-04-01T09:38:57.885Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PyFlink 场景案例 - PyFlink实现CDN日志实时分析">
+<meta name="twitter:description" content="放空自己三十辐共一毂，当其无，有车之用。埏埴以为器，当其无，有器之用。凿户牖以为室，当其无，有室之用。— 深悟 “空” 之道。 CDN 日志实时分析综述CDN将源站资源缓存至遍布全球的加速节点上，当终端用户请求获取该资源时，无需回源，系统自动调用离终端用户最近的CDN节点上已缓存的资源，那么如何进行实时日志分析呢？ 架构CDN日志的解析一般有一个通用的架构模式，就是首先要将各个边缘节点的日志数据进">
+<meta name="twitter:image" content="http://enjoyment.cool/2020/03/27/PyFlink%20场景案例-PyFlink实现CDN日志实时分析/15852891954996.jpg">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://enjoyment.cool/2020/03/27/PyFlink 场景案例-PyFlink实现CDN日志实时分析/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>PyFlink 场景案例 - PyFlink实现CDN日志实时分析 | Pretty Cool Enjoyment</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Pretty Cool Enjoyment</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">Apache Flink</h1>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-catalog">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/catalog/" rel="section"><i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Catalog</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+  
+  
+
+  
+
+  <a href="https://github.com/sunjincheng121" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://enjoyment.cool/2020/03/27/PyFlink 场景案例-PyFlink实现CDN日志实时分析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jincheng Sun">
+      <meta itemprop="description" content="Apache Flink">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Pretty Cool Enjoyment">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">PyFlink 场景案例 - PyFlink实现CDN日志实时分析
+
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+
+          
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2020-03-27 17:14:48" itemprop="dateCreated datePublished" datetime="2020-03-27T17:14:48+08:00">2020-03-27</time>
+            </span>
+          
+
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2020-04-01 17:38:57" itemprop="dateModified" datetime="2020-04-01T17:38:57+08:00">2020-04-01</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/archives/PyFlink-场景案例/" itemprop="url" rel="index"><span itemprop="name">PyFlink 场景案例</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+              
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">Comments: </span>
+                <a href="/2020/03/27/PyFlink 场景案例-PyFlink实现CDN日志实时分析/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/27/PyFlink 场景案例-PyFlink实现CDN日志实时分析/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+                 Views:  
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          
+
+          <br>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="放空自己"><a href="#放空自己" class="headerlink" title="放空自己"></a>放空自己</h1><p>三十辐共一毂，当其无，有车之用。埏埴以为器，当其无，有器之用。凿户牖以为室，当其无，有室之用。— 深悟 “空” 之道。</p>
+<h1 id="CDN-日志实时分析综述"><a href="#CDN-日志实时分析综述" class="headerlink" title="CDN 日志实时分析综述"></a>CDN 日志实时分析综述</h1><p>CDN将源站资源缓存至遍布全球的加速节点上，当终端用户请求获取该资源时，无需回源，系统自动调用离终端用户最近的CDN节点上已缓存的资源，那么如何进行实时日志分析呢？</p>
+<h2 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h2><p>CDN日志的解析一般有一个通用的架构模式，就是首先要将各个边缘节点的日志数据进行采集，一般会采集到消息队列，然后将消息队列和实时计算集群进行集成进行实时的日志分析，最后将分析的结果写到存储系统里面。那么我今天的案例将架构实例化，消息队列采用Kafka，实时计算采用Flink，最终将数据存储到MySql中。如下图所示：<br><img src="/2020/03/27/PyFlink 场景案例-PyFlink实现CDN日志实时分析/15852891954996.jpg" alt></p>
+<h2 id="需求说明"><a href="#需求说明" class="headerlink" title="需求说明"></a>需求说明</h2><p>阿里云实际的CDN日志数据结构如下（可能会不断丰富字段信息）：<br><img src="/2020/03/27/PyFlink 场景案例-PyFlink实现CDN日志实时分析/15852895311783.jpg" alt></p>
+<p>为了介绍方便，我们将实际的统计需求进行简化，示例将从CDN访问日志中，根据IP解析出其所属的地区，统计指标：</p>
+<ul>
+<li>按地区统计资源访问量</li>
+<li>按地区统计资源下载总量</li>
+<li>按地区统计资源平均下载速度</li>
+</ul>
+<h2 id="CDN实时日志分析UDF定义"><a href="#CDN实时日志分析UDF定义" class="headerlink" title="CDN实时日志分析UDF定义"></a>CDN实时日志分析UDF定义</h2><p>这里我们需要定义一个 ip_to_province()的UDF，输入是ip地址，输出是地区名字字符串。UDF的输入类型是一个字符串，输出类型也是一个字符串。同时我们会用到地理区域查询服务（<a href="http://whois.pconline.com.cn/ipJson.jsp?ip=27.184.139.25)，大家在自己的生产环境要替换为可靠的地域查询服务。" target="_blank" rel="noopener">http://whois.pconline.com.cn/ipJson.jsp?ip=27.184.139.25)，大家在自己的生产环境要替换为可靠的地域查询服务。</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">import re</span><br><span class="line">import json</span><br><span class="line">from pyflink.table import DataTypes</span><br><span class="line">from pyflink.table.udf import udf</span><br><span class="line">from urllib.parse import quote_plus</span><br><span class="line">from urllib.request import urlopen</span><br><span class="line"></span><br><span class="line">@udf(input_types=[DataTypes.STRING()], result_type=DataTypes.STRING())</span><br><span class="line">def ip_to_province(ip):</span><br><span class="line">   &quot;&quot;&quot;</span><br><span class="line">   format:</span><br><span class="line">       &#123;</span><br><span class="line">       &apos;ip&apos;: &apos;27.184.139.25&apos;,</span><br><span class="line">       &apos;pro&apos;: &apos;河北省&apos;,</span><br><span class="line">       &apos;proCode&apos;: &apos;130000&apos;,</span><br><span class="line">       &apos;city&apos;: &apos;石家庄市&apos;,</span><br><span class="line">       &apos;cityCode&apos;: &apos;130100&apos;,</span><br><span class="line">       &apos;region&apos;: &apos;灵寿县&apos;,</span><br><span class="line">       &apos;regionCode&apos;: &apos;130126&apos;,</span><br><span class="line">       &apos;addr&apos;: &apos;河北省石家庄市灵寿县 电信&apos;,</span><br><span class="line">       &apos;regionNames&apos;: &apos;&apos;,</span><br><span class="line">       &apos;err&apos;: &apos;&apos;</span><br><span class="line">       &#125;</span><br><span class="line">   &quot;&quot;&quot;</span><br><span class="line">   try:</span><br><span class="line">       urlobj = urlopen( \</span><br><span class="line">        &apos;http://whois.pconline.com.cn/ipJson.jsp?ip=%s&apos; % quote_plus(ip))</span><br><span class="line">       data = str(urlobj.read(), &quot;gbk&quot;)</span><br><span class="line">       pos = re.search(&quot;&#123;[^&#123;&#125;]+\&#125;&quot;, data).span()</span><br><span class="line">       geo_data = json.loads(data[pos[0]:pos[1]])</span><br><span class="line">       if geo_data[&apos;pro&apos;]:</span><br><span class="line">           return geo_data[&apos;pro&apos;]</span><br><span class="line">       else:</span><br><span class="line">           return geo_data[&apos;err&apos;]</span><br><span class="line">   except:</span><br><span class="line">       return &quot;UnKnow&quot;</span><br></pre></td></tr></table></figure>
+
+<h2 id="数据读取和结果写入定义"><a href="#数据读取和结果写入定义" class="headerlink" title="数据读取和结果写入定义"></a>数据读取和结果写入定义</h2><p>按照通用的作业结构，需要定义Source connector来读取Kafka数据，定义Sink connector来将计算结果存储到MySQL。最后是编写统计逻辑。在这特别说明一下，在PyFlink中也支持SQL DDL的编写，我们用一个简单的DDL描述，就完成了Source Connector的开发。其中connector.type填写kafka。SinkConnector也一样，用一行DDL描述即可，其中connector.type填写jdbc。</p>
+<h3 id="Kafka-数据源读取DDL定义"><a href="#Kafka-数据源读取DDL定义" class="headerlink" title="Kafka 数据源读取DDL定义"></a>Kafka 数据源读取DDL定义</h3><p>数据统计需求我们只选取核心的字段，比如：uuid，表示唯一的日志标示，client_ip表示访问来源，request_time表示资源下载耗时，response_size表示资源数据大小。Kafka数据字段进行简化如下：<br><img src="/2020/03/27/PyFlink 场景案例-PyFlink实现CDN日志实时分析/15852909825765.jpg" alt="-w344"></p>
+<p>DDL定义如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">kafka_source_ddl = &quot;&quot;&quot;</span><br><span class="line">CREATE TABLE cdn_access_log (</span><br><span class="line"> uuid VARCHAR,</span><br><span class="line"> client_ip VARCHAR,</span><br><span class="line"> request_time BIGINT,</span><br><span class="line"> response_size BIGINT,</span><br><span class="line"> uri VARCHAR</span><br><span class="line">) WITH (</span><br><span class="line"> &apos;connector.type&apos; = &apos;kafka&apos;,</span><br><span class="line"> &apos;connector.version&apos; = &apos;universal&apos;,</span><br><span class="line"> &apos;connector.topic&apos; = &apos;access_log&apos;,</span><br><span class="line"> &apos;connector.properties.zookeeper.connect&apos; = &apos;localhost:2181&apos;,</span><br><span class="line"> &apos;connector.properties.bootstrap.servers&apos; = &apos;localhost:9092&apos;,</span><br><span class="line"> &apos;format.type&apos; = &apos;csv&apos;,</span><br><span class="line"> &apos;format.ignore-parse-errors&apos; = &apos;true&apos;</span><br><span class="line">)</span><br><span class="line">&quot;&quot;&quot;</span><br></pre></td></tr></table></figure>
+
+<h3 id="MySql-数据写入DDL定义"><a href="#MySql-数据写入DDL定义" class="headerlink" title="MySql 数据写入DDL定义"></a>MySql 数据写入DDL定义</h3><p>其中我们发现我们需求是按地区分组，但是原始日志里面并没有地区的字段信息，所以我们需要定义一个Python UDF 更具 client_ip 来查询对应的地区。所以我们对应的MySqL统计结果表如下：<br><img src="/2020/03/27/PyFlink 场景案例-PyFlink实现CDN日志实时分析/15852908860940.jpg" alt="-w475"><br>DDL定义如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">mysql_sink_ddl = &quot;&quot;&quot;</span><br><span class="line">CREATE TABLE cdn_access_statistic (</span><br><span class="line"> province VARCHAR,</span><br><span class="line"> access_count BIGINT,</span><br><span class="line"> total_download BIGINT,</span><br><span class="line"> download_speed DOUBLE</span><br><span class="line">) WITH (</span><br><span class="line"> &apos;connector.type&apos; = &apos;jdbc&apos;,</span><br><span class="line"> &apos;connector.url&apos; = &apos;jdbc:mysql://localhost:3306/Flink&apos;,</span><br><span class="line"> &apos;connector.table&apos; = &apos;access_statistic&apos;,</span><br><span class="line"> &apos;connector.username&apos; = &apos;root&apos;,</span><br><span class="line"> &apos;connector.password&apos; = &apos;123456&apos;,</span><br><span class="line"> &apos;connector.write.flush.interval&apos; = &apos;1s&apos;</span><br><span class="line">)</span><br><span class="line">&quot;&quot;&quot;</span><br></pre></td></tr></table></figure>
+
+<h2 id="核心统计逻辑"><a href="#核心统计逻辑" class="headerlink" title="核心统计逻辑"></a>核心统计逻辑</h2><p>我们首先要将<code>client_ip</code>转换为地区名字，然后在做数据统计，如下核心统计逻辑：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># 核心的统计逻辑</span><br><span class="line">t_env.from_path(&quot;cdn_access_log&quot;)\</span><br><span class="line">   .select(&quot;uuid, &quot;</span><br><span class="line">           &quot;ip_to_province(client_ip) as province, &quot; # IP 转换为地区名称</span><br><span class="line">           &quot;response_size, request_time&quot;)\</span><br><span class="line">   .group_by(&quot;province&quot;)\</span><br><span class="line">   .select( # 计算访问量</span><br><span class="line">           &quot;province, count(uuid) as access_count, &quot; </span><br><span class="line">           # 计算下载总量 </span><br><span class="line">           &quot;sum(response_size) as total_download,  &quot; </span><br><span class="line">           # 计算下载速度</span><br><span class="line">           &quot;sum(response_size) * 1.0 / sum(request_time) as download_speed&quot;) \</span><br><span class="line">   .insert_into(&quot;cdn_access_statistic&quot;)</span><br></pre></td></tr></table></figure>
+
+<h2 id="完整的作业代码"><a href="#完整的作业代码" class="headerlink" title="完整的作业代码"></a>完整的作业代码</h2><p>我们整体看一遍完整代码结构，首先是核心依赖的导入，然后是我们需要创建一个ENV，并设置采用的planner（目前Flink支持Flink和blink两套planner）建议大家采用 blink planner。 接下来将我们刚才描述的kafka和mysql的ddl进行表的注册。再将Python UDF进行注册，这里特别提醒一点，UDF所依赖的其他文件也可以在API里面进行制定，这样在job提交时候会一起提交到集群。然后是核心的统计逻辑，最后调用executre提交作业。这样一个实际的CDN日志实时分析的作业就开发完成了。具体代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line"></span><br><span class="line">from pyFlink.datastream import StreamExecutionEnvironment</span><br><span class="line">from pyflink.table import StreamTableEnvironment, EnvironmentSettings</span><br><span class="line">from enjoyment.cdn.cdn_udf import ip_to_province</span><br><span class="line">from enjoyment.cdn.cdn_connector_ddl import kafka_source_ddl, mysql_sink_ddl</span><br><span class="line"></span><br><span class="line"># 创建Table Environment， 并选择使用的Planner</span><br><span class="line">env = StreamExecutionEnvironment.get_execution_environment()</span><br><span class="line">t_env = StreamTableEnvironment.create(</span><br><span class="line">   env,</span><br><span class="line">   environment_settings=EnvironmentSettings.new_instance().use_blink_planner().build())</span><br><span class="line"></span><br><span class="line"># 创建Kafka数据源表</span><br><span class="line">t_env.sql_update(kafka_source_ddl)</span><br><span class="line"># 创建MySql结果表</span><br><span class="line">t_env.sql_update(mysql_sink_ddl)</span><br><span class="line"></span><br><span class="line"># 注册IP转换地区名称的UDF</span><br><span class="line">t_env.register_function(&quot;ip_to_province&quot;, ip_to_province)</span><br><span class="line"></span><br><span class="line"># 添加依赖的Python文件</span><br><span class="line">t_env.add_Python_file(</span><br><span class="line">    os.path.dirname(os.path.abspath(__file__)) + &quot;/enjoyment/cdn/cdn_udf.py&quot;)</span><br><span class="line">t_env.add_Python_file(os.path.dirname(</span><br><span class="line">    os.path.abspath(__file__)) + &quot;/enjoyment/cdn/cdn_connector_ddl.py&quot;)</span><br><span class="line"></span><br><span class="line"># 核心的统计逻辑</span><br><span class="line">t_env.from_path(&quot;cdn_access_log&quot;)\</span><br><span class="line">   .select(&quot;uuid, &quot;</span><br><span class="line">           &quot;ip_to_province(client_ip) as province, &quot; # IP 转换为地区名称</span><br><span class="line">           &quot;response_size, request_time&quot;)\</span><br><span class="line">   .group_by(&quot;province&quot;)\</span><br><span class="line">   .select( # 计算访问量</span><br><span class="line">           &quot;province, count(uuid) as access_count, &quot; </span><br><span class="line">           # 计算下载总量 </span><br><span class="line">           &quot;sum(response_size) as total_download,  &quot; </span><br><span class="line">           # 计算下载速度</span><br><span class="line">           &quot;sum(response_size) * 1.0 / sum(request_time) as download_speed&quot;) \</span><br><span class="line">   .insert_into(&quot;cdn_access_statistic&quot;)</span><br><span class="line"></span><br><span class="line"># 执行作业</span><br><span class="line">t_env.execute(&quot;pyFlink_parse_cdn_log&quot;)</span><br></pre></td></tr></table></figure>
+
+<h2 id="环境搭建（MacOS）"><a href="#环境搭建（MacOS）" class="headerlink" title="环境搭建（MacOS）"></a>环境搭建（MacOS）</h2><h3 id="安装MySQL"><a href="#安装MySQL" class="headerlink" title="安装MySQL"></a>安装MySQL</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$  brew install mysql</span><br><span class="line">Updating Homebrew...</span><br><span class="line">==&gt; Auto-updated Homebrew!</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">MySQL is configured to only allow connections from localhost by default</span><br><span class="line"></span><br><span class="line">To connect run:</span><br><span class="line">    mysql -uroot</span><br><span class="line"></span><br><span class="line">To have launchd start mysql now and restart at login:</span><br><span class="line">  brew services start mysql</span><br><span class="line">Or, if you don&apos;t want/need a background service you can just run:</span><br><span class="line">  mysql.server start</span><br></pre></td></tr></table></figure>
+
+<p>如果没有安装brew，执行以下指令安装:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ /usr/bin/ruby -e &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)&quot;</span><br></pre></td></tr></table></figure>
+
+<p>安装完成后，执行安全配置，将root用户的密码设置为<code>JxXX&amp;&amp;l2j2#</code>:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ mysql_secure_installation</span><br></pre></td></tr></table></figure>
+
+<p>启动mysql服务：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ brew services start mysql</span><br><span class="line"></span><br><span class="line">==&gt; Tapping homebrew/services</span><br><span class="line">Cloning into &apos;/usr/local/Homebrew/Library/Taps/homebrew/homebrew-services&apos;...</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">==&gt; Successfully started `mysql` (label: homebrew.mxcl.mysql)</span><br></pre></td></tr></table></figure>
+
+<p>登录mysql并创建flink数据库和cdn_access_statistic表，并确认开放端口号为默认的3306：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$ mysql -uroot -p</span><br><span class="line">Enter password: JxXX&amp;&amp;l2j2#</span><br><span class="line">mysql&gt; use flink;</span><br><span class="line">Database changed</span><br><span class="line">mysql&gt; CREATE TABLE cdn_access_statistic(</span><br><span class="line">    -&gt;   province VARCHAR(255) PRIMARY KEY,</span><br><span class="line">    -&gt;   access_count BIGINT,</span><br><span class="line">    -&gt;   total_download BIGINT,</span><br><span class="line">    -&gt;   download_speed DOUBLE</span><br><span class="line">    -&gt; ) ENGINE=INNODB CHARSET=utf8mb4;</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br><span class="line">exit</span><br></pre></td></tr></table></figure>
+
+<p>这样mysql的环境就准备好了。</p>
+<h3 id="安装Kafka"><a href="#安装Kafka" class="headerlink" title="安装Kafka"></a>安装Kafka</h3><p>在Mac系统安装Kafka也非常方便，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">brew install kafka</span><br><span class="line">Updating Homebrew...</span><br><span class="line">==&gt; Installing dependencies for kafka: zookeeper</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">==&gt; Summary</span><br><span class="line">/usr/local/Cellar/zookeeper/3.5.7: 394 files, 11.3MB</span><br><span class="line">==&gt; Installing kafka</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">==&gt; kafka</span><br><span class="line">To have launchd start kafka now and restart at login:</span><br><span class="line">  brew services start kafka</span><br><span class="line">Or, if you don&apos;t want/need a background service you can just run:</span><br><span class="line">  zookeeper-server-start /usr/local/etc/kafka/zookeeper.properties &amp; kafka-server-start /usr/local/etc/kafka/server.properties</span><br></pre></td></tr></table></figure>
+
+<p>安装完成后执行以下指令启动zookeeper和kafka：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ cd /usr/local/opt/kafka/libexec/bin/</span><br><span class="line">$ ./zookeeper-server-start.sh ../config/zookeeper.properties &amp;</span><br><span class="line">$ (回车)</span><br><span class="line">$ ./kafka-server-start.sh ../config/server.properties &amp;</span><br><span class="line">$ (回车)</span><br></pre></td></tr></table></figure>
+
+<p>然后在kafka中创建名为<code>cdn_access_log</code>的topic:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ kafka-topics --create --replication-factor 1 --partitions 1 --topic cdn_access_log --zookeeper localhost:2181</span><br><span class="line">...</span><br><span class="line">Created topic cdn_access_log.</span><br></pre></td></tr></table></figure>
+
+<p>这样kafka的环境也准备好了.</p>
+<h3 id="安装PyFlink"><a href="#安装PyFlink" class="headerlink" title="安装PyFlink"></a>安装PyFlink</h3><p>确保使用Python3.5+的版本，检验如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ python --version</span><br><span class="line">Python 3.7.6</span><br></pre></td></tr></table></figure>
+
+<p>说过pip install安装PyFlink</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">python -m pip install apache-flink==1.10.0</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">Successfully installed apache-beam-2.15.0 dill-0.2.9 pyarrow-0.14.1</span><br></pre></td></tr></table></figure>
+
+<p>检查我们是否成功安装了PyFlink和依赖的Beam，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ python -m pip list |grep apache-</span><br><span class="line">apache-beam                   2.15.0                 </span><br><span class="line">apache-flink                  1.10.0</span><br></pre></td></tr></table></figure>
+
+<p>如上显示说明已经完成安装。</p>
+<h3 id="Copy使用的Connector的JAR包"><a href="#Copy使用的Connector的JAR包" class="headerlink" title="Copy使用的Connector的JAR包"></a>Copy使用的Connector的JAR包</h3><p>Flink默认是没有打包connector的，所以我们需要下载各个connector所需的jar包并放入PyFlink的lib目录。首先拿到PyFlink的lib目录的路径：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ PYFLINK_LIB=`python -c &quot;import pyflink;import os;print(os.path.dirname(os.path.abspath(pyflink.__file__))+&apos;/lib&apos;)&quot;`</span><br><span class="line">$ echo $PYFLINK_LIB</span><br><span class="line">/usr/local/lib/python3.7/site-packages/pyflink/lib</span><br></pre></td></tr></table></figure>
+
+<p>然后想需要的jar包下载到lib目录中去：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ cd $PYFLINK_LIB</span><br><span class="line">$ curl -O https://repo1.maven.org/maven2/org/apache/flink/flink-sql-connector-kafka_2.11/1.10.0/flink-sql-connector-kafka_2.11-1.10.0.jar</span><br><span class="line">$ curl -O https://repo1.maven.org/maven2/org/apache/flink/flink-jdbc_2.11/1.10.0/flink-jdbc_2.11-1.10.0.jar</span><br><span class="line">$ curl -O https://repo1.maven.org/maven2/org/apache/flink/flink-csv/1.10.0/flink-csv-1.10.0-sql-jar.jar</span><br><span class="line">$ curl -O https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.19/mysql-connector-java-8.0.19.jar</span><br></pre></td></tr></table></figure>
+
+<p>最终lib的JARs如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$ ls -la</span><br><span class="line">total 310448</span><br><span class="line">drwxr-xr-x  12 jincheng.sunjc  admin        384  3 27 15:48 .</span><br><span class="line">drwxr-xr-x  28 jincheng.sunjc  admin        896  3 24 11:44 ..</span><br><span class="line">-rw-r--r--   1 jincheng.sunjc  admin      36695  3 27 15:48 flink-csv-1.10.0-sql-jar.jar</span><br><span class="line">-rw-r--r--   1 jincheng.sunjc  admin  110055308  2 27 13:33 flink-dist_2.11-1.10.0.jar</span><br><span class="line">-rw-r--r--   1 jincheng.sunjc  admin      89695  3 27 15:48 flink-jdbc_2.11-1.10.0.jar</span><br><span class="line">-rw-r--r--   1 jincheng.sunjc  admin    2885638  3 27 15:49 flink-sql-connector-kafka_2.11-1.10.0.jar</span><br><span class="line">-rw-r--r--   1 jincheng.sunjc  admin   22520058  2 27 13:33 flink-table-blink_2.11-1.10.0.jar</span><br><span class="line">-rw-r--r--   1 jincheng.sunjc  admin   19301237  2 27 13:33 flink-table_2.11-1.10.0.jar</span><br><span class="line">-rw-r--r--   1 jincheng.sunjc  admin     489884  2 27 13:33 log4j-1.2.17.jar</span><br><span class="line">-rw-r--r--   1 jincheng.sunjc  admin    2356711  3 27 15:48 mysql-connector-java-8.0.19.jar</span><br><span class="line">-rw-r--r--   1 jincheng.sunjc  admin      20275 12  5 17:01 pyflink-demo-connector-0.1.jar</span><br><span class="line">-rw-r--r--   1 jincheng.sunjc  admin       9931  2 27 13:33 slf4j-log4j12-1.7.15.jar</span><br></pre></td></tr></table></figure>
+
+<p>这样所有的环境就准备好了。</p>
+<h2 id="本地运行作业"><a href="#本地运行作业" class="headerlink" title="本地运行作业"></a>本地运行作业</h2><ul>
+<li>启动本地集群<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$PYFLINK_LIB/../bin/start-cluster.sh local</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>启动成功后可以打开web界面（默认8081端口，我更改为4000）<br><img src="/2020/03/27/PyFlink 场景案例-PyFlink实现CDN日志实时分析/15852958397459.jpg" alt></p>
+<ul>
+<li>提交作业<br>示例涉及到如下三个py文件：</li>
+</ul>
+<ol>
+<li><a href="https://github.com/sunjincheng121/enjoyment.code/blob/master/CDN/cdn_demo.py" target="_blank" rel="noopener">cdn_demo.py</a></li>
+<li><a href="https://github.com/sunjincheng121/enjoyment.code/blob/master/CDN/cdn_connector_ddl.py" target="_blank" rel="noopener">cdn_connector_ddl.py</a></li>
+<li><a href="https://github.com/sunjincheng121/enjoyment.code/blob/master/CDN/cdn_udf.py" target="_blank" rel="noopener">cdn_udf.py</a></li>
+</ol>
+<p>我们在作业文件所在目录进行执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ $PYFLINK_LIB/../bin/flink run -m localhost:4000 -py cdn_demo.py</span><br><span class="line">Job has been submitted with JobID e71de2db44fd6cfb9bae93bd04ee2ec9</span><br></pre></td></tr></table></figure>
+
+<p>查看控制台如下：<br><img src="/2020/03/27/PyFlink 场景案例-PyFlink实现CDN日志实时分析/15852974922403.jpg" alt="-w1408"></p>
+<p>目前我们已经成功的将作业启动起来了，接下来我们向Kafka里面进行数据的写入。</p>
+<h2 id="Mock-数据"><a href="#Mock-数据" class="headerlink" title="Mock 数据"></a>Mock 数据</h2><p>我们对CDN数据进行Mock，并进行统计可视化，工具代码<a href="https://github.com/sunjincheng121/enjoyment.code/tree/master/CDNWebAccessDashBoard" target="_blank" rel="noopener">请下载</a></p>
+<ul>
+<li><p>进行源码编译</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ python setup.py sdist</span><br><span class="line">$ sudo python -m pip install dist/*</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>运行工具</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ start_dashboard.py </span><br><span class="line">--------------------------------------environment config--------------------------------------</span><br><span class="line">Target kafka port: localhost:9092</span><br><span class="line">Target kafka topic: cdn_access_log</span><br><span class="line">Target mysql://localhost:3306/flink</span><br><span class="line">Target mysql table: cdn_access_statistic</span><br><span class="line">Listen at: http://localhost:64731</span><br><span class="line">----------------------------------------------------------------------------------------------</span><br><span class="line">To change above environment config, edit this file: /usr/local/bin/start_dashboard.py</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>打开可视化界面： （根据命令行提示的 Listen at：后面的地址）<br><img src="/2020/03/27/PyFlink 场景案例-PyFlink实现CDN日志实时分析/15853000193511.jpg" alt="-w1212"></p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本篇是场景案例系列，开篇分享了老子教导我们要学会放空自己，空杯才能注水。全篇围绕阿里云CDN日志实时分析需求进行展开，描述了任何利用PyFlink解决实际业务问题。最后又为大家提供了示例的数据的Mock工具和可视化统计页面，希望对大家有所帮助。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        
+          
+        
+        <div class="post-tags">
+          
+            <a href="/archives/Flink/" rel="tag"># Flink</a>
+          
+            <a href="/archives/PyFlink/" rel="tag"># PyFlink</a>
+          
+            <a href="/archives/场景案例/" rel="tag"># 场景案例</a>
+          
+            <a href="/archives/CDN日志/" rel="tag"># CDN日志</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/16/Apache-Flink-视频系列-必修课！一小时吃透PyFlink/" rel="next" title="Apache Flink 视频系列 - 必修课！一小时吃透PyFlink">
+                <i class="fa fa-chevron-left"></i> Apache Flink 视频系列 - 必修课！一小时吃透PyFlink
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/03/31/Apache-Flink-扫雷系列-PyFlink如何解决多JAR包依赖问题/" rel="prev" title="Apache Flink 扫雷系列 - PyFlink如何解决多JAR包依赖问题">
+                Apache Flink 扫雷系列 - PyFlink如何解决多JAR包依赖问题 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="Jincheng Sun">
+            
+              <p class="site-author-name" itemprop="name">Jincheng Sun</p>
+              <div class="site-description motion-element" itemprop="description">Apache Flink</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">36</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">30</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/sunjincheng121/enjoyment" title="GitHub &rarr; https://github.com/sunjincheng121/enjoyment" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/sunjincheng121" title="Twitter &rarr; https://twitter.com/sunjincheng121" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#放空自己"><span class="nav-number">1.</span> <span class="nav-text">放空自己</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CDN-日志实时分析综述"><span class="nav-number">2.</span> <span class="nav-text">CDN 日志实时分析综述</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#架构"><span class="nav-number">2.1.</span> <span class="nav-text">架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#需求说明"><span class="nav-number">2.2.</span> <span class="nav-text">需求说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CDN实时日志分析UDF定义"><span class="nav-number">2.3.</span> <span class="nav-text">CDN实时日志分析UDF定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据读取和结果写入定义"><span class="nav-number">2.4.</span> <span class="nav-text">数据读取和结果写入定义</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Kafka-数据源读取DDL定义"><span class="nav-number">2.4.1.</span> <span class="nav-text">Kafka 数据源读取DDL定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MySql-数据写入DDL定义"><span class="nav-number">2.4.2.</span> <span class="nav-text">MySql 数据写入DDL定义</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#核心统计逻辑"><span class="nav-number">2.5.</span> <span class="nav-text">核心统计逻辑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#完整的作业代码"><span class="nav-number">2.6.</span> <span class="nav-text">完整的作业代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#环境搭建（MacOS）"><span class="nav-number">2.7.</span> <span class="nav-text">环境搭建（MacOS）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装MySQL"><span class="nav-number">2.7.1.</span> <span class="nav-text">安装MySQL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Kafka"><span class="nav-number">2.7.2.</span> <span class="nav-text">安装Kafka</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装PyFlink"><span class="nav-number">2.7.3.</span> <span class="nav-text">安装PyFlink</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Copy使用的Connector的JAR包"><span class="nav-number">2.7.4.</span> <span class="nav-text">Copy使用的Connector的JAR包</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#本地运行作业"><span class="nav-number">2.8.</span> <span class="nav-text">本地运行作业</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Mock-数据"><span class="nav-number">2.9.</span> <span class="nav-text">Mock 数据</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">3.</span> <span class="nav-text">小结</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jincheng Sun</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.2.0</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="Total Visitors">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="Total Views">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.2.0"></script>
+
+  <script src="/js/motion.js?v=7.2.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.2.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.2.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.2.0"></script>
+<script src="/js/post-details.js?v=7.2.0"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.2.0"></script>
+
+
+  
+
+  
+
+  
+
+  
+  
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://http-enjoyment-cool.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+
+
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://enjoyment.cool/2020/03/27/PyFlink 场景案例-PyFlink实现CDN日志实时分析/";
+    this.page.identifier = "2020/03/27/PyFlink 场景案例-PyFlink实现CDN日志实时分析/";
+    this.page.title = 'PyFlink 场景案例 - PyFlink实现CDN日志实时分析';
+    };
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://http-enjoyment-cool.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+  
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('3');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

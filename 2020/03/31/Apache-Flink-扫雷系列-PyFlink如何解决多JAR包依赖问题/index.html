@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+<link rel="stylesheet" href="/css/main.css?v=7.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="mask-icon" href="/images/me.png?v=7.2.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.2.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":5},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="《Apache Flink 扫雷系列》简介本篇是《Apache Flink 扫雷系列》的第一篇，所以简单介绍一下这一系列的特点，本系列所定义的”雷”是指由于目前Apache Flink目前的设计问题导致的用户非便利性问题的临时解决办法。那么为什么明知道有设计问题还不进行设计重构，避免这些”雷”的存在呢？其实社区的发展和我们各个公司内部产品发展一样，都有一些客观因素导致实际存在的问题无法及时得到解决">
+<meta name="keywords" content="PyFlink,扫雷,多JAR包">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Apache Flink 扫雷系列 - PyFlink如何解决多JAR包依赖问题">
+<meta property="og:url" content="http://enjoyment.cool/2020/03/31/Apache-Flink-扫雷系列-PyFlink如何解决多JAR包依赖问题/index.html">
+<meta property="og:site_name" content="Pretty Cool Enjoyment">
+<meta property="og:description" content="《Apache Flink 扫雷系列》简介本篇是《Apache Flink 扫雷系列》的第一篇，所以简单介绍一下这一系列的特点，本系列所定义的”雷”是指由于目前Apache Flink目前的设计问题导致的用户非便利性问题的临时解决办法。那么为什么明知道有设计问题还不进行设计重构，避免这些”雷”的存在呢？其实社区的发展和我们各个公司内部产品发展一样，都有一些客观因素导致实际存在的问题无法及时得到解决">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://enjoyment.cool/2020/03/31/Apache-Flink-扫雷系列-PyFlink如何解决多JAR包依赖问题/15856318886448.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/03/31/Apache-Flink-扫雷系列-PyFlink如何解决多JAR包依赖问题/15856346328252.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/03/31/Apache-Flink-扫雷系列-PyFlink如何解决多JAR包依赖问题/15856453885417.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/03/31/Apache-Flink-扫雷系列-PyFlink如何解决多JAR包依赖问题/15856365706016.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/03/31/Apache-Flink-扫雷系列-PyFlink如何解决多JAR包依赖问题/15856367222890.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/03/31/Apache-Flink-扫雷系列-PyFlink如何解决多JAR包依赖问题/15856461218372.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/03/31/Apache-Flink-扫雷系列-PyFlink如何解决多JAR包依赖问题/15856462069352.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2020/03/31/Apache-Flink-扫雷系列-PyFlink如何解决多JAR包依赖问题/15856463068781.jpg">
+<meta property="og:updated_time" content="2020-04-01T01:34:32.775Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Apache Flink 扫雷系列 - PyFlink如何解决多JAR包依赖问题">
+<meta name="twitter:description" content="《Apache Flink 扫雷系列》简介本篇是《Apache Flink 扫雷系列》的第一篇，所以简单介绍一下这一系列的特点，本系列所定义的”雷”是指由于目前Apache Flink目前的设计问题导致的用户非便利性问题的临时解决办法。那么为什么明知道有设计问题还不进行设计重构，避免这些”雷”的存在呢？其实社区的发展和我们各个公司内部产品发展一样，都有一些客观因素导致实际存在的问题无法及时得到解决">
+<meta name="twitter:image" content="http://enjoyment.cool/2020/03/31/Apache-Flink-扫雷系列-PyFlink如何解决多JAR包依赖问题/15856318886448.jpg">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://enjoyment.cool/2020/03/31/Apache-Flink-扫雷系列-PyFlink如何解决多JAR包依赖问题/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Apache Flink 扫雷系列 - PyFlink如何解决多JAR包依赖问题 | Pretty Cool Enjoyment</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Pretty Cool Enjoyment</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">Apache Flink</h1>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-catalog">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/catalog/" rel="section"><i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Catalog</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+  
+  
+
+  
+
+  <a href="https://github.com/sunjincheng121" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://enjoyment.cool/2020/03/31/Apache-Flink-扫雷系列-PyFlink如何解决多JAR包依赖问题/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jincheng Sun">
+      <meta itemprop="description" content="Apache Flink">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Pretty Cool Enjoyment">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">Apache Flink 扫雷系列 - PyFlink如何解决多JAR包依赖问题
+
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+
+          
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2020-03-31 17:22:25" itemprop="dateCreated datePublished" datetime="2020-03-31T17:22:25+08:00">2020-03-31</time>
+            </span>
+          
+
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2020-04-01 09:34:32" itemprop="dateModified" datetime="2020-04-01T09:34:32+08:00">2020-04-01</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/archives/Apache-Flink-扫雷系列/" itemprop="url" rel="index"><span itemprop="name">Apache Flink 扫雷系列</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+              
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">Comments: </span>
+                <a href="/2020/03/31/Apache-Flink-扫雷系列-PyFlink如何解决多JAR包依赖问题/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/31/Apache-Flink-扫雷系列-PyFlink如何解决多JAR包依赖问题/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+                 Views:  
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          
+
+          <br>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="《Apache-Flink-扫雷系列》简介"><a href="#《Apache-Flink-扫雷系列》简介" class="headerlink" title="《Apache Flink 扫雷系列》简介"></a>《Apache Flink 扫雷系列》简介</h1><p>本篇是《Apache Flink 扫雷系列》的第一篇，所以简单介绍一下这一系列的特点，本系列所定义的”雷”是指由于目前Apache Flink目前的设计问题导致的用户非便利性问题的临时解决办法。那么为什么明知道有设计问题还不进行设计重构，避免这些”雷”的存在呢？其实社区的发展和我们各个公司内部产品发展一样，都有一些客观因素导致实际存在的问题无法及时得到解决，比如，社区的Release或者内部产品发布的的周期问题，在没有新的Release之前的一些对用户非友好的问题就需要有一些“非正规”的解决方式，或者说是临时解决方案，这种方案的特点就是，能解决问题，但不是通用性解决手段，只能民间流传，不能官方宣扬。所以《Apache Flink 扫雷系列》就是为大家提供能够解决大家现实问题，但是可能不是最佳实践，大家在这系列中可以有更大的反哺社区的机会：）</p>
+<h1 id="开篇说”雷”"><a href="#开篇说”雷”" class="headerlink" title="开篇说”雷”"></a>开篇说”雷”</h1><p>本篇的”雷”是目前针对Apache Flink 1.10集以前版本中，在利用CLI提交作业时候只能提交一个JAR的功能问题解决，也就是针对命令参数<code>-j,--jarfile &lt;jarfile&gt; Flink program JAR file.</code> 的问题。目前 <code>-j</code>只允许用户提供一个JAR包，这在很多场景是不太合理的，不用说用户自己的JAR包，就单说Flink用户使用的Connector的JAR，在一个作业里面就可以能使用多个不同的Connector类型，比如在《<a href="https://enjoyment.cool/2020/03/27/PyFlink%20%E5%9C%BA%E6%99%AF%E6%A1%88%E4%BE%8B-PyFlink%E5%AE%9E%E7%8E%B0CDN%E6%97%A5%E5%BF%97%E5%AE%9E%E6%97%B6%E5%88%86%E6%9E%90/#more">PyFlink 场景案例 - PyFlink实现CDN日志实时分析</a>》为例，就用了<code>Kafka</code>,<code>MySql</code>,<code>CSV</code>等多种功能JAR包的依赖。这个普遍的问题就是要用手工方式将这三个JARs合并成一个，然后提交作业时候用<code>-j</code>选项上传到集群。</p>
+<h1 id="扫雷难度"><a href="#扫雷难度" class="headerlink" title="扫雷难度"></a>扫雷难度</h1><p>面对合并多个JAR包，也许Java用户还好（虽然不便利，但应该都会操作），但对于Python用户，在没有涉及过Java开发的情况下，可能要花费一些时间来完成JARs的合并，甚至有可能有种无从下手的感觉。所以本篇主要针对的是不了解Java的Flink Python用户。</p>
+<h1 id="案例选取"><a href="#案例选取" class="headerlink" title="案例选取"></a>案例选取</h1><p>为了大家能够实际的体验实际效果，我们选取一个具体的案例来说明如果进行多JARs的合并。我们就选取我在<a href="https://www.bilibili.com/video/BV1W7411o7Tj" target="_blank" rel="noopener">2020年3月17日直播</a>中所说的《<a href="https://enjoyment.cool/2020/03/27/PyFlink%20%E5%9C%BA%E6%99%AF%E6%A1%88%E4%BE%8B-PyFlink%E5%AE%9E%E7%8E%B0CDN%E6%97%A5%E5%BF%97%E5%AE%9E%E6%97%B6%E5%88%86%E6%9E%90/#more">PyFlink 场景案例 - PyFlink实现CDN日志实时分析</a>》来进行说明。</p>
+<h1 id="案例回顾"><a href="#案例回顾" class="headerlink" title="案例回顾"></a>案例回顾</h1><p>《<a href="https://enjoyment.cool/2020/03/27/PyFlink%20%E5%9C%BA%E6%99%AF%E6%A1%88%E4%BE%8B-PyFlink%E5%AE%9E%E7%8E%B0CDN%E6%97%A5%E5%BF%97%E5%AE%9E%E6%97%B6%E5%88%86%E6%9E%90/#more">PyFlink 场景案例 - PyFlink实现CDN日志实时分析</a>》核心是针对灌入Kafka的CDN日志数据经过PyFlink进行按地区的下载量，下载速度的统计，最终将统计数据写入到MySql中。同时放入到Kafka的数据格式是CSV(<code>&#39;format.type&#39; = &#39;csv&#39;</code>)。所以我们依赖的JARs如下：</p>
+<ul>
+<li>flink-sql-connector-kafka_2.11-1.10.0.jar</li>
+<li>flink-jdbc_2.11-1.10.0.jar</li>
+<li>flink-csv-1.10.0-sql-jar.jar</li>
+<li>mysql-connector-java-8.0.19.jar</li>
+</ul>
+<p>我们可以用如下命令下载：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ curl -O https://repo1.maven.org/maven2/org/apache/flink/flink-sql-connector-kafka_2.11/1.10.0/flink-sql-connector-kafka_2.11-1.10.0.jar</span><br><span class="line">$ curl -O https://repo1.maven.org/maven2/org/apache/flink/flink-jdbc_2.11/1.10.0/flink-jdbc_2.11-1.10.0.jar</span><br><span class="line">$ curl -O https://repo1.maven.org/maven2/org/apache/flink/flink-csv/1.10.0/flink-csv-1.10.0-sql-jar.jar</span><br><span class="line">$ curl -O https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.19/mysql-connector-java-8.0.19.jar</span><br></pre></td></tr></table></figure>
+
+<p>我们将如上4个JARs下载到某个目录，我这里下载到本机的<code>temp</code>目录：<br><img src="/2020/03/31/Apache-Flink-扫雷系列-PyFlink如何解决多JAR包依赖问题/15856318886448.jpg" alt></p>
+<h1 id="“雷”存在的场景说明"><a href="#“雷”存在的场景说明" class="headerlink" title="“雷”存在的场景说明"></a>“雷”存在的场景说明</h1><p>为啥在博客《<a href="https://enjoyment.cool/2020/03/27/PyFlink%20%E5%9C%BA%E6%99%AF%E6%A1%88%E4%BE%8B-PyFlink%E5%AE%9E%E7%8E%B0CDN%E6%97%A5%E5%BF%97%E5%AE%9E%E6%97%B6%E5%88%86%E6%9E%90/#more">PyFlink 场景案例 - PyFlink实现CDN日志实时分析</a>》并没有提到要合并JARs的问题？ 是的，这个“雷”的存在是有一定的条件的：</p>
+<ul>
+<li>作业提交的集群环境没有预先安装你所有需要的JARs（大部分情况都是不会安装的）</li>
+</ul>
+<p>上面条件是必须成立，才会存在扫雷的问题。那么在博客中我在集群环境预安装了说需要的JARs，也就是博客中提到的下载JARs到集群lib目录<br>PYFLINK_LIB=<code>python -c &quot;import pyflink;import os;print(os.path.dirname(os.path.abspath(pyflink.__file__))+&#39;/lib&#39;)&quot;</code>)的操作。</p>
+<h1 id="合并JARs的注意点"><a href="#合并JARs的注意点" class="headerlink" title="合并JARs的注意点"></a>合并JARs的注意点</h1><p>合并JARs的一个很重要的点是涉及到了JAR包的Service Provider机制,详细规范<a href="https://docs.oracle.com/javase/8/docs/technotes/guides/jar/jar.html#Service_Provider" target="_blank" rel="noopener">详见</a>。这是让Python人员是很难注意到的合并重点。JAR包的Service Provider机制会允许在JAR包的META-INF/services目录下保存Service Provider的配置文件。简单说就是他为开发者提供了一种扩展机制，在开发阶段只是定义接口，然后在包含实现的JAR包进行实现配置，就可以调用到实际接口的实现类。关于JAR包META-INF目录结构简单说明如下：</p>
+<ul>
+<li>META-INF - 目录中的下列文件和目录获得Java 2平台的认可与解释，用来配置应用程序、扩展程序、类加载器和服务：</li>
+<li>MANIFEST.MF - 清单文件，用来定义与扩展和数据包相关的数据。</li>
+<li>INDEX.LIST - 这个文件由JAR工具的新“-i”选项生成，其中包含在一个应用程序或扩展中定义的数据包的地址信息。它是JarIndex的一部分，被类加载器用来加速类加载过程。</li>
+<li>x.SF - JAR文件的签名文件。x代表基础文件名。</li>
+<li>x.DSA - 这个签名块文件与同名基础签名文件有关。此文件存储对应签名文件的数字签名。</li>
+<li>services - 这个目录存储所有服务提供程序配置文件。</li>
+</ul>
+<p>注意：provider配置文件必须是以UTF-8编码。</p>
+<h1 id="合并操作"><a href="#合并操作" class="headerlink" title="合并操作"></a>合并操作</h1><h2 id="解压JARs"><a href="#解压JARs" class="headerlink" title="解压JARs"></a>解压JARs</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir jobjar csv jdbc kafka mysql</span><br></pre></td></tr></table></figure>
+
+<p>其中<code>jobjar</code>存放最终我们打包的JAR内容， <code>csv</code> <code>jdbc</code> <code>kafka</code> <code>mysql</code>存放对应的JAR所解压的内容。具体命令如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ unzip flink-csv-1.10.0-sql-jar.jar -d csv/</span><br><span class="line">$ unzip flink-sql-connector-kafka_2.11-1.10.0.jar -d kafka/</span><br><span class="line">$ unzip flink-jdbc_2.11-1.10.0.jar -d jdbc/</span><br><span class="line">$ unzip mysql-connector-java-8.0.19.jar -d mysql</span><br></pre></td></tr></table></figure>
+
+<p>解压之后我们会在刚才的目录得到如下文件内容：<br><img src="/2020/03/31/Apache-Flink-扫雷系列-PyFlink如何解决多JAR包依赖问题/15856346328252.jpg" alt><br>我们核心要处理的是class文件夹和 <code>META-INF/services</code>文件夹，如图csv和kafka的JAR解压之后的内容。其中，Class文件夹可以直接拷贝。但是services要进行同名的合并，比如上用于Flink的Connector的服务发现配置<code>org.apache.flink.table.factories.TableFactory</code>是需要将文件内容进行合并的。</p>
+<h2 id="合并JARs"><a href="#合并JARs" class="headerlink" title="合并JARs"></a>合并JARs</h2><p>首先我们创建<code>META-INF</code>和<code>META-INF/services</code>目录,目录结构如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">jincheng:jobjar jincheng.sunjc$ tree -L 2</span><br><span class="line">.</span><br><span class="line">└── META-INF</span><br><span class="line">    └── services</span><br><span class="line">2 directories, 0 files</span><br></pre></td></tr></table></figure>
+
+<h3 id="class文件合并"><a href="#class文件合并" class="headerlink" title="class文件合并"></a>class文件合并</h3><p>将<code>csv</code> <code>jdbc</code> <code>kafka</code> <code>mysql</code>的class直接copy到<code>jobjar</code>目录，如下：</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$ cp -rf ../csv/org .</span><br><span class="line">$ cp -rf ../jdbc/org .</span><br><span class="line">$ cp -rf ../kafka/org .</span><br><span class="line">$ cp -rf ../mysql/com .</span><br><span class="line">$ tree -L 2</span><br><span class="line">  .</span><br><span class="line">  ├── META-INF</span><br><span class="line">  │   └── services</span><br><span class="line">  ├── com</span><br><span class="line">  │   └── mysql</span><br><span class="line">  └── org</span><br><span class="line">      └── apache</span><br></pre></td></tr></table></figure>
+
+<p>详细的目录结构如下：<br><img src="/2020/03/31/Apache-Flink-扫雷系列-PyFlink如何解决多JAR包依赖问题/15856453885417.jpg" alt></p>
+<h3 id="services合并"><a href="#services合并" class="headerlink" title="services合并"></a>services合并</h3><p>Service Provider是JAR的一个标准，不仅仅Flink的Connector使用了Service Provider机制，同时Kafka使用了配置的服务发现。所以我们要将所有的services里面的内容按文件名进行合并。以csv和kafka为例：</p>
+<p>在CSV里面的<code>META-INF/services</code>里面只有一个和Flink的connector相关的配置，内容如下：<br><img src="/2020/03/31/Apache-Flink-扫雷系列-PyFlink如何解决多JAR包依赖问题/15856365706016.jpg" alt></p>
+<p>在Kafka里面的<code>META-INF/services</code>里面有Flink的connector相关的配置和Kafka内部使用的配置，内容如下：<br><img src="/2020/03/31/Apache-Flink-扫雷系列-PyFlink如何解决多JAR包依赖问题/15856367222890.jpg" alt></p>
+<p>所以我们需要将Kafka相关的直接copy到<code>jobjar/META-INF/services/</code>目录，然后将csv和Kafka关于<code>org.apache.flink.table.factories.TableFactory</code>的配置进行内容合并。合并的内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># Licensed to the Apache Software Foundation (ASF) under</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line"># limitations under the License.</span><br><span class="line"></span><br><span class="line">org.apache.flink.formats.csv.CsvRowFormatFactory</span><br><span class="line">org.apache.flink.streaming.connectors.kafka.KafkaTableSourceSinkFactory</span><br></pre></td></tr></table></figure>
+
+<p>我们最终将4个JARs的services配置进行合并之后的最终代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># Licensed to the Apache Software Foundation (ASF) under</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line"># limitations under the License.</span><br><span class="line"></span><br><span class="line">org.apache.flink.formats.csv.CsvRowFormatFactory</span><br><span class="line">org.apache.flink.streaming.connectors.kafka.KafkaTableSourceSinkFactory</span><br><span class="line">org.apache.flink.api.java.io.jdbc.JDBCTableSourceSinkFactory</span><br></pre></td></tr></table></figure>
+
+<p>大家可以尝试使用的命令如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ cat ../csv/META-INF/services/org.apache.flink.table.factories.TableFactory | grep ^[^#] &gt;&gt; META-INF/services/org.apache.flink.table.factories.TableFactory</span><br><span class="line">$ cat ../kafka/META-INF/services/org.apache.flink.table.factories.TableFactory | grep ^[^#] &gt;&gt; META-INF/services/org.apache.flink.table.factories.TableFactory</span><br><span class="line">$ cat ../kafka/META-INF/services/org.apache.flink.kafka.shaded.org.apache.kafka.common.config.provider.ConfigProvider | grep ^[^#] &gt;&gt; META-INF/services/org.apache.flink.kafka.shaded.org.apache.kafka.common.config.provider.ConfigProvider</span><br><span class="line">$ cat ../jdbc/META-INF/services/org.apache.flink.table.factories.TableFactory | grep ^[^#] &gt;&gt; META-INF/services/org.apache.flink.table.factories.TableFactory</span><br></pre></td></tr></table></figure>
+
+<h3 id="创建JAR"><a href="#创建JAR" class="headerlink" title="创建JAR"></a>创建JAR</h3><p>这一步骤没有特别强调的内容，直接用用<code>zip</code>或者<code>jar</code>命令进行打包就好了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jincheng:jobjar jincheng.sunjc$ jar -cf myjob.jar META-INF com org</span><br></pre></td></tr></table></figure>
+
+<p>我最终产生的JAR可以在这里<a href="https://github.com/sunjincheng121/enjoyment.code/blob/master/CDN/myjob.jar" target="_blank" rel="noopener">下载</a>，用于对比你自己打包的是否和我的一样：）</p>
+<p>OK，到这里我们就完成了多JARs的合并工作。我们可以尝试应用CLI进行提交命令了。</p>
+<h1 id="CLI提交作业"><a href="#CLI提交作业" class="headerlink" title="CLI提交作业"></a>CLI提交作业</h1><ul>
+<li>启动集群（我修改了flink-conf，将端口更改到4000了）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/usr/local/lib/python3.7/site-packages/pyflink/bin/start-cluster.sh local</span><br><span class="line">Starting cluster.</span><br><span class="line">Starting standalonesession daemon on host jincheng.local.</span><br><span class="line">Starting taskexecutor daemon on host jincheng.local.</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>提交作业<br>当没有添加<code>-j</code>选项时候，提交作业如下：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$PYFLINK_LIB/../bin/flink run -m localhost:4000 -py cdn_demo.py</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>报错如下：<br><img src="/2020/03/31/Apache-Flink-扫雷系列-PyFlink如何解决多JAR包依赖问题/15856461218372.jpg" alt></p>
+<p>提供正确的<code>-j</code>参数，将我们打包的JAR提交到集群的情况，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$PYFLINK_LIB/../bin/flink run -j ~/temp/jobjar/myjob.jar -m localhost:4000 -py cdn_demo.py</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/03/31/Apache-Flink-扫雷系列-PyFlink如何解决多JAR包依赖问题/15856462069352.jpg" alt></p>
+<p>同时Web控制台可以查看提交的作业：<br><img src="/2020/03/31/Apache-Flink-扫雷系列-PyFlink如何解决多JAR包依赖问题/15856463068781.jpg" alt></p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本篇核心介绍了PyFlink的用户如何解决多JARs依赖作业提交问题，也许这不是最Nice的解决方法，但至少是你解决多JARs依赖作业提交的方法之一，祝你 “扫雷” 顺利，也期望如果你有更好的解决办法，留言或者邮件与我分享哦：）！</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        
+          
+        
+        <div class="post-tags">
+          
+            <a href="/archives/PyFlink/" rel="tag"># PyFlink</a>
+          
+            <a href="/archives/扫雷/" rel="tag"># 扫雷</a>
+          
+            <a href="/archives/多JAR包/" rel="tag"># 多JAR包</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/27/PyFlink 场景案例-PyFlink实现CDN日志实时分析/" rel="next" title="PyFlink 场景案例 - PyFlink实现CDN日志实时分析">
+                <i class="fa fa-chevron-left"></i> PyFlink 场景案例 - PyFlink实现CDN日志实时分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/04/06/走进ASF系列-序/" rel="prev" title="走进ASF系列 - 序">
+                走进ASF系列 - 序 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="Jincheng Sun">
+            
+              <p class="site-author-name" itemprop="name">Jincheng Sun</p>
+              <div class="site-description motion-element" itemprop="description">Apache Flink</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">36</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">30</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/sunjincheng121/enjoyment" title="GitHub &rarr; https://github.com/sunjincheng121/enjoyment" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/sunjincheng121" title="Twitter &rarr; https://twitter.com/sunjincheng121" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#《Apache-Flink-扫雷系列》简介"><span class="nav-number">1.</span> <span class="nav-text">《Apache Flink 扫雷系列》简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#开篇说”雷”"><span class="nav-number">2.</span> <span class="nav-text">开篇说”雷”</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#扫雷难度"><span class="nav-number">3.</span> <span class="nav-text">扫雷难度</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#案例选取"><span class="nav-number">4.</span> <span class="nav-text">案例选取</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#案例回顾"><span class="nav-number">5.</span> <span class="nav-text">案例回顾</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#“雷”存在的场景说明"><span class="nav-number">6.</span> <span class="nav-text">“雷”存在的场景说明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#合并JARs的注意点"><span class="nav-number">7.</span> <span class="nav-text">合并JARs的注意点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#合并操作"><span class="nav-number">8.</span> <span class="nav-text">合并操作</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解压JARs"><span class="nav-number">8.1.</span> <span class="nav-text">解压JARs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#合并JARs"><span class="nav-number">8.2.</span> <span class="nav-text">合并JARs</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#class文件合并"><span class="nav-number">8.2.1.</span> <span class="nav-text">class文件合并</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#services合并"><span class="nav-number">8.2.2.</span> <span class="nav-text">services合并</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建JAR"><span class="nav-number">8.2.3.</span> <span class="nav-text">创建JAR</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CLI提交作业"><span class="nav-number">9.</span> <span class="nav-text">CLI提交作业</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">10.</span> <span class="nav-text">小结</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jincheng Sun</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.2.0</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="Total Visitors">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="Total Views">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.2.0"></script>
+
+  <script src="/js/motion.js?v=7.2.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.2.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.2.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.2.0"></script>
+<script src="/js/post-details.js?v=7.2.0"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.2.0"></script>
+
+
+  
+
+  
+
+  
+
+  
+  
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://http-enjoyment-cool.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+
+
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://enjoyment.cool/2020/03/31/Apache-Flink-扫雷系列-PyFlink如何解决多JAR包依赖问题/";
+    this.page.identifier = "2020/03/31/Apache-Flink-扫雷系列-PyFlink如何解决多JAR包依赖问题/";
+    this.page.title = 'Apache Flink 扫雷系列 - PyFlink如何解决多JAR包依赖问题';
+    };
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://http-enjoyment-cool.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+  
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('3');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

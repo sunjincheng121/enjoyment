@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+<link rel="stylesheet" href="/css/main.css?v=7.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="mask-icon" href="/images/me.png?v=7.2.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.2.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":5},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="开篇说道老子在《道德经》第七章中说：”天长地久，天地所以能长且久者，以其不自生，故能长生。是以圣人后其身而身先，外其身而身存。以其无私，故能成其私。”。其核心内容简单来说就是 “利他”，即：人为自己照亮别人，外其身而身存！这里我也分享一个真实的事情和一个我不记得在哪里读到的故事： 前些时我回老家发现村里给每个盲人发了一个拐杖，这个拐杖竟然还有手电筒，我第一反应很是诧异：”盲人要手电筒干什么？”,">
+<meta name="keywords" content="Flink,道德经,PyFlink,外其身而身存">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Apache Flink 说道系列 - 如何在PyFlink 1.10中自定义Python UDF">
+<meta property="og:url" content="http://enjoyment.cool/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/index.html">
+<meta property="og:site_name" content="Pretty Cool Enjoyment">
+<meta property="og:description" content="开篇说道老子在《道德经》第七章中说：”天长地久，天地所以能长且久者，以其不自生，故能长生。是以圣人后其身而身先，外其身而身存。以其无私，故能成其私。”。其核心内容简单来说就是 “利他”，即：人为自己照亮别人，外其身而身存！这里我也分享一个真实的事情和一个我不记得在哪里读到的故事： 前些时我回老家发现村里给每个盲人发了一个拐杖，这个拐杖竟然还有手电筒，我第一反应很是诧异：”盲人要手电筒干什么？”,">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://enjoyment.cool/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/15753417161209.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/timg.gif">
+<meta property="og:image" content="http://enjoyment.cool/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/15754418304289.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/15754415664635.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/15754425323104.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/15754465271079.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/15755160471733.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/15755370489596.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/15755371347855.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/15755372413329.jpg">
+<meta property="og:image" content="http://enjoyment.cool/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/show.gif">
+<meta property="og:updated_time" content="2020-03-27T03:59:47.531Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Apache Flink 说道系列 - 如何在PyFlink 1.10中自定义Python UDF">
+<meta name="twitter:description" content="开篇说道老子在《道德经》第七章中说：”天长地久，天地所以能长且久者，以其不自生，故能长生。是以圣人后其身而身先，外其身而身存。以其无私，故能成其私。”。其核心内容简单来说就是 “利他”，即：人为自己照亮别人，外其身而身存！这里我也分享一个真实的事情和一个我不记得在哪里读到的故事： 前些时我回老家发现村里给每个盲人发了一个拐杖，这个拐杖竟然还有手电筒，我第一反应很是诧异：”盲人要手电筒干什么？”,">
+<meta name="twitter:image" content="http://enjoyment.cool/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/15753417161209.jpg">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://enjoyment.cool/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Apache Flink 说道系列 - 如何在PyFlink 1.10中自定义Python UDF | Pretty Cool Enjoyment</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Pretty Cool Enjoyment</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">Apache Flink</h1>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-catalog">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/catalog/" rel="section"><i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Catalog</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+  
+  
+
+  
+
+  <a href="https://github.com/sunjincheng121" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://enjoyment.cool/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jincheng Sun">
+      <meta itemprop="description" content="Apache Flink">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Pretty Cool Enjoyment">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">Apache Flink 说道系列 - 如何在PyFlink 1.10中自定义Python UDF
+
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+
+          
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-12-05 17:31:02" itemprop="dateCreated datePublished" datetime="2019-12-05T17:31:02+08:00">2019-12-05</time>
+            </span>
+          
+
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2020-03-27 11:59:47" itemprop="dateModified" datetime="2020-03-27T11:59:47+08:00">2020-03-27</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/archives/Apache-Flink-说道/" itemprop="url" rel="index"><span itemprop="name">Apache Flink 说道</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+              
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">Comments: </span>
+                <a href="/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+                 Views:  
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          
+
+          <br>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="开篇说道"><a href="#开篇说道" class="headerlink" title="开篇说道"></a>开篇说道</h1><p>老子在《道德经》第七章中说：”天长地久，天地所以能长且久者，以其不自生，故能长生。是以圣人后其身而身先，外其身而身存。以其无私，故能成其私。”。其核心内容简单来说就是 “利他”，即：人为自己照亮别人，外其身而身存！这里我也分享一个真实的事情和一个我不记得在哪里读到的故事：</p>
+<p>前些时我回老家发现村里给每个盲人发了一个拐杖，这个拐杖竟然还有手电筒，我第一反应很是诧异：”盲人要手电筒干什么？”, 不过我想聪明的你一定在笑我傻，盲人的手电筒当然是为了照亮行路。没错，盲人打手电筒照亮漆黑夜路，方便其他行人的同时，也保护了自己！</p>
+<p>还有一个故事，那是在战争年代，一个班长带队去打仗，当一个炮弹飞来那一刹那，他刚要卧倒，却看见一个新兵还在傻傻的站着，没有丝毫避让的意识，他立马扑过去，用身体保护着新兵，当一声巨响之后，他刚要训斥新兵为啥不懂得卧倒自保的时候，后头发现，炮弹正将他最初要卧倒的地方炸的很大的坑。</p>
+<p>“天长地久，天地所以能长且久者，以其不自生，故能长生”，天地之所以长久是因为他们的从不考虑自身的得失，而是默默无闻的滋养着万物，万物自然割舍不下天地，天地自会伴随生生不息的万物长存。“是以圣人后其身而身先，外其身而身存。以其无私，故能成其私” 品行高尚的人总是先考虑别人的得失，当然人人都感激其德行，自然也就尊为圣人。</p>
+<p>我们都是普通人，但我们始终要 相信小的伟大，为别人，也为自己，始终保持“利他”的精神。<br><img src="/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/15753417161209.jpg" alt></p>
+<h1 id="这篇博客的意义"><a href="#这篇博客的意义" class="headerlink" title="这篇博客的意义"></a>这篇博客的意义</h1><p>每篇博客都有其预期的目标，本篇希望再Apache Flink 1.10发布之前提前给大家介绍一下PyFlink的Python UDF的功能，让Apche Fink的Python用户可以轻松的应用PyFlink开发自己的业务需求。</p>
+<h1 id="Python-UDF的发展趋势"><a href="#Python-UDF的发展趋势" class="headerlink" title="Python UDF的发展趋势"></a>Python UDF的发展趋势</h1><p>我们知道PyFlink是在Apache Flink 1.9版新增的，那么在Apache Flink 1.10中Python UDF功能支持的速度是否能够满足用户的急切需求呢？<br><img src="/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/timg.gif" alt></p>
+<p>直观的判断，PyFlink Python UDF的功能可以如上图一样可以迅速从幼苗变成大树，为啥有此判断，请继续往下看…</p>
+<h1 id="Flink-on-Beam"><a href="#Flink-on-Beam" class="headerlink" title="Flink on Beam"></a>Flink on Beam</h1><p>我们都知道有Beam on Flink的场景，就是Beam支持多种Runner，也就是说Beam SDK 编写的Job可以运行在Flink之上。如下图所示：<br><img src="/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/15754418304289.jpg" alt></p>
+<p>上面这图是Beam Portability Framework的架构图，他描述了Beam如何支持多语言，如何支持多Runner，单独说Apache Flink的时候我们就可以说是Beam on Flink，那么怎么解释 Flink on Beam呢？</p>
+<p><img src="/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/15754415664635.jpg" alt></p>
+<p>在Apache Flink 1.10中我们所说的 Flink on Beam更精确的说是PyFlink on Beam Portability Framework。我们看一下简单的架构图，如下：<br><img src="/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/15754425323104.jpg" alt><br>Beam Portability Framework 是一个成熟的多语言支持框架，框架高度抽象了语言之间的通信协议(gRPC),定义了数据的传输格式(Protobuf)，并且根据通用流计算框架所需要的组件，抽象个各种服务，比如DataService，StateService，MetricsService等。在这样一个成熟的框架下，PyFlink可以快速的构建自己的Python算子，同时重用Apache Beam Portability Framework中现有SDK harness组件，可以支持多种Python运行模式，如：Process，Docker，etc.，这使得PyFlink对Python UDF的支持变得非常容易，在Apache Flink 1.10中的功能也非常的稳定和完整。那么为啥说是Apache Flink和Apache Beam 共同打造呢，是因为我发现目前Apache Beam Portability Framework的框架也存在很多优化的空间，所以我在Beam社区进行了优化讨论,<a href="https://lists.apache.org/thread.html/4025a19ba267f0b1b842af20b63ac794306259a3226e07c87bda62ba@%3Cdev.beam.apache.org%3E" target="_blank" rel="noopener">详情</a>，并且在Beam 社区也贡献了20+的优化补丁，<a href="https://github.com/apache/beam/commits?author=sunjincheng121" target="_blank" rel="noopener">详情</a>。<br>概要了解了Apache Flink 1.10中Python UDF的架构之后，我们还是切入的代码部分，看看如何开发和使用Python UDF…</p>
+<h1 id="如何定义Python-UDF"><a href="#如何定义Python-UDF" class="headerlink" title="如何定义Python UDF"></a>如何定义Python UDF</h1><p>在Apache Flink 1.10中我们有多种方式进行UDF的定义，比如：</p>
+<ul>
+<li>Extend ScalarFunction, e.g.:</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">class HashCodeMean(ScalarFunction):</span><br><span class="line">   def eval(self, i, j):</span><br><span class="line">       return (hash(i) + hash(j)) / 2</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Lambda Function</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lambda i, j: (hash(i) + hash(j)) / 2</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Named Function</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">def hash_code_mean(i, j):</span><br><span class="line">   return (hash(i) + hash(j)) / 2</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Callable Function</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">class CallableHashCodeMean(object):</span><br><span class="line">   def __call__(self, i, j):</span><br><span class="line">       return (hash(i) + hash(j)) / 2</span><br></pre></td></tr></table></figure>
+
+<p>我们发现上面定义函数除了第一个扩展<code>ScalaFunction</code>的方式是PyFlink特有的，其他方式都是Python语言本身就支持的，也就是说，在Apache Flink 1.10中PyFlink允许以任何Python语言所支持的方式定义UDF。</p>
+<h1 id="如何使用Python-UDF"><a href="#如何使用Python-UDF" class="headerlink" title="如何使用Python UDF"></a>如何使用Python UDF</h1><p>那么定义完UDF我们应该怎样使用呢？Apache Flink 1.10中提供了2种Decorators，如下：</p>
+<ul>
+<li>Decorators - udf(), e.g. :</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">udf(lambda i, j: (hash(i) + hash(j)) / 2,</span><br><span class="line">      [for input types], [for result types])</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Decorators - @udf,  e.g. :</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">@udf(input_types=..., result_type=...) </span><br><span class="line">     def hash_code_mean(…):</span><br><span class="line">               return …</span><br></pre></td></tr></table></figure>
+
+<p>然后在使用之前进行注册，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">st_env.register_function(&quot;hash_code&quot;, hash_code_mean)</span><br></pre></td></tr></table></figure>
+
+<p>接下来就可以在Table API/SQL中进行使用了，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">my_table.select(&quot;hash_code_mean(a, b)&quot;).insert_into(&quot;Results&quot;)</span><br></pre></td></tr></table></figure>
+
+<p>目前为止，我们已经完成了Python UDF的定义，声明和注册了。接下来我们还是看一个完整的势力吧：）</p>
+<h1 id="案例描述"><a href="#案例描述" class="headerlink" title="案例描述"></a>案例描述</h1><ul>
+<li>需求：<br>  假设 苹果 公司要统计该公司产品在双11期间各城市的销售数量和销售金额分布情况。</li>
+<li>数据格式<br>每一笔订单是一个字符串，字段用逗号分隔, 例如:</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ItemName, OrderCount, Price, City</span><br><span class="line">-------------------------------------------</span><br><span class="line">iPhone 11, 30, 5499, Beijing\n</span><br><span class="line">iPhone 11 Pro,20,8699,Guangzhou\n</span><br></pre></td></tr></table></figure>
+
+<h1 id="案例分析"><a href="#案例分析" class="headerlink" title="案例分析"></a>案例分析</h1><p>根据案例的需求和数据结构分析，我们需要对原始字符串进行结构化解析，那么需要一个按“，”号分隔的UDF(split)和一个能够将各个列信息展平的DUF(get)。同时我们需要根据城市进行分组统计。</p>
+<h1 id="核心实现"><a href="#核心实现" class="headerlink" title="核心实现"></a>核心实现</h1><h2 id="UDF定义"><a href="#UDF定义" class="headerlink" title="UDF定义"></a>UDF定义</h2><ul>
+<li>Split UDF</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@udf(input_types=[DataTypes.STRING()],</span><br><span class="line">           result_type=DataTypes.ARRAY(DataTypes.STRING()))</span><br><span class="line">  def split(line):</span><br><span class="line">       return line.split(&quot;,&quot;)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Get UDF</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">@udf(input_types=[DataTypes.ARRAY(DataTypes.STRING()), DataTypes.INT()], result_type=DataTypes.STRING())</span><br><span class="line">def get(array, index):</span><br><span class="line">       return array[index]</span><br></pre></td></tr></table></figure>
+
+<h2 id="注册UDF"><a href="#注册UDF" class="headerlink" title="注册UDF"></a>注册UDF</h2><ul>
+<li><p>注册 Split UDF</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">t_env.register_function(&quot;split&quot;, split)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>注册 Get UDF</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">t_env.register_function(&quot;get&quot;, get)</span><br></pre></td></tr></table></figure>
+
+<h2 id="核心实现逻辑"><a href="#核心实现逻辑" class="headerlink" title="核心实现逻辑"></a>核心实现逻辑</h2><p>如下代码我们发现核心实现逻辑非常简单，只需要对数据进行解析和对数据进行集合计算：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">t_env.from_table_source(SocketTableSource(port=9999))\        .alias(&quot;line&quot;)\        .select(&quot;split(line) as str_array&quot;)\        .select(&quot;get(str_array, 3) as city, &quot;                     &quot;get(str_array, 1).cast(LONG) as count, &quot;                     &quot;get(str_array, 2).cast(LONG) as unit_price&quot;)\        .select(&quot;city, count, count * unit_price as total_price&quot;)\       </span><br><span class="line">        .group_by(&quot;city&quot;)\        .select(&quot;city, sum(count) as sales_volume, sum(total_price)   </span><br><span class="line">         as sales&quot;)\</span><br><span class="line">       .insert_into(&quot;sink&quot;)</span><br><span class="line">t_env.execute(&quot;Sales Statistic&quot;)</span><br></pre></td></tr></table></figure>
+
+<p>上面的代码我们假设是一个Socket的Source，Sink是一个Chart Sink，那么最终运行效果图，如下：<br><img src="/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/15754465271079.jpg" alt="-w1087"></p>
+<p>我总是认为在博客中只是文本描述而不能让读者真正的在自己的机器上运行起来的博客，不是好博客，所以接下来我们看看按照我们下面的操作，是否能在你的机器上也运行起来？ :)</p>
+<h1 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h1><p>因为目前PyFlink已经部署到PyPI上面了，安装PyFlink只需要使用如下命令：</p>
+<ol>
+<li><p>检查Python版本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ python --version</span><br><span class="line"># the version printed here must be 3.5+</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装PyFlink</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ python -m pip install apache-flink==1.10.0</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>检查核心包<br>我们核心需要apache-beam和apache-flink，如下命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ pip list</span><br><span class="line">Package                       Version  </span><br><span class="line">----------------------------- ---------</span><br><span class="line">alabaster                     0.7.12   </span><br><span class="line">apache-beam                   2.15.0   </span><br><span class="line">apache-flink                  1.10.0</span><br><span class="line">atomicwrites                  1.3.0</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p>如上信息证明你我们所需的Python依赖已经okay了，接下来回过头来在看看如何进行业务需求的开发。</p>
+<h1 id="PyFlinlk的Job结构"><a href="#PyFlinlk的Job结构" class="headerlink" title="PyFlinlk的Job结构"></a>PyFlinlk的Job结构</h1><p><img src="/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/15755160471733.jpg" alt><br>一个完成的PyFlink的Job需要有外部数据源的定义，有业务逻辑的定义和最终计算结果输出的定义。也就是 Source connector， Transformations， Sink connector，接下来我们根据这个三个部分进行介绍来完成我们的需求。</p>
+<h1 id="Source-Connector"><a href="#Source-Connector" class="headerlink" title="Source Connector"></a>Source Connector</h1><p>我们需要实现一个Socket Connector，首先要实现一个<code>StreamTableSource</code>, 核心代码是实现<code>getDataStream</code>,代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">	public DataStream&lt;Row&gt; getDataStream(StreamExecutionEnvironment env) &#123;</span><br><span class="line">		return env.socketTextStream(hostname, port, lineDelimiter, MAX_RETRY)</span><br><span class="line">			.flatMap(new Spliter(fieldNames.length, fieldDelimiter, appendProctime))</span><br><span class="line">			.returns(getReturnType());</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面代码利用了<code>StreamExecutionEnvironment</code>中现有<code>socketTextStream</code>方法接收数据，然后将业务订单数据传个一个<code>FlatMapFunction</code>, <code>FlatMapFunction</code>主要实现将数据类型封装为 <code>Row</code>,详细代码查阅 <a href="https://github.com/sunjincheng121/enjoyment.code/blob/master/PyUDFDemoConnector/src/main/java/org/apache/flink/python/connector/SocketTableSource.java" target="_blank" rel="noopener">Spliter</a></p>
+<p>同时，我们还需要在Python封装一个<code>SocketTableSource</code>,详情查阅 <a href="https://github.com/sunjincheng121/enjoyment.code/blob/master/PyUDFDemoConnector/pyflink/demo/socket_table_source.py" target="_blank" rel="noopener">socket_table_source.py</a></p>
+<h1 id="Sink-Connector"><a href="#Sink-Connector" class="headerlink" title="Sink Connector"></a>Sink Connector</h1><p>我们预期要得到的一个效果是能够将结果数据进行图形化展示，简单的思路是将数据写到一个本地的文件，然后在写一个HTML页面，使其能够自动更新结果文件，并展示结果。所以我们还需要自定义一个Sink来完成该功能，我们的需求计算结果是会不断的更新的，也就是涉及到Retraction（如果大家不理解这个概念，可以查阅我以前的博客），目前在Flink里面还没有默认支持Retract的Sink，所以我们需要自定义一个RetractSink,比如我们实现一下<code>CsvRetractTableSink</code>. <code>CsvRetractTableSink</code>的核心逻辑是缓冲计算结果，每次更新进行一次<strong>全量</strong>（这是个纯demo，不能用于生产环境）文件输出。源代码查阅<a href="https://github.com/sunjincheng121/enjoyment.code/blob/master/PyUDFDemoConnector/src/main/java/org/apache/flink/python/connector/CsvRetractTableSink.java" target="_blank" rel="noopener">CsvRetractTableSink</a>。</p>
+<p>同时我们还需要利用Python进行封装，详见 <a href="https://github.com/sunjincheng121/enjoyment.code/blob/master/PyUDFDemoConnector/pyflink/demo/chart_table_sink.py" target="_blank" rel="noopener">chart_table_sink.py</a></p>
+<p>在<code>chart_table_sink.py</code>我们封装了一个http server，这样我们可以在浏览器中查阅我们的统计结果。</p>
+<h1 id="业务逻辑"><a href="#业务逻辑" class="headerlink" title="业务逻辑"></a>业务逻辑</h1><p>完成自定义的 Source 和 Sink之后我们终于可以进行业务逻辑的开发了，其实整个过程自定义 Source和Sink是最麻烦的，核心计算逻辑似乎要简单的多。</p>
+<ul>
+<li>设置Python版本（很重要）<br>如果你本地环境 <code>python</code> 命令版本是2.x，那么需要对Python版本进行设置，如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">t_env.get_config().set_python_executable(&quot;python3&quot;)</span><br></pre></td></tr></table></figure>
+
+<p><strong>PyFlink 1.10之后支持Python3.6+版本。</strong></p>
+<ul>
+<li>读取数据源<br>PyFlink读取数据源非常简单，如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">...</span><br><span class="line">t_env.from_table_source(SocketTableSource(port=9999)).alias(&quot;line&quot;)</span><br></pre></td></tr></table></figure>
+
+<p>上面这一行代码定义了监听端口 9999 的数据源，同时结构化Table只有一个名为<code>line</code>的列。</p>
+<ul>
+<li>解析原始数据<br>我们需要对上面列进行分析，为了演示 Python UDF，我们在<code>SocketTableSource</code>中并没有对数据进行预处理，所以我们利用上面 <strong>UDF定义</strong> 一节定义的UDF，来对原始数据进行预处理。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">...</span><br><span class="line">.select(&quot;split(line) as str_array&quot;)        </span><br><span class="line">.select(&quot;get(str_array, 3) as city, &quot; &quot;get(str_array, 1).cast(LONG) as count, &quot; &quot;get(str_array, 2).cast(LONG) as unit_price&quot;)        </span><br><span class="line">.select(&quot;city, count, count * unit_price as total_price&quot;)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>统计分析<br>核心的统计逻辑是根据 <code>city</code> 进行分组，然后对 销售数量和销售金额进行求和，如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">...</span><br><span class="line">.group_by(&quot;city&quot;)</span><br><span class="line">.select(&quot;city, sum(count) as sales_volume, sum(total_price)   </span><br><span class="line">         as sales&quot;)\</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>计算结果输出<br>计算结果写入到我们自定义的Sink中，如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">...</span><br><span class="line">.insert_into(&quot;sink&quot;)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>完整的代码（<a href="https://github.com/sunjincheng121/enjoyment.code/blob/master/myPyFlink/enjoyment/udf/blog_demo.py" target="_blank" rel="noopener">blog_demo.py</a>）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">from pyflink.datastream import StreamExecutionEnvironment</span><br><span class="line">from pyflink.demo import ChartConnector, SocketTableSource</span><br><span class="line">from pyflink.table import StreamTableEnvironment, EnvironmentSettings, DataTypes</span><br><span class="line">from pyflink.table.descriptors import Schema</span><br><span class="line">from pyflink.table.udf import udf</span><br><span class="line"></span><br><span class="line">env = StreamExecutionEnvironment.get_execution_environment()</span><br><span class="line">t_env = StreamTableEnvironment.create(</span><br><span class="line">    env,</span><br><span class="line">    environment_settings=EnvironmentSettings.new_instance().use_blink_planner().build())</span><br><span class="line">t_env.connect(ChartConnector())\</span><br><span class="line">    .with_schema(Schema()</span><br><span class="line">                 .field(&quot;city&quot;, DataTypes.STRING())</span><br><span class="line">                 .field(&quot;sales_volume&quot;, DataTypes.BIGINT())</span><br><span class="line">                 .field(&quot;sales&quot;, DataTypes.BIGINT()))\</span><br><span class="line">    .register_table_sink(&quot;sink&quot;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@udf(input_types=[DataTypes.STRING()],</span><br><span class="line">     result_type=DataTypes.ARRAY(DataTypes.STRING()))</span><br><span class="line">def split(line):</span><br><span class="line">    return line.split(&quot;,&quot;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@udf(input_types=[DataTypes.ARRAY(DataTypes.STRING()), DataTypes.INT()],</span><br><span class="line">     result_type=DataTypes.STRING())</span><br><span class="line">def get(array, index):</span><br><span class="line">    return array[index]</span><br><span class="line"></span><br><span class="line">t_env.get_config().set_python_executable(&quot;python3&quot;)</span><br><span class="line"></span><br><span class="line">t_env.register_function(&quot;split&quot;, split)</span><br><span class="line">t_env.register_function(&quot;get&quot;, get)</span><br><span class="line">t_env.from_table_source(SocketTableSource(port=6666))\</span><br><span class="line">    .alias(&quot;line&quot;)\</span><br><span class="line">    .select(&quot;split(line) as str_array&quot;)\</span><br><span class="line">    .select(&quot;get(str_array, 3) as city, &quot;</span><br><span class="line">            &quot;get(str_array, 1).cast(LONG) as count, &quot;</span><br><span class="line">            &quot;get(str_array, 2).cast(LONG) as unit_price&quot;)\</span><br><span class="line">    .select(&quot;city, count, count * unit_price as total_price&quot;)\</span><br><span class="line">    .group_by(&quot;city&quot;)\</span><br><span class="line">    .select(&quot;city, &quot;</span><br><span class="line">            &quot;sum(count) as sales_volume, &quot;</span><br><span class="line">            &quot;sum(total_price) as sales&quot;)\</span><br><span class="line">    .insert_into(&quot;sink&quot;)</span><br><span class="line"></span><br><span class="line">t_env.execute(&quot;Sales Statistic&quot;)</span><br></pre></td></tr></table></figure>
+
+<p>上面代码中大家会发现一个陌生的部分，就是 <code>from pyflink.demo import ChartConnector, SocketTableSource</code>. 其中 pyflink.demo是哪里来的呢？其实就是包含了上面我们介绍的 自定义Source/Sink（Java&amp;Python)。 下面我们来介绍如何增加这个 <code>pyflink.demo</code>模块。</p>
+<h1 id="安装-pyflink-demo"><a href="#安装-pyflink-demo" class="headerlink" title="安装 pyflink.demo"></a>安装 pyflink.demo</h1><p>为了大家方便我把自定义Source/Sink（Java&amp;Python)的源代码放到了 这里 ，大家可以进行如下操作：</p>
+<ul>
+<li>下载源码</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/sunjincheng121/enjoyment.code.git</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>编译源码</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd enjoyment.code/PyUDFDemoConnector/; mvn clean install</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>构建发布包</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">python3 setup.py sdist bdist_wheel</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">adding &apos;pyflink_demo_connector-0.1.dist-info/WHEEL&apos;</span><br><span class="line">adding &apos;pyflink_demo_connector-0.1.dist-info/top_level.txt&apos;</span><br><span class="line">adding &apos;pyflink_demo_connector-0.1.dist-info/RECORD&apos;</span><br><span class="line">removing build/bdist.macosx-10.14-x86_64/wheel</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>安装Pyflink.demo</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">pip3 install dist/pyflink-demo-connector-0.1.tar.gz</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">Successfully built pyflink-demo-connector</span><br><span class="line">Installing collected packages: pyflink-demo-connector</span><br><span class="line">Successfully installed pyflink-demo-connector-0.1</span><br></pre></td></tr></table></figure>
+
+<p>出现上面信息证明已经将<code>PyFlink.demo</code>模块成功安装。接下来我们可以运行我们的示例了 :)</p>
+<h1 id="运行示例"><a href="#运行示例" class="headerlink" title="运行示例"></a>运行示例</h1><p>示例的代码在上面下载的源代码里面已经包含了，为了简单，我们利用PyCharm打开<code>enjoyment.code/myPyFlink</code>。 同时在Terminal 启动一个端口：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nc -l 6666</span><br></pre></td></tr></table></figure>
+
+<p>启动blog_demo,如果一切顺利，启动之后，控制台会输出一个web地址，如下所示：<br><img src="/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/15755370489596.jpg" alt><br>我们打开这个页面，开始是一个空白页面，如下：<br><img src="/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/15755371347855.jpg" alt></p>
+<p>我们尝试将下面的数据，一条，一条的发送给Source Connector：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">iPhone 11,30,5499,Beijing</span><br><span class="line">iPhone 11 Pro,20,8699,Guangzhou</span><br><span class="line">MacBook Pro,10,9999,Beijing</span><br><span class="line">AirPods Pro,50,1999,Beijing</span><br><span class="line">MacBook Pro,10,11499,Shanghai</span><br><span class="line">iPhone 11,30,5999,Shanghai</span><br><span class="line">iPhone 11 Pro,20,9999,Shenzhen</span><br><span class="line">MacBook Pro,10,13899,Hangzhou</span><br><span class="line">iPhone 11,10,6799,Beijing</span><br><span class="line">MacBook Pro,10,18999,Beijing</span><br><span class="line">iPhone 11 Pro,10,11799,Shenzhen</span><br><span class="line">MacBook Pro,10,22199,Shanghai</span><br><span class="line">AirPods Pro,40,1999,Shanghai</span><br></pre></td></tr></table></figure>
+
+<p>当输入第一条订单 <code>iPhone 11,30,5499,Beijing</code>,之后，页面变化如下：<br><img src="/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/15755372413329.jpg" alt></p>
+<p>随之订单数据的不断输入，统计图不断变化。一个完整的gif演示如下：</p>
+<p><img src="/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/show.gif" alt></p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本篇从架构到UDF接口定义，在到具体的实例，向大家介绍了在Apache Flink 1.10 发布之后，如何利用PyFlink进行业务开发，其中 用户自定义 Source和Sink部分比较复杂，这也是目前社区需要进行改进的部分(Java/Scala)。真正的核心逻辑部分其实比较简单，为了大家按照本篇进行实战操作有些成就感，所以我增加了自定义Source/Sink和图形化部分。但如果大家想简化实例的实现也可以利用Kafka作为Source和Sink，这样就可以省去自定义的部分，做起来也会简单一些。 同时该篇的 <strong>开篇说道</strong> 部分重点分享了老子 “利他” 的思想，希望我们大家共勉，做一个有助于他人的人。谢谢大家！</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        
+          
+        
+        <div class="post-tags">
+          
+            <a href="/archives/Flink/" rel="tag"># Flink</a>
+          
+            <a href="/archives/道德经/" rel="tag"># 道德经</a>
+          
+            <a href="/archives/PyFlink/" rel="tag"># PyFlink</a>
+          
+            <a href="/archives/外其身而身存/" rel="tag"># 外其身而身存</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/09/Apache Flink 说道系列- Python API 中如何使用 Java 自定义 Connector (上)/" rel="next" title="Apache Flink 说道系列- Python API 中如何使用 Java 自定义 Connector (上)">
+                <i class="fa fa-chevron-left"></i> Apache Flink 说道系列- Python API 中如何使用 Java 自定义 Connector (上)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/01/02/Apache-Flink-说道系列-PyFlink-作业的多种部署模式/" rel="prev" title="Apache Flink 说道系列 - PyFlink 作业的多种部署模式">
+                Apache Flink 说道系列 - PyFlink 作业的多种部署模式 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="Jincheng Sun">
+            
+              <p class="site-author-name" itemprop="name">Jincheng Sun</p>
+              <div class="site-description motion-element" itemprop="description">Apache Flink</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">36</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">30</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/sunjincheng121/enjoyment" title="GitHub &rarr; https://github.com/sunjincheng121/enjoyment" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/sunjincheng121" title="Twitter &rarr; https://twitter.com/sunjincheng121" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#开篇说道"><span class="nav-number">1.</span> <span class="nav-text">开篇说道</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#这篇博客的意义"><span class="nav-number">2.</span> <span class="nav-text">这篇博客的意义</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Python-UDF的发展趋势"><span class="nav-number">3.</span> <span class="nav-text">Python UDF的发展趋势</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Flink-on-Beam"><span class="nav-number">4.</span> <span class="nav-text">Flink on Beam</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#如何定义Python-UDF"><span class="nav-number">5.</span> <span class="nav-text">如何定义Python UDF</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#如何使用Python-UDF"><span class="nav-number">6.</span> <span class="nav-text">如何使用Python UDF</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#案例描述"><span class="nav-number">7.</span> <span class="nav-text">案例描述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#案例分析"><span class="nav-number">8.</span> <span class="nav-text">案例分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#核心实现"><span class="nav-number">9.</span> <span class="nav-text">核心实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#UDF定义"><span class="nav-number">9.1.</span> <span class="nav-text">UDF定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注册UDF"><span class="nav-number">9.2.</span> <span class="nav-text">注册UDF</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#核心实现逻辑"><span class="nav-number">9.3.</span> <span class="nav-text">核心实现逻辑</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#环境"><span class="nav-number">10.</span> <span class="nav-text">环境</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PyFlinlk的Job结构"><span class="nav-number">11.</span> <span class="nav-text">PyFlinlk的Job结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Source-Connector"><span class="nav-number">12.</span> <span class="nav-text">Source Connector</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Sink-Connector"><span class="nav-number">13.</span> <span class="nav-text">Sink Connector</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#业务逻辑"><span class="nav-number">14.</span> <span class="nav-text">业务逻辑</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装-pyflink-demo"><span class="nav-number">15.</span> <span class="nav-text">安装 pyflink.demo</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#运行示例"><span class="nav-number">16.</span> <span class="nav-text">运行示例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">17.</span> <span class="nav-text">小结</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jincheng Sun</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.2.0</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="Total Visitors">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="Total Views">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.2.0"></script>
+
+  <script src="/js/motion.js?v=7.2.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.2.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.2.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.2.0"></script>
+<script src="/js/post-details.js?v=7.2.0"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.2.0"></script>
+
+
+  
+
+  
+
+  
+
+  
+  
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://http-enjoyment-cool.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+
+
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://enjoyment.cool/2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/";
+    this.page.identifier = "2019/12/05/Apache-Flink-说道系列-如何在PyFlink-1-10中自定义Python-UDF/";
+    this.page.title = 'Apache Flink 说道系列 - 如何在PyFlink 1.10中自定义Python UDF';
+    };
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://http-enjoyment-cool.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+  
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('3');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

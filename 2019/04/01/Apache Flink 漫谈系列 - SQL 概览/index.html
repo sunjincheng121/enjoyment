@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+<link rel="stylesheet" href="/css/main.css?v=7.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/me.png?v=7.2.0">
+
+
+  <link rel="mask-icon" href="/images/me.png?v=7.2.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.2.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":5},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Apache Flink SQL 概览本篇核心目标是让大家概要了解一个完整的Apache Flink SQL Job的组成部分，以及Apache Flink SQL所提供的核心算子的语义，最后会应用Tumble Window编写一个End-to-End的页面访问的统计示例。 Apache Flink SQL Job的组成我们做任何数据计算都离不开读取原始数据，计算逻辑和写入计算结果数据三部分，当然">
+<meta name="keywords" content="Flink">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Apache Flink 漫谈系列 - SQL 概览">
+<meta property="og:url" content="http://enjoyment.cool/2019/04/01/Apache Flink 漫谈系列 - SQL 概览/index.html">
+<meta property="og:site_name" content="Pretty Cool Enjoyment">
+<meta property="og:description" content="Apache Flink SQL 概览本篇核心目标是让大家概要了解一个完整的Apache Flink SQL Job的组成部分，以及Apache Flink SQL所提供的核心算子的语义，最后会应用Tumble Window编写一个End-to-End的页面访问的统计示例。 Apache Flink SQL Job的组成我们做任何数据计算都离不开读取原始数据，计算逻辑和写入计算结果数据三部分，当然">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://enjoyment.cool/2019/04/01/Apache%20Flink%20漫谈系列%20-%20SQL%20概览/E18BAB16-4094-48B3-92E5-D45EA18A62C1.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/04/01/Apache%20Flink%20漫谈系列%20-%20SQL%20概览/59761691-219B-47D5-8DC8-FC1D9C3E949E.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/04/01/Apache%20Flink%20漫谈系列%20-%20SQL%20概览/391D7615-63C5-4A18-85BA-540730B6B5E2.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/04/01/Apache%20Flink%20漫谈系列%20-%20SQL%20概览/9F6085AD-4792-4A30-9503-82DF82540304.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/04/01/Apache%20Flink%20漫谈系列%20-%20SQL%20概览/E3CA71CA-8B44-4802-8165-53684A152503.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/04/01/Apache%20Flink%20漫谈系列%20-%20SQL%20概览/1D8D2D78-5454-4919-A7C3-48B2338BDC78.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/04/01/Apache%20Flink%20漫谈系列%20-%20SQL%20概览/CD7B2F3B-5802-417F-AD05-BC4BBF4E9B69.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/04/01/Apache%20Flink%20漫谈系列%20-%20SQL%20概览/16080D31-EB87-48F9-A32E-A992CC6DCEAC.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/04/01/Apache%20Flink%20漫谈系列%20-%20SQL%20概览/05A64357-27DF-4714-BDDB-B390B7A0814A.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/04/01/Apache%20Flink%20漫谈系列%20-%20SQL%20概览/051876D7-5A89-4134-8ED0-E6939FC3F412.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/04/01/Apache%20Flink%20漫谈系列%20-%20SQL%20概览/95F7D755-E087-4808-83F7-2A20CA5C685F.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/04/01/Apache%20Flink%20漫谈系列%20-%20SQL%20概览/26FE2626-FDA4-4474-9B25-5505FEF5FB37.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/04/01/Apache%20Flink%20漫谈系列%20-%20SQL%20概览/AE17D459-66B1-4946-A962-BFC3B9438E79.png">
+<meta property="og:image" content="http://enjoyment.cool/2019/04/01/Apache%20Flink%20漫谈系列%20-%20SQL%20概览/5636227F-29BE-4A3D-A1CD-A0F4EFB35E75.png">
+<meta property="og:updated_time" content="2019-07-13T13:09:44.190Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Apache Flink 漫谈系列 - SQL 概览">
+<meta name="twitter:description" content="Apache Flink SQL 概览本篇核心目标是让大家概要了解一个完整的Apache Flink SQL Job的组成部分，以及Apache Flink SQL所提供的核心算子的语义，最后会应用Tumble Window编写一个End-to-End的页面访问的统计示例。 Apache Flink SQL Job的组成我们做任何数据计算都离不开读取原始数据，计算逻辑和写入计算结果数据三部分，当然">
+<meta name="twitter:image" content="http://enjoyment.cool/2019/04/01/Apache%20Flink%20漫谈系列%20-%20SQL%20概览/E18BAB16-4094-48B3-92E5-D45EA18A62C1.png">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://enjoyment.cool/2019/04/01/Apache Flink 漫谈系列 - SQL 概览/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Apache Flink 漫谈系列 - SQL 概览 | Pretty Cool Enjoyment</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Pretty Cool Enjoyment</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">Apache Flink</h1>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-catalog">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/catalog/" rel="section"><i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Catalog</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+  
+  
+
+  
+
+  <a href="https://github.com/sunjincheng121" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://enjoyment.cool/2019/04/01/Apache Flink 漫谈系列 - SQL 概览/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jincheng Sun">
+      <meta itemprop="description" content="Apache Flink">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Pretty Cool Enjoyment">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">Apache Flink 漫谈系列 - SQL 概览
+
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+
+          
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-04-01 18:18:18" itemprop="dateCreated datePublished" datetime="2019-04-01T18:18:18+08:00">2019-04-01</time>
+            </span>
+          
+
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-07-13 21:09:44" itemprop="dateModified" datetime="2019-07-13T21:09:44+08:00">2019-07-13</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/archives/Apache-Flink-漫谈/" itemprop="url" rel="index"><span itemprop="name">Apache Flink 漫谈</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+              
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">Comments: </span>
+                <a href="/2019/04/01/Apache Flink 漫谈系列 - SQL 概览/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/04/01/Apache Flink 漫谈系列 - SQL 概览/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+                 Views:  
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          
+
+          <br>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Apache-Flink-SQL-概览"><a href="#Apache-Flink-SQL-概览" class="headerlink" title="Apache Flink SQL 概览"></a>Apache Flink SQL 概览</h1><p>本篇核心目标是让大家概要了解一个完整的Apache Flink SQL Job的组成部分，以及Apache Flink SQL所提供的核心算子的语义，最后会应用Tumble Window编写一个End-to-End的页面访问的统计示例。</p>
+<h1 id="Apache-Flink-SQL-Job的组成"><a href="#Apache-Flink-SQL-Job的组成" class="headerlink" title="Apache Flink SQL Job的组成"></a>Apache Flink SQL Job的组成</h1><p>我们做任何数据计算都离不开读取原始数据，计算逻辑和写入计算结果数据三部分，当然基于Apache Flink SQL编写的计算Job也离不开这个三部分，如下所所示：<br><img src="/2019/04/01/Apache Flink 漫谈系列 - SQL 概览/E18BAB16-4094-48B3-92E5-D45EA18A62C1.png" alt><br>如上所示，一个完整的Apache Flink SQL Job 由如下三部分：</p>
+<ul>
+<li><p>Source Operator - Soruce operator是对外部数据源的抽象, 目前Apache Flink内置了很多常用的数据源实现，比如上图提到的Kafka。</p>
+</li>
+<li><p>Query Operators - 查询算子主要完成如图的Query Logic，目前支持了Union，Join，Projection,Difference, Intersection以及window等大多数传统数据库支持的操作。</p>
+</li>
+<li><p>Sink Operator - Sink operator 是对外结果表的抽象，目前Apache Flink也内置了很多常用的结果表的抽象，比如上图提到的Kafka。</p>
+</li>
+</ul>
+<h1 id="Apache-Flink-SQL-核心算子"><a href="#Apache-Flink-SQL-核心算子" class="headerlink" title="Apache Flink SQL 核心算子"></a>Apache Flink SQL 核心算子</h1><p>SQL是Structured Quevy Language的缩写，最初是由美国计算机科学家<a href="https://en.wikipedia.org/wiki/Donald_D._Chamberlin#/media/File:Don_Chamberlin.jpg" target="_blank" rel="noopener">Donald D. Chamberlin</a>和Raymond F. Boyce在20世纪70年代早期从 <a href="https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6359709" target="_blank" rel="noopener">Early History of SQL</a> 中了解关系模型后在IBM开发的。该版本最初称为[SEQUEL: A Structured English Query Language]（结构化英语查询语言），旨在操纵和检索存储在IBM原始准关系数据库管理系统System R中的数据。SEQUEL后来改为SQL，因为“SEQUEL”是英国Hawker Siddeley飞机公司的商标。我们看一款用于特技飞行的英国皇家空军豪客Siddeley Hawk T.1A (Looks great):</p>
+<p><img src="/2019/04/01/Apache Flink 漫谈系列 - SQL 概览/59761691-219B-47D5-8DC8-FC1D9C3E949E.png" alt></p>
+<p>在20世纪70年代后期，Oracle公司(当时叫 Relational Software，Inc.)开发了基于SQL的RDBMS，并希望将其出售给美国海军，Central Intelligence代理商和其他美国政府机构。 1979年6月，Oracle 公司为VAX计算机推出了第一个商业化的SQL实现，即Oracle V2。直到1986年，ANSI和ISO标准组正式采用了标准的”数据库语言SQL”语言定义。Apache Flink SQL 核心算子的语义设计也参考了<a href="http://www.contrib.andrew.cmu.edu/~shadow/sql/sql1992.txt" target="_blank" rel="noopener">1992</a> 、<a href="http://cs.ulb.ac.be/public/_media/teaching/infoh415/tempfeaturessql2011.pdf" target="_blank" rel="noopener">2011</a>等ANSI-SQL标准。接下来我们将简单为大家介绍Apache Flink SQL 每一个算子的语义。</p>
+<h2 id="SELECT"><a href="#SELECT" class="headerlink" title="SELECT"></a>SELECT</h2><p>SELECT 用于从数据集/流中选择数据，语法遵循ANSI-SQL标准，语义是关系代数中的投影(Projection),对关系进行垂直分割，消去某些列, 如下图所示:<br><img src="/2019/04/01/Apache Flink 漫谈系列 - SQL 概览/391D7615-63C5-4A18-85BA-540730B6B5E2.png" alt><br>对应的SQL语句如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT ColA, ColC FROME tab ;</span><br></pre></td></tr></table></figure>
+
+<h2 id="WHERE"><a href="#WHERE" class="headerlink" title="WHERE"></a>WHERE</h2><p>WHERE 用于从数据集/流中过滤数据，与SELECT一起使用，语法遵循ANSI-SQL标准，语义是关系代数的Selection，根据某些条件对关系做水平分割，即选择符合条件的记录，如下所示：<br><img src="/2019/04/01/Apache Flink 漫谈系列 - SQL 概览/9F6085AD-4792-4A30-9503-82DF82540304.png" alt><br>对应的SQL语句如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM tab WHERE ColA &lt;&gt; &apos;a2&apos; ;</span><br></pre></td></tr></table></figure>
+
+<h2 id="GROUP-BY"><a href="#GROUP-BY" class="headerlink" title="GROUP BY"></a>GROUP BY</h2><p>GROUP BY 是对数据进行分组的操作，比如我需要分别计算一下一个学生表里面女生和男生的人数分别是多少，如下：<br><img src="/2019/04/01/Apache Flink 漫谈系列 - SQL 概览/E3CA71CA-8B44-4802-8165-53684A152503.png" alt><br>对应的SQL语句如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT sex, COUNT(name) AS count FROM tab GROUP BY sex ;</span><br></pre></td></tr></table></figure>
+
+<h2 id="UNION-ALL"><a href="#UNION-ALL" class="headerlink" title="UNION ALL"></a>UNION ALL</h2><p>UNION ALL 将两个表合并起来，要求两个表的字段完全一致，包括字段类型、字段顺序,语义对应关系代数的Union，只是关系代数是Set集合操作，会有去重复操作，UNION ALL 不进行去重，如下所示：<br><img src="/2019/04/01/Apache Flink 漫谈系列 - SQL 概览/1D8D2D78-5454-4919-A7C3-48B2338BDC78.png" alt><br>对应的SQL语句如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM T1 UNION ALL SELECT * FROM T2</span><br></pre></td></tr></table></figure>
+
+<h2 id="UNION"><a href="#UNION" class="headerlink" title="UNION"></a>UNION</h2><p>UNION 将两个流给合并起来，要求两个流的字段完全一致，包括字段类型、字段顺序，并其UNION 不同于UNION ALL，UNION会对结果数据去重,与关系代数的Union语义一致，如下：<br><img src="/2019/04/01/Apache Flink 漫谈系列 - SQL 概览/CD7B2F3B-5802-417F-AD05-BC4BBF4E9B69.png" alt><br>对应的SQL语句如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM T1 UNION SELECT * FROM T2</span><br></pre></td></tr></table></figure>
+
+<h2 id="JOIN"><a href="#JOIN" class="headerlink" title="JOIN"></a>JOIN</h2><p>JOIN 用于把来自两个表的行联合起来形成一个宽表，Apache Flink支持的JOIN类型：</p>
+<ul>
+<li>JOIN - INNER JOIN</li>
+<li>LEFT JOIN - LEFT OUTER JOIN</li>
+<li>RIGHT JOIN - RIGHT OUTER JOIN  </li>
+<li>FULL JOIN - FULL OUTER JOIN</li>
+</ul>
+<p>JOIN与关系代数的Join语义相同，具体如下：<br><img src="/2019/04/01/Apache Flink 漫谈系列 - SQL 概览/16080D31-EB87-48F9-A32E-A992CC6DCEAC.png" alt></p>
+<p>对应的SQL语句如下(INNER JOIN)：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT ColA, ColB, T2.ColC, ColE FROM TI JOIN T2 ON T1.ColC = T2.ColC ;</span><br></pre></td></tr></table></figure>
+
+<p><code>LEFT JOIN</code>与<code>INNER JOIN</code>的区别是当右表没有与左边相JOIN的数据时候，右边对应的字段补<code>NULL</code>输出，如下：<br><img src="/2019/04/01/Apache Flink 漫谈系列 - SQL 概览/05A64357-27DF-4714-BDDB-B390B7A0814A.png" alt><br>对应的SQL语句如下(INNER JOIN)：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT ColA, ColB, T2.ColC, ColE FROM TI LEFT JOIN T2 ON T1.ColC = T2.ColC ;</span><br></pre></td></tr></table></figure>
+
+<p><strong>说明：</strong> </p>
+<ul>
+<li><p>细心的读者可能发现上面T2.ColC是添加了前缀T2了，这里需要说明一下，当两张表有字段名字一样的时候，我需要指定是从那个表里面投影的。</p>
+</li>
+<li><p><code>RIGHT JOIN</code> 相当于 <code>LEFT JOIN</code> 左右两个表交互一下位置。<code>FULL JOIN</code>相当于 <code>RIGHT JOIN</code> 和 <code>LEFT JOIN</code> 之后进行<code>UNION ALL</code>操作。</p>
+</li>
+</ul>
+<h2 id="Window"><a href="#Window" class="headerlink" title="Window"></a>Window</h2><p>在Apache Flink中有2种类型的Window，一种是OverWindow，即传统数据库的标准开窗，每一个元素都对应一个窗口。一种是GroupWindow，目前在SQL中GroupWindow都是基于时间进行窗口划分的。</p>
+<h3 id="OverWindow"><a href="#OverWindow" class="headerlink" title="OverWindow"></a>OverWindow</h3><p>OVER Window 目前支持由如下三个元素组合的8中类型：</p>
+<ul>
+<li>时间 - Processing Time 和 EventTime</li>
+<li>数据集 - Bounded 和 UnBounded</li>
+<li>划分方式 - ROWS 和 RANGE<br>我们以的Bounded ROWS 和 Bounded RANGE 两种常用类型，想大家介绍Over Window的语义</li>
+</ul>
+<h4 id="Bounded-ROWS-Over-Window"><a href="#Bounded-ROWS-Over-Window" class="headerlink" title="Bounded ROWS Over Window"></a>Bounded ROWS Over Window</h4><p>Bounded ROWS OVER Window 每一行元素都视为新的计算行，即，每一行都是一个新的窗口。</p>
+<h5 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">SELECT </span><br><span class="line">    agg1(col1) OVER(</span><br><span class="line">     [PARTITION BY (value_expression1,..., value_expressionN)] </span><br><span class="line">     ORDER BY timeCol</span><br><span class="line">     ROWS </span><br><span class="line">     BETWEEN (UNBOUNDED | rowCount) PRECEDING AND CURRENT ROW) AS colName, </span><br><span class="line">... </span><br><span class="line">FROM Tab1</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>value_expression - 进行分区的字表达式；</li>
+<li>timeCol - 用于元素排序的时间字段；</li>
+<li>rowCount - 是定义根据当前行开始向前追溯几行元素；</li>
+</ul>
+<h5 id="语义"><a href="#语义" class="headerlink" title="语义"></a>语义</h5><p>我们以3个元素(2 PRECEDING)的窗口为例，如下图:<br><img src="/2019/04/01/Apache Flink 漫谈系列 - SQL 概览/051876D7-5A89-4134-8ED0-E6939FC3F412.png" alt><br>上图所示窗口 user 1 的 w5和w6， user 2的 窗口 w2 和 w3，虽然有元素都是同一时刻到达，但是他们仍然是在不同的窗口，这一点有别于RANGE OVER Window.</p>
+<h4 id="Bounded-RANGE-Over-Window"><a href="#Bounded-RANGE-Over-Window" class="headerlink" title="Bounded RANGE Over Window"></a>Bounded RANGE Over Window</h4><p>Bounded RANGE OVER Window 具有相同时间值的所有元素行视为同一计算行，即，具有相同时间值的所有行都是同一个窗口；</p>
+<h5 id="语法-1"><a href="#语法-1" class="headerlink" title="语法"></a>语法</h5><p>Bounded RANGE OVER Window的语法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">SELECT </span><br><span class="line">    agg1(col1) OVER(</span><br><span class="line">     [PARTITION BY (value_expression1,..., value_expressionN)] </span><br><span class="line">     ORDER BY timeCol</span><br><span class="line">     RANGE </span><br><span class="line">     BETWEEN (UNBOUNDED | timeInterval) PRECEDING AND CURRENT ROW) AS colName, </span><br><span class="line">... </span><br><span class="line">FROM Tab1</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>value_expression - 进行分区的字表达式；</li>
+<li>timeCol - 用于元素排序的时间字段；</li>
+<li>timeInterval - 是定义根据当前行开始向前追溯指定时间的元素行；<h5 id="语义-1"><a href="#语义-1" class="headerlink" title="语义"></a>语义</h5>我们以3秒中数据(INTERVAL ‘2’ SECOND)的窗口为例，如下图：<br><img src="/2019/04/01/Apache Flink 漫谈系列 - SQL 概览/95F7D755-E087-4808-83F7-2A20CA5C685F.png" alt></li>
+</ul>
+<p>注意: 上图所示窗口 user 1 的 w6， user 2的 窗口 w3，元素都是同一时刻到达,他们是在同一个窗口，这一点有别于ROWS OVER Window.</p>
+<h3 id="GroupWindow"><a href="#GroupWindow" class="headerlink" title="GroupWindow"></a>GroupWindow</h3><p>根据窗口数据划分的不同，目前Apache Flink有如下3种Bounded Winodw:</p>
+<ul>
+<li>Tumble - 滚动窗口，窗口数据有固定的大小，窗口数据无叠加；</li>
+<li>Hop - 滑动窗口，窗口数据有固定大小，并且有固定的窗口重建频率，窗口数据有叠加；</li>
+<li>Session - 会话窗口，窗口数据没有固定的大小，根据窗口数据活跃程度划分窗口，窗口数据无叠加；</li>
+</ul>
+<p><strong>说明：</strong> Aapche Flink 还支持UnBounded的 Group Window，也就是全局Window，流上所有数据都在一个窗口里面，语义非常简单，这里不做详细介绍了。</p>
+<p>GroupWindow的语法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">SELECT </span><br><span class="line">    [gk], </span><br><span class="line">    agg1(col1),</span><br><span class="line">     ... </span><br><span class="line">    aggN(colN)</span><br><span class="line">FROM Tab1</span><br><span class="line">GROUP BY [WINDOW(definition)], [gk]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>[WINDOW(definition)] - 在具体窗口语义介绍中介绍。</li>
+</ul>
+<h4 id="Tumble-Window"><a href="#Tumble-Window" class="headerlink" title="Tumble Window"></a>Tumble Window</h4><p>Tumble 滚动窗口有固定size，窗口数据不重叠,具体语义如下：<br><img src="/2019/04/01/Apache Flink 漫谈系列 - SQL 概览/26FE2626-FDA4-4474-9B25-5505FEF5FB37.png" alt><br>假设我们要写一个2分钟大小的Tumble，示例SQL如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SELECT gk, COUNT(*) AS pv </span><br><span class="line">  FROM tab </span><br><span class="line">    GROUP BY TUMBLE(rowtime, INTERVAL &apos;2&apos; MINUTE), gk</span><br></pre></td></tr></table></figure>
+
+<h4 id="Hop-Window"><a href="#Hop-Window" class="headerlink" title="Hop Window"></a>Hop Window</h4><p>Hop 滑动窗口和滚动窗口类似，窗口有固定的size，与滚动窗口不同的是滑动窗口可以通过slide参数控制滑动窗口的新建频率。因此当slide值小于窗口size的值的时候多个滑动窗口会重叠，具体语义如下：<br><img src="/2019/04/01/Apache Flink 漫谈系列 - SQL 概览/AE17D459-66B1-4946-A962-BFC3B9438E79.png" alt><br>假设我们要写一个每5分钟统计近10分钟的页面访问量(PV).</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SELECT gk, COUNT(*) AS pv </span><br><span class="line">  FROM tab </span><br><span class="line">    GROUP BY HOP(rowtime, INTERVAL &apos;5&apos; MINUTE, INTERVAL &apos;10&apos; MINUTE), gk</span><br></pre></td></tr></table></figure>
+
+<h4 id="Session-Window"><a href="#Session-Window" class="headerlink" title="Session Window"></a>Session Window</h4><p>Seeeion 会话窗口 是没有固定大小的窗口，通过session的活跃度分组元素。不同于滚动窗口和滑动窗口，会话窗口不重叠,也没有固定的起止时间。一个会话窗口在一段时间内没有接收到元素时，即当出现非活跃间隙时关闭。一个会话窗口 分配器通过配置session gap来指定非活跃周期的时长,具体语义如下：<br><img src="/2019/04/01/Apache Flink 漫谈系列 - SQL 概览/5636227F-29BE-4A3D-A1CD-A0F4EFB35E75.png" alt></p>
+<p>假设我们要写一个统计连续的两个访问用户之间的访问时间间隔不超过3分钟的的页面访问量(PV).</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SELECT gk, COUNT(*) AS pv  </span><br><span class="line">  FROM pageAccessSession_tab</span><br><span class="line">    GROUP BY SESSION(rowtime, INTERVAL &apos;3&apos; MINUTE), gk</span><br></pre></td></tr></table></figure>
+
+<p><strong>说明:</strong> 很多场景用户需要获得Window的开始和结束时间，上面的GroupWindow的SQL示例中没有体现，那么窗口的开始和结束时间应该怎样获取呢? Apache Flink 我们提供了如下辅助函数：</p>
+<ul>
+<li>TUMBLE_START/TUMBLE_END</li>
+<li>HOP_START/HOP_END</li>
+<li>SESSION_START/SESSION_END</li>
+</ul>
+<p>这些辅助函数如何使用，请参考如下完整示例的使用方式。</p>
+<h1 id="完整的-SQL-Job-案例"><a href="#完整的-SQL-Job-案例" class="headerlink" title="完整的 SQL Job 案例"></a>完整的 SQL Job 案例</h1><p>上面我们介绍了Apache Flink SQL核心算子的语法及语义，这部分将选取Bounded EventTime Tumble Window为例为大家编写一个完整的包括Source和Sink定义的Apache Flink SQL Job。假设有一张淘宝页面访问表(PageAccess_tab)，有地域，用户ID和访问时间。我们需要按不同地域统计每2分钟的淘宝首页的访问量(PV). 具体数据如下：</p>
+<table>
+<thead>
+<tr>
+<th>region</th>
+<th>userId</th>
+<th>accessTime</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ShangHai</td>
+<td>U0010</td>
+<td>2017-11-11 10:01:00</td>
+</tr>
+<tr>
+<td>BeiJing</td>
+<td>U1001</td>
+<td>2017-11-11 10:01:00</td>
+</tr>
+<tr>
+<td>BeiJing</td>
+<td>U2032</td>
+<td>2017-11-11 10:10:00</td>
+</tr>
+<tr>
+<td>BeiJing</td>
+<td>U1100</td>
+<td>2017-11-11 10:11:00</td>
+</tr>
+<tr>
+<td>ShangHai</td>
+<td>U0011</td>
+<td>2017-11-11 12:10:00</td>
+</tr>
+</tbody></table>
+<h2 id="Source-定义"><a href="#Source-定义" class="headerlink" title="Source 定义"></a>Source 定义</h2><p>自定义Apache Flink Stream Source需要实现<code>StreamTableSource</code>, <code>StreamTableSource</code>中通过<code>StreamExecutionEnvironment</code> 的<code>addSource</code>方法获取<code>DataStream</code>, 所以我们需要自定义一个 <code>SourceFunction</code>, 并且要支持产生WaterMark，也就是要实现<code>DefinedRowtimeAttributes</code>接口。</p>
+<h3 id="Source-Function定义"><a href="#Source-Function定义" class="headerlink" title="Source Function定义"></a>Source Function定义</h3><p>支持接收携带EventTime的数据集合，Either的数据结构区分WaterMark和元数据:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">class MySourceFunction[T](dataWithTimestampList: Seq[Either[(Long, T), Long]]) </span><br><span class="line">  extends SourceFunction[T] &#123;</span><br><span class="line">  override def run(ctx: SourceContext[T]): Unit = &#123;</span><br><span class="line">    dataWithTimestampList.foreach &#123;</span><br><span class="line">      case Left(t) =&gt; ctx.collectWithTimestamp(t._2, t._1)</span><br><span class="line">      case Right(w) =&gt; ctx.emitWatermark(new Watermark(w))</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  override def cancel(): Unit = ???</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="定义-StreamTableSource"><a href="#定义-StreamTableSource" class="headerlink" title="定义 StreamTableSource"></a>定义 StreamTableSource</h3><p>我们自定义的Source要携带我们测试的数据，已经对应WaterMark数据，具体如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">class MyTableSource extends StreamTableSource[Row] with DefinedRowtimeAttributes &#123;</span><br><span class="line"></span><br><span class="line">  val fieldNames = Array(&quot;accessTime&quot;, &quot;region&quot;, &quot;userId&quot;)</span><br><span class="line">  val schema = new TableSchema(fieldNames, Array(Types.SQL_TIMESTAMP, Types.STRING, Types.STRING))</span><br><span class="line">  val rowType = new RowTypeInfo(</span><br><span class="line">    Array(Types.LONG, Types.STRING, Types.STRING).asInstanceOf[Array[TypeInformation[_]]],</span><br><span class="line">    fieldNames)</span><br><span class="line"></span><br><span class="line">  // 页面访问表数据 rows with timestamps and watermarks</span><br><span class="line">  val data = Seq(</span><br><span class="line">    Left(1510365660000L, Row.of(new JLong(1510365660000L), &quot;ShangHai&quot;, &quot;U0010&quot;)),</span><br><span class="line">    Right(1510365660000L),</span><br><span class="line">    Left(1510365660000L, Row.of(new JLong(1510365660000L), &quot;BeiJing&quot;, &quot;U1001&quot;)),</span><br><span class="line">    Right(1510365660000L),</span><br><span class="line">    Left(1510366200000L, Row.of(new JLong(1510366200000L), &quot;BeiJing&quot;, &quot;U2032&quot;)),</span><br><span class="line">    Right(1510366200000L),</span><br><span class="line">    Left(1510366260000L, Row.of(new JLong(1510366260000L), &quot;BeiJing&quot;, &quot;U1100&quot;)),</span><br><span class="line">    Right(1510366260000L),</span><br><span class="line">    Left(1510373400000L, Row.of(new JLong(1510373400000L), &quot;ShangHai&quot;, &quot;U0011&quot;)),</span><br><span class="line">    Right(1510373400000L)</span><br><span class="line">  )</span><br><span class="line"></span><br><span class="line">  override def getRowtimeAttributeDescriptors: util.List[RowtimeAttributeDescriptor] = &#123;</span><br><span class="line">    Collections.singletonList(new RowtimeAttributeDescriptor(</span><br><span class="line">      &quot;accessTime&quot;,</span><br><span class="line">      new ExistingField(&quot;accessTime&quot;),</span><br><span class="line">      PreserveWatermarks.INSTANCE))</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  override def getDataStream(execEnv: StreamExecutionEnvironment): DataStream[Row] = &#123;</span><br><span class="line">    execEnv.addSource(new MySourceFunction[Row](data)).setParallelism(1).returns(rowType)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  override def getReturnType: TypeInformation[Row] = rowType</span><br><span class="line"></span><br><span class="line">  override def getTableSchema: TableSchema = schema</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="Sink-定义"><a href="#Sink-定义" class="headerlink" title="Sink 定义"></a>Sink 定义</h2><p>我们简单的将计算结果写入到Apache Flink内置支持的CSVSink中，定义Sink如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">def getCsvTableSink: TableSink[Row] = &#123;</span><br><span class="line">    val tempFile = File.createTempFile(&quot;csv_sink_&quot;, &quot;tem&quot;)</span><br><span class="line">    // 打印sink的文件路径，方便我们查看运行结果</span><br><span class="line">    println(&quot;Sink path : &quot; + tempFile)</span><br><span class="line">    if (tempFile.exists()) &#123;</span><br><span class="line">      tempFile.delete()</span><br><span class="line">    &#125;</span><br><span class="line">    new CsvTableSink(tempFile.getAbsolutePath).configure(</span><br><span class="line">      Array[String](&quot;region&quot;, &quot;winStart&quot;, &quot;winEnd&quot;, &quot;pv&quot;),</span><br><span class="line">      Array[TypeInformation[_]](Types.STRING, Types.SQL_TIMESTAMP, Types.SQL_TIMESTAMP, Types.LONG))</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="构建主程序"><a href="#构建主程序" class="headerlink" title="构建主程序"></a>构建主程序</h2><p>主程序包括执行环境的定义，Source/Sink的注册以及统计查SQL的执行，具体如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">def main(args: Array[String]): Unit = &#123;</span><br><span class="line">    // Streaming 环境</span><br><span class="line">    val env = StreamExecutionEnvironment.getExecutionEnvironment</span><br><span class="line">    val tEnv = TableEnvironment.getTableEnvironment(env)</span><br><span class="line"></span><br><span class="line">    // 设置EventTime</span><br><span class="line">    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)</span><br><span class="line"></span><br><span class="line">    //方便我们查出输出数据</span><br><span class="line">    env.setParallelism(1)</span><br><span class="line"></span><br><span class="line">    val sourceTableName = &quot;mySource&quot;</span><br><span class="line">    // 创建自定义source数据结构</span><br><span class="line">    val tableSource = new MyTableSource</span><br><span class="line"></span><br><span class="line">    val sinkTableName = &quot;csvSink&quot;</span><br><span class="line">    // 创建CSV sink 数据结构</span><br><span class="line">    val tableSink = getCsvTableSink</span><br><span class="line"></span><br><span class="line">    // 注册source</span><br><span class="line">    tEnv.registerTableSource(sourceTableName, tableSource)</span><br><span class="line">    // 注册sink</span><br><span class="line">    tEnv.registerTableSink(sinkTableName, tableSink)</span><br><span class="line"></span><br><span class="line">    val sql =</span><br><span class="line">      &quot;SELECT  &quot; +</span><br><span class="line">      &quot;  region, &quot; +</span><br><span class="line">      &quot;  TUMBLE_START(accessTime, INTERVAL &apos;2&apos; MINUTE) AS winStart,&quot; +</span><br><span class="line">      &quot;  TUMBLE_END(accessTime, INTERVAL &apos;2&apos; MINUTE) AS winEnd, COUNT(region) AS pv &quot; +</span><br><span class="line">      &quot; FROM mySource &quot; +</span><br><span class="line">      &quot; GROUP BY TUMBLE(accessTime, INTERVAL &apos;2&apos; MINUTE), region&quot;</span><br><span class="line"></span><br><span class="line">    tEnv.sqlQuery(sql).insertInto(sinkTableName);</span><br><span class="line">    env.execute()</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="执行并查看运行结果"><a href="#执行并查看运行结果" class="headerlink" title="执行并查看运行结果"></a>执行并查看运行结果</h2><p>执行主程序后我们会在控制台得到Sink的文件路径，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Sink path : /var/folders/88/8n406qmx2z73qvrzc_rbtv_r0000gn/T/csv_sink_8025014910735142911tem</span><br></pre></td></tr></table></figure>
+
+<p>Cat 方式查看计算结果，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">jinchengsunjcdeMacBook-Pro:FlinkTableApiDemo jincheng.sunjc$ cat /var/folders/88/8n406qmx2z73qvrzc_rbtv_r0000gn/T/csv_sink_8025014910735142911tem</span><br><span class="line">ShangHai,2017-11-11 02:00:00.0,2017-11-11 02:02:00.0,1</span><br><span class="line">BeiJing,2017-11-11 02:00:00.0,2017-11-11 02:02:00.0,1</span><br><span class="line">BeiJing,2017-11-11 02:10:00.0,2017-11-11 02:12:00.0,2</span><br><span class="line">ShangHai,2017-11-11 04:10:00.0,2017-11-11 04:12:00.0,1</span><br></pre></td></tr></table></figure>
+
+<p>表格化如上结果：</p>
+<table>
+<thead>
+<tr>
+<th>region</th>
+<th>winStart</th>
+<th>winEnd</th>
+<th>pv</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>BeiJing</td>
+<td>2017-11-11 02:00:00.0</td>
+<td>2017-11-11 02:02:00.0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>BeiJing</td>
+<td>2017-11-11 02:10:00.0</td>
+<td>2017-11-11 02:12:00.0</td>
+<td>2</td>
+</tr>
+<tr>
+<td>ShangHai</td>
+<td>2017-11-11 02:00:00.0</td>
+<td>2017-11-11 02:02:00.0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>ShangHai</td>
+<td>2017-11-11 04:10:00.0</td>
+<td>2017-11-11 04:12:00.0</td>
+<td>1</td>
+</tr>
+</tbody></table>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本篇概要的介绍了Apache Flink SQL 的所有核心算子，并以一个End-to-End的示例展示了如何编写Apache Flink SQL的Job. 希望对大家有所帮助.</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        
+          
+        
+        <div class="post-tags">
+          
+            <a href="/archives/Flink/" rel="tag"># Flink</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/26/Apache Flink 漫谈系列 - Table API 概述/" rel="next" title="Apache Flink 漫谈系列 - Table API 概览">
+                <i class="fa fa-chevron-left"></i> Apache Flink 漫谈系列 - Table API 概览
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/07/13/Apache-Flink-说道系列-序/" rel="prev" title="Apache Flink 说道系列 - 序">
+                Apache Flink 说道系列 - 序 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="Jincheng Sun">
+            
+              <p class="site-author-name" itemprop="name">Jincheng Sun</p>
+              <div class="site-description motion-element" itemprop="description">Apache Flink</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">36</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">30</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/sunjincheng121/enjoyment" title="GitHub &rarr; https://github.com/sunjincheng121/enjoyment" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/sunjincheng121" title="Twitter &rarr; https://twitter.com/sunjincheng121" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Apache-Flink-SQL-概览"><span class="nav-number">1.</span> <span class="nav-text">Apache Flink SQL 概览</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Apache-Flink-SQL-Job的组成"><span class="nav-number">2.</span> <span class="nav-text">Apache Flink SQL Job的组成</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Apache-Flink-SQL-核心算子"><span class="nav-number">3.</span> <span class="nav-text">Apache Flink SQL 核心算子</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SELECT"><span class="nav-number">3.1.</span> <span class="nav-text">SELECT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WHERE"><span class="nav-number">3.2.</span> <span class="nav-text">WHERE</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GROUP-BY"><span class="nav-number">3.3.</span> <span class="nav-text">GROUP BY</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UNION-ALL"><span class="nav-number">3.4.</span> <span class="nav-text">UNION ALL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UNION"><span class="nav-number">3.5.</span> <span class="nav-text">UNION</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JOIN"><span class="nav-number">3.6.</span> <span class="nav-text">JOIN</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Window"><span class="nav-number">3.7.</span> <span class="nav-text">Window</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#OverWindow"><span class="nav-number">3.7.1.</span> <span class="nav-text">OverWindow</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Bounded-ROWS-Over-Window"><span class="nav-number">3.7.1.1.</span> <span class="nav-text">Bounded ROWS Over Window</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#语法"><span class="nav-number">3.7.1.1.1.</span> <span class="nav-text">语法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#语义"><span class="nav-number">3.7.1.1.2.</span> <span class="nav-text">语义</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Bounded-RANGE-Over-Window"><span class="nav-number">3.7.1.2.</span> <span class="nav-text">Bounded RANGE Over Window</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#语法-1"><span class="nav-number">3.7.1.2.1.</span> <span class="nav-text">语法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#语义-1"><span class="nav-number">3.7.1.2.2.</span> <span class="nav-text">语义</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GroupWindow"><span class="nav-number">3.7.2.</span> <span class="nav-text">GroupWindow</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Tumble-Window"><span class="nav-number">3.7.2.1.</span> <span class="nav-text">Tumble Window</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Hop-Window"><span class="nav-number">3.7.2.2.</span> <span class="nav-text">Hop Window</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Session-Window"><span class="nav-number">3.7.2.3.</span> <span class="nav-text">Session Window</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#完整的-SQL-Job-案例"><span class="nav-number">4.</span> <span class="nav-text">完整的 SQL Job 案例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Source-定义"><span class="nav-number">4.1.</span> <span class="nav-text">Source 定义</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Source-Function定义"><span class="nav-number">4.1.1.</span> <span class="nav-text">Source Function定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#定义-StreamTableSource"><span class="nav-number">4.1.2.</span> <span class="nav-text">定义 StreamTableSource</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Sink-定义"><span class="nav-number">4.2.</span> <span class="nav-text">Sink 定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#构建主程序"><span class="nav-number">4.3.</span> <span class="nav-text">构建主程序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#执行并查看运行结果"><span class="nav-number">4.4.</span> <span class="nav-text">执行并查看运行结果</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">5.</span> <span class="nav-text">小结</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jincheng Sun</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.2.0</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="Total Visitors">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="Total Views">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.2.0"></script>
+
+  <script src="/js/motion.js?v=7.2.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.2.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.2.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.2.0"></script>
+<script src="/js/post-details.js?v=7.2.0"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.2.0"></script>
+
+
+  
+
+  
+
+  
+
+  
+  
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://http-enjoyment-cool.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+
+
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://enjoyment.cool/2019/04/01/Apache Flink 漫谈系列 - SQL 概览/";
+    this.page.identifier = "2019/04/01/Apache Flink 漫谈系列 - SQL 概览/";
+    this.page.title = 'Apache Flink 漫谈系列 - SQL 概览';
+    };
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://http-enjoyment-cool.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+  
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('3');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
